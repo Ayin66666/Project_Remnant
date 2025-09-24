@@ -1,43 +1,30 @@
-# ========== Unity 기본 무시 항목 ==========
+###############################################
+# 1. 모든 파일 기본적으로 무시
+*
+*.meta
+
+###############################################
+# 2. 예외: Scripts 폴더 내 모든 C# 스크립트만 포함
+
+# 상위 폴더들 무시 해제
+!Assets/
+!Assets/Scripts/
+!Assets/Scripts/**/
+!Assets/Scripts/**/*.cs
+
+###############################################
+# 3. Unity 불필요한 디렉토리 무시 (안 써도 되지만 안정성 ↑)
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
-[Bb]uild/
-[Bb]uilds/
-[Ll]ogs/
-[Mm]emoryCaptures/
+[Bb]uild*/
 UserSettings/
+Logs/
 
-# 에디터 캐시 및 OS 파일
-*.pidb
-*.booproj
-*.svd
-*.pdb
-*.mdb
-*.opendb
-*.VC.db
-.DS_Store
-*.swp
-*.tmp
-
-# Rider, VSCode, VisualStudio 등 IDE 파일
-.vscode/
-.idea/
+###############################################
+# 4. IDE/빌드 시스템 관련 불필요한 파일 무시
 *.csproj
-*.unityproj
 *.sln
-*.suo
-*.tmp
 *.user
-*.userprefs
-
-# ========== 내가 원하는 조건 (C# + JSON만 업로드) ==========
-# Assets 폴더 기본적으로 전부 무시
-Assets/**
-
-# 하지만 .cs, .json 파일은 허용
-!Assets/**/*.cs
-!Assets/**/*.json
-
-# (선택) Assembly Definition은 코드 관리용이라 필요하다면 허용
-!Assets/**/*.asmdef
+*.unityproj
+.DS_Store
