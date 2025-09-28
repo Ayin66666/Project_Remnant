@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Player_Manager : MonoBehaviour
 {
+
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
