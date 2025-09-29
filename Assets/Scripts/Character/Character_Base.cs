@@ -8,7 +8,7 @@ public class Buff
     public BuffType type;
     public int buff_Value;
     public int buff_Duration;
-    public enum BuffType { AttackPoint, DefensePoint, DamageIncrease, DamageReduction }
+    public enum BuffType { AttackPoint, DefensePoint, DamageIncrease, DamageReduction, minSpeed, maxSpeed }
 
     public void Buff_Check()
     {
@@ -43,12 +43,10 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem
         { Buff.BuffType.AttackPoint, 0 },
         { Buff.BuffType.DefensePoint, 0 },
         { Buff.BuffType.DamageIncrease, 0 },
-        { Buff.BuffType.DamageReduction, 0 }
+        { Buff.BuffType.DamageReduction, 0 },
+        { Buff.BuffType.minSpeed, 0 },
+        { Buff.BuffType.maxSpeed, 0 },
     };
-
-
-    [Header("---Skill---")]
-    public List<Skill_Base> skill_List;
 
 
     [Header("---Body---")]
