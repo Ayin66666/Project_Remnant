@@ -6,5 +6,7 @@ public interface IDamageSystem
     // 참격, 관통, 타격
     public enum DamageType { Slash, Pierce, Strike }
 
+    public enum DamageTarget { Hp, Groggy }
+
     public void TakeDamage(SinType sin, DamageType type, bool isCriticl, int hitcount, int damage);
 }

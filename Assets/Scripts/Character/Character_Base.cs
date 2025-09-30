@@ -2,21 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class Buff
-{
-    public BuffType type;
-    public int buff_Value;
-    public int buff_Duration;
-    public enum BuffType { AttackPoint, DefensePoint, DamageIncrease, DamageReduction, minSpeed, maxSpeed }
 
-    public void Buff_Check()
-    {
-        buff_Duration--;
-    }
+[System.Serializable]
+public class Groggy
+{
+    public int groggyValue;
+    public bool isused;
 }
 
-public abstract class Character_Base : MonoBehaviour, IDamageSystem
+
+public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
 {
     [Header("---State---")]
     public CharacterType characterType;
@@ -26,7 +21,9 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem
 
 
     [Header("---Status---")]
-    public int hp;
+    public int curHp;
+    public int maxHp;
+    public List<Groggy> groggy_Gauge;
     public int attackPoint;
     public int defensePoint;
     public Vector2Int minMax_Speed;
@@ -37,16 +34,7 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem
 
 
     [Header("---Buff & DeBuff---")]
-    public List<Buff> buffList;
-    public Dictionary<Buff.BuffType, int> buff = new Dictionary<Buff.BuffType, int>()
-    {
-        { Buff.BuffType.AttackPoint, 0 },
-        { Buff.BuffType.DefensePoint, 0 },
-        { Buff.BuffType.DamageIncrease, 0 },
-        { Buff.BuffType.DamageReduction, 0 },
-        { Buff.BuffType.minSpeed, 0 },
-        { Buff.BuffType.maxSpeed, 0 },
-    };
+    [SerializeField] private List<Buff_Base> buffList;
 
 
     [Header("---Body---")]
@@ -54,26 +42,52 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem
 
 
     #region Buff
-    public void Buff_Setting(Buff buff, bool isAdd)
+
+    public void BuffUse(IBuffEffect effect)
     {
-        if (isAdd)
+        effect.Use();
+    }
+
+    /// <summary>
+    /// 버프 & 디버프 추가
+    /// </summary>
+    /// <param name="buff"></param>
+    public void Buff_Add(Buff_Base buff)
+    {
+        bool found = false;
+        foreach (Buff_Base value in buffList)
+        {
+            if(value.type == buff.type)
+            {
+                // 수치 증가
+                found = true;
+                value.buff_Value += buff.buff_Value;
+                value.buff_Duration = buff.buff_Duration;
+
+                // 6대 키워드 세부 타입 변경 [예시) 진동 -> 진동-작렬] 
+                value.Type_Change(buff);
+                break;
+            }
+        }
+
+        if (!found)
         {
             buffList.Add(buff);
-            this.buff[buff.type] += buff.buff_Value;
-        }
-        else
-        {
-            buffList.Remove(buff);
-            this.buff[buff.type] -= buff.buff_Value;
         }
     }
 
+    /// <summary>
+    /// 버프 & 디버프 체크 및 제거
+    /// </summary>
     public void Buff_Check()
     {
         for (int i = buffList.Count - 1; i >= 0; i--)
         {
-            buffList[i].Buff_Check();
-            if (buffList[i].buff_Duration <= 0) Buff_Setting(buffList[i], false);
+            buffList[i].UpdateBuff();
+            if (buffList[i].buff_Duration <= 0)
+            {
+                buffList.RemoveAt(i);
+            }
         }
     }
     #endregion
@@ -116,11 +130,11 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem
         float criticalValue = isCriticl ? 1.2f : 1f;
 
         // 피해 감소율
-        float total_DamageReduction = 1f - (buff[Buff.BuffType.DamageReduction] / 10f);
+        float total_DamageReduction = 1f /* - (buff[Buff.BuffType.DamageReduction] / 10f)*/;
         total_DamageReduction = Mathf.Clamp01(total_DamageReduction);
 
         // 총 방어력
-        int total_DefencePoint = buff[Buff.BuffType.DefensePoint] + defensePoint;
+        int total_DefencePoint = /*buff[Buff.BuffType.DefensePoint]*/ +defensePoint;
 
         // 최종 데미지
         int calDamage = (int)((damage * criticalValue * (typeDefence[type] + sinDefence[sin]) - total_DefencePoint) * total_DamageReduction);
@@ -129,12 +143,55 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem
         // 체력 감소
         for (int i = 0; i < hitcount; i++)
         {
-            hp -= calDamage; 
+            curHp -= calDamage;
         }
 
+        // 그로기 체크
+        Groggy_Check();
+
         // 사망 체크
-        if (hp <= 0) Die();
+        if (curHp <= 0) Die();
+
     }
+
+    public void TakeBuffDamage(IDamageSystem.DamageTarget target, int damage)
+    {
+        switch (target)
+        {
+            case IDamageSystem.DamageTarget.Hp:
+                curHp -= damage;
+                if (curHp <= 0) Die();
+                else Groggy_Check();
+                break;
+
+            case IDamageSystem.DamageTarget.Groggy:
+                for (int i = 0; i < groggy_Gauge.Count; i++)
+                {
+                    if (!groggy_Gauge[i].isused)
+                        groggy_Gauge[i].groggyValue -= damage;
+                }
+
+                Groggy_Check();
+                break;
+        }
+    }
+
+    private void Groggy_Check()
+    {
+        bool isGroggy = false;
+        for (int i = 0; i < groggy_Gauge.Count; i++)
+        {
+            if (!groggy_Gauge[i].isused && curHp <= groggy_Gauge[i].groggyValue)
+            {
+                isGroggy = true;
+                groggy_Gauge[i].isused = true;
+            }
+        }
+
+        if (isGroggy) Groggy();
+    }
+
+    protected abstract void Groggy();
 
     protected abstract void Die();
     #endregion

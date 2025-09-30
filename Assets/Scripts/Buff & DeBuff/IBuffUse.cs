@@ -1,4 +1,4 @@
 public interface IBuffUse
 {
-    public void Use(IBuffEffect effect);
+    public void BuffUse(IBuffEffect effect);
 }
