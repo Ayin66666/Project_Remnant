@@ -9,9 +9,4 @@ public class Player_Test : Player_Base
     {
 
     }
-
-    protected override void Groggy()
-    {
-        throw new System.NotImplementedException();
-    }
 }

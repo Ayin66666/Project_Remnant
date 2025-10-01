@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -16,7 +17,7 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
     [Header("---State---")]
     public CharacterType characterType;
     public State curState;
-    public enum State { Idle, Move, Attack, Die }
+    public enum State { Idle, Move, Attack, Groggy, Die }
     public enum CharacterType { Player, Enemy }
 
 
@@ -27,6 +28,7 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
     public int attackPoint;
     public int defensePoint;
     public Vector2Int minMax_Speed;
+    private int groggy_Turn;
 
     // Anger, Lust, Sloth, Gluttony, Melancholy, Pride, Envy
     public Dictionary<IDamageSystem.SinType, float> sinDefence;
@@ -34,45 +36,66 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
 
 
     [Header("---Buff & DeBuff---")]
-    [SerializeField] private List<Buff_Base> buffList;
+    [SerializeField] private List<Buff_Base> buff_Noraml;
+    [SerializeField] private Dictionary<BuffType, Buff_Base> buff_keyword;
 
 
     [Header("---Body---")]
     [SerializeField] private SpriteRenderer body;
 
 
-    #region Buff
+    [Header("---Attack Slot---")]
+    [SerializeField] private List<Attack_Slot> attackSlot;
 
+
+    #region Buff
     public void BuffUse(IBuffEffect effect)
     {
         effect.Use();
     }
 
     /// <summary>
-    /// 버프 & 디버프 추가
+    /// 일반(스테이터스) 버프 & 디버프 추가
     /// </summary>
     /// <param name="buff"></param>
-    public void Buff_Add(Buff_Base buff)
+    public void BuffNormal_Add(Buff_Base buff)
     {
         bool found = false;
-        foreach (Buff_Base value in buffList)
+        foreach (Buff_Base value in buff_Noraml)
         {
-            if(value.type == buff.type)
+            if (value.type == buff.type)
             {
                 // 수치 증가
                 found = true;
                 value.buff_Value += buff.buff_Value;
                 value.buff_Duration = buff.buff_Duration;
-
-                // 6대 키워드 세부 타입 변경 [예시) 진동 -> 진동-작렬] 
-                value.Type_Change(buff);
                 break;
             }
         }
 
         if (!found)
         {
-            buffList.Add(buff);
+            buff_Noraml.Add(buff);
+        }
+    }
+
+    /// <summary>
+    /// 키워드(7대) 버프 & 디버프 추가
+    /// </summary>
+    /// <param name="buff"></param>
+    public void BuffKeyword_Add(Buff_Base buff)
+    {
+        if (buff_keyword.TryGetValue(buff.type, out var baseBuff))
+        {
+            baseBuff.buff_Value += buff.buff_Value;
+            baseBuff.buff_Duration += buff.buff_Duration;
+
+            // 6대 키워드 세부 타입 변경 [예시) 진동 -> 진동-작렬] 
+            baseBuff.Type_Change(buff);
+        }
+        else
+        {
+            buff_keyword[buff.type] = buff;
         }
     }
 
@@ -81,17 +104,46 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
     /// </summary>
     public void Buff_Check()
     {
-        for (int i = buffList.Count - 1; i >= 0; i--)
+        // 일반 버프 체크
+        for (int i = buff_Noraml.Count - 1; i >= 0; i--)
         {
-            buffList[i].UpdateBuff();
-            if (buffList[i].buff_Duration <= 0)
+            buff_Noraml[i].UpdateBuff();
+            if (buff_Noraml[i].buff_Duration <= 0)
             {
-                buffList.RemoveAt(i);
+                buff_Noraml.RemoveAt(i);
             }
+        }
+
+        // 키워드 버프 체크
+        var list = buff_keyword.Keys.ToList();
+        foreach (var key in list)
+        {
+            var buff = buff_keyword[key];
+            buff.UpdateBuff();
+
+            if (buff.buff_Duration <= 0) buff_keyword.Remove(key);
         }
     }
     #endregion
 
+    #region Fight
+    /// <summary>
+    /// 공격 슬롯 속도 설정
+    /// </summary>
+    public void Speed_Setting()
+    {
+
+    }
+
+    /// <summary>
+    /// 슬롯 추가
+    /// </summary>
+    public void Slot_Add()
+    {
+        
+    }
+
+    #endregion
 
     #region Movement
     public void LookAt(bool isLeft)
@@ -156,6 +208,8 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
 
     public void TakeBuffDamage(IDamageSystem.DamageTarget target, int damage)
     {
+        // Buff_Base 에서 character_base를 들고 있다 Use() 에서 호출해야하나?
+
         switch (target)
         {
             case IDamageSystem.DamageTarget.Hp:
@@ -191,7 +245,19 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
         if (isGroggy) Groggy();
     }
 
-    protected abstract void Groggy();
+    protected void Groggy()
+    {
+        curState = State.Groggy;
+        groggy_Turn = Stage_Manager.instance.turnCount;
+    }
+
+    protected void GroggyOff()
+    {
+        if(Stage_Manager.instance.turnCount > groggy_Turn)
+        {
+            curState = State.Idle;
+        }
+    }
 
     protected abstract void Die();
     #endregion

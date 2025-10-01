@@ -16,7 +16,7 @@ public class Stage_Manager : MonoBehaviour
     public static Stage_Manager instance;
 
     [Header("---Stage Setting---")]
-    [SerializeField] private int turnCount = 0;
+    public int turnCount = 0;
     public bool isPlayerSelect;
     public bool isFight;
     private AudioSource audioSource;

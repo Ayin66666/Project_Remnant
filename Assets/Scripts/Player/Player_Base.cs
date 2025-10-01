@@ -41,14 +41,6 @@ public abstract class Player_Base : Character_Base
     }
 
     /// <summary>
-    /// 공격 속도 설정
-    /// </summary>
-    public void Speed_Setting()
-    {
-
-    }
-
-    /// <summary>
     /// 매턴 가중치 랜덤 스킬 선택
     /// </summary>
     public void Skill_Setting()

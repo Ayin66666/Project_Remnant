@@ -14,12 +14,12 @@ public class SkillData_SO : ScriptableObject
     public class SkillData
     {
         [Header("---UI---")]
-        [SerializeField] private Sprite icon;
-        [SerializeField][TextArea] private string description;
+        public Sprite icon;
+        [TextArea] public string description;
 
 
         [Header("---Value---")]
-        [SerializeField] private List<Value> value;
+        public List<Value> value;
     }
 
     [System.Serializable]
