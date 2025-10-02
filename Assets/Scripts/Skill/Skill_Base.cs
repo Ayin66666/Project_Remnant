@@ -12,4 +12,5 @@ public abstract class Skill_Base : MonoBehaviour
 
 
     public abstract void Use();
+    public abstract void Skill_Reset();
 }

@@ -8,7 +8,7 @@ public class SkillData_SO : ScriptableObject
     [Header("---Value---")]
     [SerializeField] private List<SkillData> skillData;
     public List<SkillData> SkillDatas { get { return skillData; } private set { skillData = value; } }
-    public enum Hit_Effect { None, }
+
 
     [System.Serializable]
     public class SkillData

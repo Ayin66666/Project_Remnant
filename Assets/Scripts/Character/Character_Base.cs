@@ -40,12 +40,12 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
     [SerializeField] private Dictionary<BuffType, Buff_Base> buff_keyword;
 
 
-    [Header("---Body---")]
-    [SerializeField] private SpriteRenderer body;
-
-
     [Header("---Attack Slot---")]
     [SerializeField] private List<Attack_Slot> attackSlot;
+
+
+    [Header("---Component---")]
+    [SerializeField] private SpriteRenderer body;
 
 
     #region Buff
@@ -126,6 +126,7 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
     }
     #endregion
 
+
     #region Fight
     /// <summary>
     /// 공격 슬롯 속도 설정
@@ -145,6 +146,7 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
 
     #endregion
 
+
     #region Movement
     public void LookAt(bool isLeft)
     {
@@ -158,6 +160,11 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
 
     private IEnumerator Movement(Vector3 movePos, float moveSpeed)
     {
+        // 바라보기
+        float dir = transform.position.x - movePos.x;
+        LookAt(dir < 0);
+
+        // 이동
         curState = State.Move;
         Vector3 startPos = transform.position;
         Vector3 endPos = movePos;
@@ -203,7 +210,6 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
 
         // 사망 체크
         if (curHp <= 0) Die();
-
     }
 
     public void TakeBuffDamage(IDamageSystem.DamageTarget target, int damage)

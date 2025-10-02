@@ -68,19 +68,25 @@ public class Stage_Manager : MonoBehaviour
 
     public IEnumerator Stage_Start()
     {
+
+
+        // 1. 시작 셋팅
+        curWaveIndex = 0;
+        curEnemySpawnIndex = 0;
+        enemyCount = enemyWave[curWaveIndex].enemys.Count;
+
+        // 플레이어 에고 데이터 설정
+        Player_Manager.instance.EgoData_Setting();
+
+
         // 시작 이벤트 체크
-        foreach(StageEvnet stageEvent in stageEvent)
+        foreach (StageEvnet stageEvent in stageEvent)
         {
             if(stageEvent.eventPos == StageEvnet.EvnetPos.Stage_Start)
             {
 
             }
         }
-
-        // 1. 시작 셋팅
-        curWaveIndex = 0;
-        curEnemySpawnIndex = 0;
-        enemyCount = enemyWave[curWaveIndex].enemys.Count;
 
         // 웨이브 만큼 반복
         while (curWaveIndex < enemyWave.Count)
