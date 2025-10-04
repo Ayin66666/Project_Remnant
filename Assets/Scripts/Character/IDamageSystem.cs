@@ -1,8 +1,3 @@
-
-// 타격 효과
-public enum Hit_Effect { None, Vibration_Explosion }
-
-
 public interface IDamageSystem
 {
     // 분노, 색욕, 나태, 탐식, 우울, 오만, 질투

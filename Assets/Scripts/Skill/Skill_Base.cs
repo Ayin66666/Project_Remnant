@@ -1,10 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
 public abstract class Skill_Base : MonoBehaviour
 {
+    [Header("---Data---")]
+    public string egoName;
+    public int id;
+
+
     [Header("---Value---")]
     public SkillType skillType;
     public SkillData_SO skillData;

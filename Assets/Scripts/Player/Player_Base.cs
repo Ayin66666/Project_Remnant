@@ -14,6 +14,11 @@ public class Skill
 
 public abstract class Player_Base : Character_Base
 {
+    [Header("---Data---")]
+    public string bodyName;
+    public int id;
+
+
     [Header("---Skill---")]
     [SerializeField] private List<Skill> normalSkill;
     [SerializeField] private Skill defenceSkill;

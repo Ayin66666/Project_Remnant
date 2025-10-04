@@ -3,7 +3,7 @@ using UnityEngine;
 
 
 [System.Serializable]
-public class OrganizationData
+public class CharacterData
 {
     public bool isDie;
     public bool isSally;
@@ -11,13 +11,13 @@ public class OrganizationData
     public Character_Base character;
 }
 
-public class Player_Manager : MonoBehaviour
+public class Player_Turn_Manager : MonoBehaviour
 {
-    public static Player_Manager instance;
+    public static Player_Turn_Manager instance;
 
 
     [Header("---Setting---")]
-    public List<OrganizationData> characterList;
+    public List<CharacterData> characterList;
 
 
     [Header("---Player Resource---")]
@@ -32,7 +32,6 @@ public class Player_Manager : MonoBehaviour
         { IDamageSystem.SinType.Pride, 0 }, // 오만
         { IDamageSystem.SinType.Envy, 0 } // 질투
     };
-
 
 
     private void Awake()

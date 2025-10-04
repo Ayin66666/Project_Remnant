@@ -76,7 +76,7 @@ public class Stage_Manager : MonoBehaviour
         enemyCount = enemyWave[curWaveIndex].enemys.Count;
 
         // 플레이어 에고 데이터 설정
-        Player_Manager.instance.EgoData_Setting();
+        Player_Turn_Manager.instance.EgoData_Setting();
 
 
         // 시작 이벤트 체크
