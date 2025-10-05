@@ -38,6 +38,10 @@ public class Organization_Manager : MonoBehaviour
     public List<Character> organizationOrderList; // 편성 순서 데이터
 
 
+    [Header("---Character List UI---")]
+    [SerializeField] private GameObject bodyListSet;
+
+
     private void Awake()
     {
         if (instance == null)
@@ -75,7 +79,7 @@ public class Organization_Manager : MonoBehaviour
         if (data != null)
         {
             var egoData = data.egoList.Find(o => o.egoGrade == egoGrade);
-            if(egoData != null) egoData.ego = ego;
+            if (egoData != null) egoData.ego = ego;
         }
     }
 
@@ -86,7 +90,7 @@ public class Organization_Manager : MonoBehaviour
     /// <param name="isAdd"></param>
     public void Change_Organization(Character character)
     {
-        if(organizationOrderList.Contains(character))
+        if (organizationOrderList.Contains(character))
         {
             // 이미 편성 상태라면 - 편성 제거
             organizationOrderList.Remove(character);
@@ -96,5 +100,15 @@ public class Organization_Manager : MonoBehaviour
             // 편성 상태가 아니라면 - 추가
             organizationOrderList.Add(character);
         }
+    }
+
+    /// <summary>
+    /// 인격 선택창 OnOff
+    /// </summary>
+    /// <param name="character"></param>
+    /// <param name="isOn"></param>
+    public void CharacterList_Setting(Character character, bool isOn)
+    {
+        bodyListSet.SetActive(isOn);
     }
 }
