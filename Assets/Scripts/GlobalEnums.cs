@@ -5,7 +5,7 @@
 // 뮤리스, 몬티스, 유나, 유노, 라이나, 라이프, 핀
 // Myuris, Montis, Yuna, Yuno, Raina, Lyph, Finn
 
-public enum Character { Myuris, Montis, Yuna, Yuno, Raina, Lyph, Finn }
+public enum Character { None, Myuris, Montis, Yuna, Yuno, Raina, Lyph, Finn }
 
 public enum EgoGrade { Zayin, Teth, He, Waw, Aleph }
 

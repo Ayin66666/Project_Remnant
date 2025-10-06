@@ -5,20 +5,24 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-public class Organization_CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
+public class Character_Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
 {
+
+    // 단순 클릭 = selected 표시
+    // 꾹 누르기 = 상세 설명
     [Header("---UI---")]
     public Image portraitImage;
     public Image loadImage;
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI nameText;
     public GameObject[] gradeIcon;
-    public TextMeshProUGUI mouseOverText;
+    public GameObject mouseOverText;
+    public GameObject selectedText;
 
 
     [Header("---Character Data---")]
-    [SerializeField] private Character character;
-    [SerializeField] private Character_Base body;
+    public Character character;
+    [SerializeField] private Player_Base body;
 
 
     [Header("---Click ---")]
@@ -27,10 +31,24 @@ public class Organization_CharacterSlot : MonoBehaviour, IPointerEnterHandler, I
     private Coroutine clickCoroutine;
 
 
-    public void Setting(Character character, Character_Base body)
+    public void Setting(Character character, Player_Base body)
     {
         this.character = character;
         this.body = body;
+    }
+
+    public void Reset_Slot()
+    {
+        portraitImage.sprite = null;
+        levelText.text = null;
+        nameText.text = null;
+        mouseOverText.SetActive(false);
+        selectedText.SetActive(false);
+
+        foreach (GameObject go in gradeIcon)
+        {
+            go.SetActive(false);
+        }
     }
 
     private IEnumerator ClickCheck()
@@ -54,7 +72,7 @@ public class Organization_CharacterSlot : MonoBehaviour, IPointerEnterHandler, I
     #region Click Evnet
     public void OnPointerDown(PointerEventData eventData)
     {
-        if(clickCoroutine != null) StopCoroutine(clickCoroutine);
+        if (clickCoroutine != null) StopCoroutine(clickCoroutine);
         clickCoroutine = StartCoroutine(ClickCheck());
     }
 
@@ -67,13 +85,17 @@ public class Organization_CharacterSlot : MonoBehaviour, IPointerEnterHandler, I
         // 클릭 시간 체크
         if (clickTimer < 1)
         {
-            // 편성
-            Organization_Manager.instance.Change_Organization(character);
+            // 다른 슬롯의 selectedText Off
+            UI_Manager.instance.SelectedOff();
+
+            // 선택한 인격 변경 & selected 표시 
+            selectedText.SetActive(true);
+            Organization_Manager.instance.Change_Body(character, body);
         }
         else
         {
-            // 인격 선택
-            Organization_Manager.instance.CharacterList_Setting(character, true);
+            // 인격 상세 설명
+            UI_Manager.instance.Character_Description(true, body);
         }
     }
 

@@ -9,20 +9,15 @@ public class UI_Manager : MonoBehaviour
 {
     public static UI_Manager instance;
 
-    [Header("---Character Status---")]
-    [SerializeField] private GameObject statusSet;
-    [SerializeField] private TextMeshProUGUI nameText;
-    [SerializeField] private TextMeshProUGUI levelText;
-    [SerializeField] private TextMeshProUGUI hpText;
-    [SerializeField] private Slider hpSlider;
+    [Header("---Organization Character List---")]
+    [SerializeField] private GameObject organization_CharacterList;
+    [SerializeField] private List<GameObject> organization_ListSlot;
+    [SerializeField] private List<Character_Slot> character_Slots;
 
 
-    [Header("---Ego---")]
-    [SerializeField] private List<UI_Ego_Slot> slot_Ego;
+    [Header("---Character Description---")]
+    [SerializeField] private GameObject characterDescriptionset;
 
-
-    [Header("---Skill---")]
-    [SerializeField] private List<GameObject> slot_Skill;
 
 
     private void Awake()
@@ -37,17 +32,60 @@ public class UI_Manager : MonoBehaviour
         }
     }
 
-    #region Player Status
-    public void Status_Setting(Character_Base data, bool isOn)
+
+    /// <summary>
+    /// 캐릭터 리스트 On Off
+    /// </summary>
+    /// <param name="isOn"></param>
+    /// <param name="character"></param>
+    public void Organization_CharacterList(bool isOn, Character_ListDataSO data)
     {
-        // 현제 스테이터스
+        organization_CharacterList.SetActive(isOn);
+        if (isOn)
+        {
+            // 슬롯 내 데이터 리셋
+            foreach (Character_Slot slot in character_Slots)
+            {
+                slot.Reset_Slot();
+            }
 
-        // 에고 데이터
+            // 데이터 표시
+            for (int i = 0; i < data.characterBodyList.Count; i++)
+            {
+                character_Slots[i].Setting(data.character, data.characterBodyList[i].body);
+            }
 
-        // 스킬 데이터
-
-        // UI On
-        statusSet.SetActive(isOn);
+            // 남은 슬롯 비활성화
+            foreach (Character_Slot slot in character_Slots)
+            {
+                if (slot.character == Character.None)
+                    slot.gameObject.SetActive(false);
+            }
+        }
     }
-    #endregion
+
+    /// <summary>
+    /// 모든 캐릭터 리스트 슬롯의 선택됨 표시 Off
+    /// </summary>
+    public void SelectedOff()
+    {
+        foreach(Character_Slot slot in character_Slots)
+        {
+            slot.selectedText.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// 캐릭터 리스트에서 선택한 캐릭터의 상세설명 UI OnOff
+    /// </summary>
+    /// <param name="isOn"></param>
+    /// <param name="character"></param>
+    public void Character_Description(bool isOn, Character_Base character)
+    {
+        characterDescriptionset.SetActive(isOn);
+        if (!isOn)
+        {
+
+        }
+    }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.U2D.Animation;
 using UnityEngine;
 
 
@@ -40,6 +41,7 @@ public class Organization_Manager : MonoBehaviour
 
     [Header("---Character List UI---")]
     [SerializeField] private GameObject bodyListSet;
+    [SerializeField] private List<GameObject> bodySlots;
 
 
     private void Awake()
@@ -109,6 +111,17 @@ public class Organization_Manager : MonoBehaviour
     /// <param name="isOn"></param>
     public void CharacterList_Setting(Character character, bool isOn)
     {
+        // 1. enum에 맞게 인격 데이터 검색
+        Character_ListDataSO data = characterData.Find(o => o.character == character);
+
+        // 2. 데이터를 추출해서 슬롯에 할당
+        if (data != null)
+        {
+            // 한번에 n 개 이상 데이터가 표시될 일이 없음 -> 미리 슬롯을 배치해둬도 될듯?
+            // 슬롯은 뭐쓰지? -> 새로 만들어야지
+        }
+
+        // 3. UI 표시
         bodyListSet.SetActive(isOn);
     }
 }
