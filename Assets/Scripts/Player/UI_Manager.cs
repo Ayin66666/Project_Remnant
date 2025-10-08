@@ -9,6 +9,13 @@ public class UI_Manager : MonoBehaviour
 {
     public static UI_Manager instance;
 
+
+    [Header("---Main UI---")]
+    [SerializeField] private GameObject[] uiSet;
+    [SerializeField] private GameObject exitSet;
+    [SerializeField] private GameObject entrycheckSet;
+
+
     [Header("---Organization Character List---")]
     [SerializeField] private GameObject organization_CharacterList;
     [SerializeField] private List<GameObject> organization_ListSlot;
@@ -32,7 +39,56 @@ public class UI_Manager : MonoBehaviour
         }
     }
 
+    #region 메인 화면
+    /// <summary>
+    /// 메인 화면 하단 버튼 클릭
+    /// 0 : 유리창 
+    /// 1 : 편성
+    /// 2 : 운전석
+    /// </summary>
+    /// <param name="index"></param>
+    public void Click_Button(int index)
+    {
+        foreach (GameObject item in uiSet)
+        {
+            item.SetActive(false);
+        }
 
+        uiSet[index].SetActive(true);
+    }
+
+    /// <summary>
+    /// 종료 버튼 클릭
+    /// </summary>
+    public void Click_Exit()
+    {
+        exitSet.SetActive(true);
+    }
+
+    /// <summary>
+    /// 게임 종료
+    /// </summary>
+    public void Exit(bool isExit)
+    {
+        if (isExit)
+        {
+            // 게임 종료
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
+        }
+        else
+        {
+            // 종료 UI Off
+            exitSet.SetActive(false);
+        }
+    }
+    #endregion
+
+
+    #region 편성창
     /// <summary>
     /// 캐릭터 리스트 On Off
     /// </summary>
@@ -88,4 +144,13 @@ public class UI_Manager : MonoBehaviour
 
         }
     }
+    #endregion
+
+
+    #region 운전대
+    public void EntrycheckUI(bool isOn)
+    {
+        entrycheckSet.SetActive(isOn);
+    }
+    #endregion
 }

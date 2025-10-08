@@ -16,3 +16,8 @@ public enum EgoGrade { Zayin, Teth, He, Waw, Aleph }
 // 타격 효과
 public enum Hit_Effect { None, Vibration_Explosion }
 #endregion
+
+
+#region Stage Data
+public enum ExClear_Condition { Stage_Clear, Clear_N_Turn, No_one_Die }
+#endregion

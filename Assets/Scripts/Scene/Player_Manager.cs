@@ -1,20 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
-
-
-[System.Serializable]
-public class ChapterData
-{
-    public List<StageData> stageList;
-}
-
-[System.Serializable]
-public class StageData
-{
-    public bool isClear;
-    public string stageSceneName;
-}
 
 
 public class Player_Manager : MonoBehaviour
@@ -27,16 +13,12 @@ public class Player_Manager : MonoBehaviour
     public static Player_Manager instacne;
 
 
-    [Header("---Main UI---")]
-    [SerializeField] private GameObject[] uiSet;
-    [SerializeField] private GameObject exitSet;
-    [SerializeField] private GameObject entrycheckSet;
+
 
 
     [Header("---Chapter & Stage Data---")]
-    [SerializeField] private List<ChapterData> chapterData;
-    [SerializeField] private int curChapterIndex;
-    [SerializeField] private int curSTageIndex;
+    [SerializeField] private List<ChapterData_SO> chapterData;
+    [SerializeField] private StageData stageData;
 
 
     private void Awake()
@@ -52,57 +34,6 @@ public class Player_Manager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
     }
-
-
-
-    /// <summary>
-    /// 메인 화면 하단 버튼 클릭
-    /// 0 : 유리창 
-    /// 1 : 편성
-    /// 2 : 운전석
-    /// </summary>
-    /// <param name="index"></param>
-    public void Click_Button(int index)
-    {
-        foreach (GameObject item in uiSet)
-        {
-            item.SetActive(false);
-        }
-
-        uiSet[index].SetActive(true);
-    }
-
-
-    #region 게임 종료
-    /// <summary>
-    /// 게임 종료 클릭
-    /// </summary>
-    public void Click_Exit()
-    {
-        exitSet.SetActive(true);
-    }
-
-    /// <summary>
-    /// 게임 종료
-    /// </summary>
-    public void Exit(bool isExit)
-    {
-        if (isExit)
-        {
-            // 게임 종료
-            #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-            #else
-            Application.Quit();
-            #endif
-        }
-        else
-        {
-            // 종료 UI Off
-            exitSet.SetActive(isExit);
-        }
-    }
-    #endregion
 
 
     #region 유리창
@@ -148,11 +79,10 @@ public class Player_Manager : MonoBehaviour
     public void Click_Stage(int charpterIndex, int stageIndex)
     {
         // 진입 데이터 설정
-        curChapterIndex = charpterIndex;
-        curSTageIndex = stageIndex;
+        stageData = chapterData[charpterIndex].stageList[stageIndex];
 
         // UI 표시
-        entrycheckSet.SetActive(true);
+        UI_Manager.instance.EntrycheckUI(true);
     }
 
     /// <summary>
@@ -164,23 +94,22 @@ public class Player_Manager : MonoBehaviour
         if(isIn)
         {
             // 데이터 체크
-            if(curChapterIndex == -1)
+            if(stageData != null)
             {
                 Debug.Log("동작 불가 - 데이터 없음!");
                 return;
             }
 
-            // 씬 로드 - 매니저 추가 필요
-            // Load_Manager.LoadScene(chapterData[curChapterIndex].stageList[curSTageIndex]);
+            // 씬 로드 - 매니저 추가
+            Load_Manager.LoadScene(stageData.stageSceneName);
         }
         else
         {
             // 데이터 초기화
-            curChapterIndex = -1;
-            curSTageIndex = -1;
+            stageData = null;
 
             // 선택 해제
-            entrycheckSet.SetActive(false);
+            UI_Manager.instance.EntrycheckUI(false);
         }
     }
     #endregion
