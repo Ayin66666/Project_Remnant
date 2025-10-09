@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
 
@@ -11,10 +10,6 @@ public class Player_Manager : MonoBehaviour
      * 3. 데이터 관련 이모저모?
      */
     public static Player_Manager instacne;
-
-
-
-
 
     [Header("---Chapter & Stage Data---")]
     [SerializeField] private List<ChapterData_SO> chapterData;
@@ -62,13 +57,10 @@ public class Player_Manager : MonoBehaviour
     /// 스테이지 선택 버튼 클릭
     /// </summary>
     /// <param name="index"></param>
-    public void Click_Chapter(int ChapterIndex)
+    public void Click_Chapter(int chapterIndex)
     {
         // 1. 챕터 클릭 시 해당 챕터 UI 표시
-
-        // 2. 챕터 내 스테이지 클릭 시 해당 스테이지 입장 여부 체크
-
-        // 3. 입장 클릭 시 스테이지 입장
+        UI_Manager.instance.chapterUI(chapterData[chapterIndex], chapterIndex);
     }
 
     /// <summary>
@@ -89,7 +81,7 @@ public class Player_Manager : MonoBehaviour
     /// 스테이지 진입 버튼 클릭
     /// </summary>
     /// <param name="isIn"></param>
-    public void Click_Stage(bool isIn)
+    public void Click_StageIn(bool isIn)
     {
         if(isIn)
         {

@@ -23,8 +23,11 @@ public class UI_Manager : MonoBehaviour
 
 
     [Header("---Character Description---")]
-    [SerializeField] private GameObject characterDescriptionset;
+    [SerializeField] private GameObject character_Descriptionset;
 
+
+    [Header("---Chapter & Stage---")]
+    [SerializeField] private GameObject[] chapterUISet;
 
 
     private void Awake()
@@ -138,7 +141,7 @@ public class UI_Manager : MonoBehaviour
     /// <param name="character"></param>
     public void Character_Description(bool isOn, Character_Base character)
     {
-        characterDescriptionset.SetActive(isOn);
+        character_Descriptionset.SetActive(isOn);
         if (!isOn)
         {
 
@@ -151,6 +154,18 @@ public class UI_Manager : MonoBehaviour
     public void EntrycheckUI(bool isOn)
     {
         entrycheckSet.SetActive(isOn);
+    }
+
+    /// <summary>
+    /// 챕터 클릭 시 데이터 받아오기 & UI 표시
+    /// </summary>
+    /// <param name="data">표시할 챕터 데이터</param>
+    public void chapterUI(ChapterData_SO data, int chapterIndex)
+    {
+        // 데이터 셋팅
+
+        // 챕터 UI 표시
+        chapterUISet[chapterIndex].SetActive(true);
     }
     #endregion
 }
