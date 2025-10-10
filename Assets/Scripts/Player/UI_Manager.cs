@@ -30,6 +30,11 @@ public class UI_Manager : MonoBehaviour
     [SerializeField] private GameObject[] chapterUISet;
 
 
+    [Header("---Stage Select---")]
+    [SerializeField] private GameObject stageSelectSet;
+
+
+
     private void Awake()
     {
         if (instance == null)
@@ -160,12 +165,28 @@ public class UI_Manager : MonoBehaviour
     /// 챕터 클릭 시 데이터 받아오기 & UI 표시
     /// </summary>
     /// <param name="data">표시할 챕터 데이터</param>
-    public void chapterUI(ChapterData_SO data, int chapterIndex)
+    public void ChapterUI(ChapterData_SO data, int chapterIndex)
     {
         // 데이터 셋팅
 
         // 챕터 UI 표시
         chapterUISet[chapterIndex].SetActive(true);
+    }
+
+    /// <summary>
+    /// 스테이지 선택 시 등장 적, 추천 레벨, 진입 여부 체크 UI 표시 기능
+    /// </summary>
+    /// <param name="data"></param>
+    public void StageSelectUI(StageData data, bool isOn)
+    {
+        // 데이터 셋팅
+        if (isOn)
+        {
+
+        }
+
+        // UI 표시
+        stageSelectSet.SetActive(isOn);
     }
     #endregion
 }

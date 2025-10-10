@@ -60,7 +60,7 @@ public class Player_Manager : MonoBehaviour
     public void Click_Chapter(int chapterIndex)
     {
         // 1. 챕터 클릭 시 해당 챕터 UI 표시
-        UI_Manager.instance.chapterUI(chapterData[chapterIndex], chapterIndex);
+        UI_Manager.instance.ChapterUI(chapterData[chapterIndex], chapterIndex);
     }
 
     /// <summary>
