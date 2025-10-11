@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -23,7 +22,8 @@ public class UI_Manager : MonoBehaviour
 
 
     [Header("---Character Description---")]
-    [SerializeField] private GameObject character_Descriptionset;
+    // 내부 UI가 너무 많아서 분리함!
+    [SerializeField] private Character_DescriptionUI characterDescriptionUI; 
 
 
     [Header("---Chapter & Stage---")]
@@ -46,6 +46,19 @@ public class UI_Manager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+
+    /// <summary>
+    /// 캐릭터 리스트에서 선택한 캐릭터의 상세설명 UI OnOff
+    /// </summary>
+    /// <param name="isOn"></param>
+    /// <param name="character"></param>
+    public void Character_Description(bool isOn, Character_Base character)
+    {
+        characterDescriptionUI.gameObject.SetActive(isOn);
+        if (isOn) characterDescriptionUI.Setting(character);
+    }
+
 
     #region 메인 화면
     /// <summary>
@@ -98,7 +111,7 @@ public class UI_Manager : MonoBehaviour
 
     #region 편성창
     /// <summary>
-    /// 캐릭터 리스트 On Off
+    /// 캐릭터 인격 리스트 On Off
     /// </summary>
     /// <param name="isOn"></param>
     /// <param name="character"></param>
@@ -136,20 +149,6 @@ public class UI_Manager : MonoBehaviour
         foreach(Character_Slot slot in character_Slots)
         {
             slot.selectedText.SetActive(false);
-        }
-    }
-
-    /// <summary>
-    /// 캐릭터 리스트에서 선택한 캐릭터의 상세설명 UI OnOff
-    /// </summary>
-    /// <param name="isOn"></param>
-    /// <param name="character"></param>
-    public void Character_Description(bool isOn, Character_Base character)
-    {
-        character_Descriptionset.SetActive(isOn);
-        if (!isOn)
-        {
-
         }
     }
     #endregion

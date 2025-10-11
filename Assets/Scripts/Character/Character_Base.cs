@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.U2D.Animation;
 using UnityEngine;
 
 
@@ -22,6 +23,8 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
 
 
     [Header("---Status---")]
+    public CharacterDataSO characterData;
+    public int level;
     public int curHp;
     public int maxHp;
     public List<Groggy> groggy_Gauge;
@@ -47,6 +50,25 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
     [Header("---Component---")]
     [SerializeField] private SpriteRenderer body;
 
+
+    /// <summary>
+    /// 스테이터스 셋팅 - 레벨에 따라 셋팅
+    /// </summary>
+    public void Status_Setting()
+    {
+        // 체력
+        int hp = characterData.baseHp + (characterData.hpUpByLevel * level);
+        curHp = hp;
+        maxHp = hp;
+
+        // 그로기
+        groggy_Gauge = new List<Groggy>(characterData.groggyPercent.Length);
+        for (int i = 0; i < characterData.groggyPercent.Length; i++)
+        {
+            groggy_Gauge[i].groggyValue = (int)(hp * (characterData.groggyPercent[i] / 100f));
+        }
+        
+    }
 
     #region Buff
     public void BuffUse(IBuffEffect effect)
