@@ -67,8 +67,17 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
         {
             groggy_Gauge[i].groggyValue = (int)(hp * (characterData.groggyPercent[i] / 100f));
         }
-        
+
+        // 공격
+        attackPoint = characterData.baseAttackPoint + (characterData.attackPointUpbyLevel * level);
+
+        // 방어
+        defensePoint = characterData.baseDefencePoint + (characterData.defencePointUpbyLevel * level);
+
+        // 속도
+        minMax_Speed = characterData.baseMinMaxSpeed;
     }
+
 
     #region Buff
     public void BuffUse(IBuffEffect effect)
@@ -153,17 +162,28 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
     /// <summary>
     /// 공격 슬롯 속도 설정
     /// </summary>
-    public void Speed_Setting()
+    public void Speed_Setting() // 속도 데이터는 슬롯이?
     {
-
+        foreach (Attack_Slot slot in attackSlot)
+        {
+            if (slot.gameObject.activeSelf)
+                slot.Speed_Setting(Random.Range(minMax_Speed.x, minMax_Speed.y));
+        }
     }
 
     /// <summary>
     /// 슬롯 추가
     /// </summary>
-    public void Slot_Add()
+    public void Slot_Add() // 이거 UI에도 데이터 줘야하는데? 지금은 그냥 켜지기만 함
     {
-        
+        for (int i = 0; i < attackSlot.Count; i++)
+        {
+            if (!attackSlot[i].gameObject.activeSelf)
+            {
+                attackSlot[i].gameObject.SetActive(true);
+                return;
+            }
+        }
     }
 
     #endregion
@@ -281,7 +301,7 @@ public abstract class Character_Base : MonoBehaviour, IDamageSystem, IBuffUse
 
     protected void GroggyOff()
     {
-        if(Stage_Manager.instance.turnCount > groggy_Turn)
+        if (Stage_Manager.instance.turnCount > groggy_Turn)
         {
             curState = State.Idle;
         }

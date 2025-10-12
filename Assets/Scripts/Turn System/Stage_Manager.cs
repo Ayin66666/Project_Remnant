@@ -7,7 +7,7 @@ using UnityEngine;
 public class EnemyWave
 {
     [SerializeField] private string waveName;
-    public List<GameObject> enemys;
+    public List<Character_Base> enemys;
 }
 
 
@@ -65,18 +65,28 @@ public class Stage_Manager : MonoBehaviour
         StartCoroutine(Stage_Start());
     }
 
+    /// <summary>
+    /// 전투 시작 시 최초 1회 플레이어 셋팅
+    /// </summary>
+    public void Player_Setting()
+    {
+        // 플레이어 활성화
+
+        // 플레이어 배치
+
+        // 플레이어 에고 데이터 설정
+        Player_Turn_Manager.instance.EgoData_Setting();
+    }
 
     public IEnumerator Stage_Start()
     {
-
-
         // 1. 시작 셋팅
         curWaveIndex = 0;
         curEnemySpawnIndex = 0;
         enemyCount = enemyWave[curWaveIndex].enemys.Count;
 
-        // 플레이어 에고 데이터 설정
-        Player_Turn_Manager.instance.EgoData_Setting();
+        Player_Setting();
+
 
 
         // 시작 이벤트 체크
@@ -131,7 +141,15 @@ public class Stage_Manager : MonoBehaviour
         {
             if (!spawnSlot[i].haveCharacter && curEnemySpawnIndex < wave.enemys.Count)
             {
-                // wave.enemys[curEnemySpawnIndex].Spawn();
+                // 오브젝트 활성화
+                wave.enemys[curEnemySpawnIndex].gameObject.SetActive(true);
+
+                // 스텟 셋팅
+                wave.enemys[curEnemySpawnIndex].Status_Setting();
+
+                // 이동 지시
+
+                // 소환 카운트 ++
                 curEnemySpawnIndex++;
             }
         }

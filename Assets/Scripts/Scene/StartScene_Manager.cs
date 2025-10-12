@@ -1,5 +1,6 @@
 using UnityEngine;
 
+
 public class StartScene_Manager : MonoBehaviour
 {
     public static StartScene_Manager instance;
@@ -24,22 +25,17 @@ public class StartScene_Manager : MonoBehaviour
     #region Click_Event
     public void Click_Start()
     {
-
-    }
-
-    public void Click_Extra()
-    {
-
-    }
-
-    public void Click_Option()
-    {
-
+        Load_Manager.LoadScene("Main_Scene");
     }
 
     public void Click_Exit()
     {
-
+        // 게임 종료
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
     }
     #endregion
 }

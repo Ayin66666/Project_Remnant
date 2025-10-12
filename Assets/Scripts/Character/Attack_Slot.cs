@@ -8,6 +8,7 @@ public class Attack_Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 {
     [Header("---Setting---")]
     [SerializeField] private Skill_Base skill;
+    [SerializeField] private int speed;
     public bool haveSkill;
 
 
@@ -21,7 +22,12 @@ public class Attack_Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         haveSkill = true;
         this.skill = skill;
-        icon.sprite = skill.skillData.SkillDatas[index].icon;
+        icon.sprite = skill.skillData.icon;
+    }
+
+    public void Speed_Setting(int speed)
+    {
+        this.speed = speed;
     }
 
     public void Slot_Reset()

@@ -13,6 +13,8 @@ public class Player_Manager : MonoBehaviour
 
     [Header("---Chapter & Stage Data---")]
     [SerializeField] private List<ChapterData_SO> chapterData;
+
+    [Header("---Selected Stage---")]
     [SerializeField] private StageData stageData;
 
 
