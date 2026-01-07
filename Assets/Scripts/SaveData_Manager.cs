@@ -17,6 +17,7 @@ public class SaveData
     public List<ChapterData> chapterData;
 }
 
+#region Chapter
 public class ChapterData
 {
     public List<StageData> stageData;
@@ -27,6 +28,7 @@ public class StageData
     public bool isClear;
     public bool isExClear;
 }
+#endregion
 
 
 public class SaveData_Manager : MonoBehaviour
@@ -45,11 +47,30 @@ public class SaveData_Manager : MonoBehaviour
         path = Path.Combine(Application.dataPath, fileName);
     }
 
-    public void SaveData()
+    /// <summary>
+    /// 데이터 존재 여부 체크
+    /// </summary>
+    public void CheckData()
     {
 
     }
 
+    /// <summary>
+    /// 데이터 저장
+    /// </summary>
+    public void SaveData()
+    {
+        // 각 매니저에서 데이터 받아오기
+        // 1. 인벤토리 (레벨업 재화 & 동기화 재화) -> Inventory_Manager
+        // 2. 캐릭터 편성 데이터 (인격 & 에고) -> Organization_Manager
+        // 3. 캐릭터 보유 여부 & 스테이터스(레벨 & 동기화) -> CharacterData_Manager
+        // 4. 스테이지 데이터 -> ChapterData_Manager
+        // 5. 튜토리얼 클리어 여부 -> ChapterData_Manager(튜토리얼 종료 후 체크)
+    }
+
+    /// <summary>
+    /// 데이터 로드
+    /// </summary>
     public void LoadData()
     {
 

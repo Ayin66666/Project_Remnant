@@ -9,22 +9,25 @@ public class SceneLoad_Manager : MonoBehaviour
 {
     [Header("---Setting---")]
     public static string sceneName;
+    public static string stageName;
     private Coroutine loadCoroutine;
+    [SerializeField, TextArea] private string[] tips;
 
     [Header("---UI---")]
     [SerializeField] private Slider progressbar;
-    [SerializeField] private TextMeshProUGUI loadingText;
-    [SerializeField] private CanvasGroup tipCanvasGroup;
     [SerializeField] private TextMeshProUGUI tipText;
+    [SerializeField] private TextMeshProUGUI stageNameText;
+    [SerializeField] private Image backgroundImage;
 
 
     /// <summary>
     /// æ¿ »£√‚
     /// </summary>
     /// <param name="sceneName"></param>
-    public static void LoadScene(string sceneName)
+    public static void LoadScene(string sceneName, string stageNameText)
     {
         SceneLoad_Manager.sceneName = sceneName;
+        SceneLoad_Manager.stageName = stageNameText;
         SceneManager.LoadScene("Loading_Scene");
     }
 
@@ -33,6 +36,18 @@ public class SceneLoad_Manager : MonoBehaviour
     {
         if (loadCoroutine != null) StopCoroutine(loadCoroutine);
         loadCoroutine = StartCoroutine(Load());
+        Tip();
+        StageName();
+    }
+
+    private void Tip()
+    {
+        tipText.text = tips[Random.Range(0, tips.Length)];
+    }
+
+    private void StageName()
+    {
+        stageNameText.text = stageName;
     }
 
     private IEnumerator Load()
@@ -51,17 +66,13 @@ public class SceneLoad_Manager : MonoBehaviour
                 progressbar.value = Mathf.MoveTowards(progressbar.value, 1f, Time.deltaTime);
             }
 
-            if (progressbar.value >= 1f)
-            {
-                loadingText.text = "Press SpaceBar to Start.";
-            }
-
             if (Input.GetKeyDown(KeyCode.Space) && progressbar.value >= 1f && operation.progress >= 0.9f)
             {
                 // Scene Move
+                SceneLoad_Manager.sceneName = "";
+                SceneLoad_Manager.stageName = "";
                 operation.allowSceneActivation = true;
             }
-
 
             yield return null;
         }
