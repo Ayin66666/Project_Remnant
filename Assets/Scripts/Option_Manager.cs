@@ -1,8 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
-using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 
 public class Option_Manager : MonoBehaviour
@@ -18,10 +17,45 @@ public class Option_Manager : MonoBehaviour
     [SerializeField] private float masterVolume;
     [SerializeField] private float bgmVolume;
     [SerializeField] private float sfxVolume;
-    public enum SoundType { Master, BGM, SFX };
+    public enum SoundType 
+    { 
+        Master, BGM, SFX 
+    };
+
+    [Header("---FPS & V-Sync---")]
+    [SerializeField]  private List<int> fps = new List<int> { 30, 60, 90, 120, -1 };
+    [SerializeField] private bool isVSyncOn;
+
+    [Header("---Post Processing---")]
+    [SerializeField] private bool isPostOn;
+    [SerializeField] private bool isPost_BloomOn;
+    [SerializeField] private bool isPost_MotionBlurOn;
+
+    [Header("---Anti Aliasing---")]
+    [SerializeField] private AntiAliasingType antiAliasing;
+    [SerializeField] private UniversalAdditionalCameraData cam;
+    public enum AntiAliasingType
+    {
+        Off, FXAA, SMAA,
+    }
 
 
     #region Sound Option
+    public void ToggleMaster(bool isOn)
+    {
+        SoundOnOff(isOn, SoundType.Master);
+    }
+
+    public void ToggleBGM(bool isOn)
+    {
+        SoundOnOff(isOn, SoundType.BGM);
+    }
+
+    public void ToggleSFX(bool isOn)
+    {
+        SoundOnOff(isOn, SoundType.SFX);
+    }
+
     /// <summary>
     /// 사운드의 On Off 여부 체크
     /// </summary>
@@ -45,6 +79,21 @@ public class Option_Manager : MonoBehaviour
         }
 
         ApplySound(type);
+    }
+
+    public void SetMasterVolume(float value)
+    {
+        SoundSetting(value, SoundType.Master);
+    }
+
+    public void SetBGMVolume(float value)
+    {
+        SoundSetting(value, SoundType.BGM);
+    }
+
+    public void SetSFXVolume(float value)
+    {
+        SoundSetting(value, SoundType.SFX);
     }
 
     /// <summary>
@@ -98,5 +147,89 @@ public class Option_Manager : MonoBehaviour
 
 
     #region FPS
+    /// <summary>
+    /// 프레임 조절 30 ~ 120
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetFPS(int value)
+    {
+        if (value < 0 || value >= fps.Count) 
+            Debug.Log($"프레임레이트 사이즈 오버 / 체크 필요 {value}");
+        else 
+            Application.targetFrameRate = fps[value];
+    }
+
+    public void VSync(bool isOn)
+    {
+        // 1 = On
+        // 2 = Off
+        isVSyncOn = isOn;
+        QualitySettings.vSyncCount = isOn ? 1 : 0;
+    }
+    #endregion
+
+
+    #region Post Processing & Anti Aliasing
+    
+    // 포스트 프로세싱 On/Off 는 여기에서는 값만 제어함!
+    
+    // 로드 과정에서 Stage_Manager 같은 해당 씬을 제어하는 매니저에게 알림을 주고
+    // 거기서 자기들이 가지고 있는 volume 컴포넌트의 값을 바꾸게 하도록 구현
+    // 이때 제어는 컴포넌트나 오브젝트 OnOff 대신 weight 값을 0~1로 제어하도록 변경
+
+    // On/Off 의 경우 연산 과정에서 일시적으로 프레임이 튀어버림
+    // 단, 성능 부분에서 최소 계산값이 있긴 함! 다만 무시해도 되는 수준
+
+    /// <summary>
+    /// 안티 얼라이싱 조절
+    /// </summary>
+    /// <param name="value"></param>
+    public void AntiAliasing_Setting(int value)
+    {
+        antiAliasing = (AntiAliasingType)value;
+        ApplyAntiAliasing(antiAliasing);
+    }
+
+    public void ApplyAntiAliasing(AntiAliasingType type)
+    {
+        // 여기 사용된 기능은 스위치식 C# 8.0 이상부터 사용 가능
+        cam.antialiasing = type switch
+        {
+            AntiAliasingType.Off => AntialiasingMode.None,
+            AntiAliasingType.FXAA => AntialiasingMode.FastApproximateAntialiasing,
+            AntiAliasingType.SMAA => AntialiasingMode.SubpixelMorphologicalAntiAliasing,
+            _ => AntialiasingMode.None
+        };
+    }
+
+    /// <summary>
+    /// 포스트 프로세싱 On/Off
+    /// </summary>
+    /// <param name="isOn"></param>
+    public void Post_Setting(bool isOn)
+    {
+        isPostOn = isOn;
+        // stage_Manager의 OnOff 함수 호출
+    }
+
+    /// <summary>
+    /// 포스트 프로세싱 - 볼륨 On/Off
+    /// </summary>
+    /// <param name="isOn"></param>
+    public void Post_Bloom(bool isOn)
+    {
+        isPost_BloomOn = isOn;
+        // stage_Manager의 OnOff 함수 호출
+    }
+
+    /// <summary>
+    /// 포스트 프로세싱 - 모션블러 On/Off
+    /// </summary>
+    /// <param name="isOn"></param>
+    public void Post_MotionBlur(bool isOn)
+    {
+        isPost_MotionBlurOn = isOn;
+        // stage_Manager의 OnOff 함수 호출
+    }
     #endregion
 }
