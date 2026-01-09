@@ -8,8 +8,8 @@ using TMPro;
 public class SceneLoad_Manager : MonoBehaviour
 {
     [Header("---Setting---")]
-    public static string sceneName;
-    public static string stageName;
+    public static string sceneName = "";
+    public static string stageName = "";
     private Coroutine loadCoroutine;
     [SerializeField, TextArea] private string[] tips;
 

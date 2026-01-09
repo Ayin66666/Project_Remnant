@@ -9,6 +9,7 @@ public class Option_Manager : MonoBehaviour
     [Header("---Component---")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioMixer mixer;
+    [SerializeField] private GameObject optionUI;
 
     [Header("---Setting / Sound---")]
     [SerializeField] private bool isMasterOn;
@@ -29,7 +30,7 @@ public class Option_Manager : MonoBehaviour
     [Header("---Post Processing---")]
     [SerializeField] private bool isPostOn;
     [SerializeField] private bool isPost_BloomOn;
-    [SerializeField] private bool isPost_MotionBlurOn;
+    [SerializeField] private bool isPost_VignetteOn;
 
     [Header("---Anti Aliasing---")]
     [SerializeField] private AntiAliasingType antiAliasing;
@@ -37,6 +38,12 @@ public class Option_Manager : MonoBehaviour
     public enum AntiAliasingType
     {
         Off, FXAA, SMAA,
+    }
+
+
+    public void OptionOnOff()
+    {
+        optionUI.SetActive(!optionUI.activeSelf);
     }
 
 
@@ -206,9 +213,9 @@ public class Option_Manager : MonoBehaviour
     /// 포스트 프로세싱 On/Off
     /// </summary>
     /// <param name="isOn"></param>
-    public void Post_Setting(bool isOn)
+    public void Post_Postprocessing(int value)
     {
-        isPostOn = isOn;
+        isPostOn = value == 0 ? false : true;
         // stage_Manager의 OnOff 함수 호출
     }
 
@@ -216,9 +223,9 @@ public class Option_Manager : MonoBehaviour
     /// 포스트 프로세싱 - 볼륨 On/Off
     /// </summary>
     /// <param name="isOn"></param>
-    public void Post_Bloom(bool isOn)
+    public void Post_Bloom(int value)
     {
-        isPost_BloomOn = isOn;
+        isPost_BloomOn = value == 0 ? false : true;
         // stage_Manager의 OnOff 함수 호출
     }
 
@@ -226,10 +233,29 @@ public class Option_Manager : MonoBehaviour
     /// 포스트 프로세싱 - 모션블러 On/Off
     /// </summary>
     /// <param name="isOn"></param>
-    public void Post_MotionBlur(bool isOn)
+    public void Post_Vignette(int value)
     {
-        isPost_MotionBlurOn = isOn;
+        isPost_VignetteOn = value == 0 ? false : true;
         // stage_Manager의 OnOff 함수 호출
+    }
+    #endregion
+
+
+    #region Save & Load
+    /// <summary>
+    /// 세이브에 필요한 데이터 전달
+    /// </summary>
+    public void SaveData()
+    {
+
+    }
+
+    /// <summary>
+    /// 저장된 옵션 설정 값 로드 후 적용
+    /// </summary>
+    public void LoadData()
+    {
+
     }
     #endregion
 }
