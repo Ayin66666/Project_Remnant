@@ -8,6 +8,8 @@ public class AttackSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 {
     [Header("---state---")]
     [SerializeField] private bool haveSkill;
+    [SerializeField] private Skill_Base skill;
+    [SerializeField] private AttackSlot targetSlot;
 
     [Header("---UI---")]
     [SerializeField] private Image icon;
@@ -37,4 +39,9 @@ public class AttackSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             // UI 종료
         }
     }
+
+    // 슬롯 역할
+    // 1. 스킬 & 속도 표시
+    // 2. 도발치 표시
+    // 3. 마우스 오버 시 스킬 & 합 설명 On/Off
 }
