@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Title_Manager : MonoBehaviour
+public class TitleManager : MonoBehaviour
 {
     // 역할
     // 시작 씬 관리
@@ -41,12 +41,12 @@ public class Title_Manager : MonoBehaviour
         if(true/*SaveData_Manager.CheckData()*/)
         {
             // 저장 데이터가 있다면 - 메인화면 이동
-            SceneLoad_Manager.LoadScene("Main_Scene", "임시 피난처");
+            SceneLoadManager.LoadScene("Main_Scene", "임시 피난처");
         }
         else
         {
             // 저장 데이터가 없다면 - 튜토리얼 이동
-            SceneLoad_Manager.LoadScene("Tutorial_Scene", "튜토리얼 \n- 엄지 산하 지부");
+            SceneLoadManager.LoadScene("Tutorial_Scene", "튜토리얼 \n- 엄지 산하 지부");
         }
 
     }

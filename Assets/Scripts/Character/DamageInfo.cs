@@ -1,11 +1,12 @@
-
-
-
 /// <summary>
 /// 공격자의 데미지 정보 전달 구조체
 /// </summary>
 public struct DamageInfo
 {
+    /// <summary>
+    /// 공격 타입
+    /// </summary>
+    public AttackType attackType;
     /// <summary>
     /// 공격자의 공격 레벨
     /// </summary>

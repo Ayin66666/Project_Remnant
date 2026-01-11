@@ -8,7 +8,7 @@ public class AttackSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 {
     [Header("---state---")]
     [SerializeField] private bool haveSkill;
-    [SerializeField] private Skill_Base skill;
+    [SerializeField] private SkillBase skill;
     [SerializeField] private AttackSlot targetSlot;
 
     [Header("---UI---")]

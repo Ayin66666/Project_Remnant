@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Game_Manager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     // ¸ğµç ±â´É ÃÑ°ı? À¯ÀÏÇÑ ½Ì±ÛÅæ?
-    public static Game_Manager instance;
+    public static GameManager instance;
 
     [Header("---Manager---")]
-    public SaveData_Manager saveData_Manager;
-    public Option_Manager option_Manager;
+    public SaveDataManager saveData_Manager;
+    public OptionManager option_Manager;
 
 
     private void Awake()

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Character_Base : MonoBehaviour, IDamageable
+public abstract class CharacterBase : MonoBehaviour, IDamageable
 {
     // 플레이어 & 몬스터의 공용 기능
 
@@ -13,20 +13,40 @@ public abstract class Character_Base : MonoBehaviour, IDamageable
     [Header("---Status---")]
     [SerializeField] private int level;
     [SerializeField] private int sync;
-    [SerializeField] private int hp;
+    [SerializeField] private int maxHp;
+    [SerializeField] private int curHp;
     [SerializeField] private List<int> groggy;
     [SerializeField] private int attack;
     [SerializeField] private int defence;
     [SerializeField] private Vector2Int speed;
     [SerializeField] private StatusDataSO statData;
-    public int Hp { get { return hp; } set {  hp = value; } }
+    public int Hp { get { return maxHp; } set {  maxHp = value; } }
     public List<int> Groggy { get {  return groggy; } set {  groggy = value; } }
 
+
     [Header("------")]
-    [SerializeField] private GameObject[] attackSlots;
+    [SerializeField] private AttackSlot[] attackSlots;
+
+
+    [Header("---Component---")]
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Rigidbody2D rigid;
+    [SerializeField] private CharacterUI characterUI;
 
 
     #region Status
+    /// <summary>
+    /// 통합 능력치 설정 함수 - Data_Setting() & Status_Setting() 둘 다 호출함
+    /// </summary>
+    /// <param name="level"></param>
+    /// <param name="sync"></param>
+    public void SetUp(int level, int sync)
+    {
+        Data_Setting(level, sync);
+        Status_Setting();
+        characterUI.UI_Setting(this);
+    }
+    
     /// <summary>
     /// 캐릭터 데이터 전달
     /// </summary>
@@ -43,23 +63,25 @@ public abstract class Character_Base : MonoBehaviour, IDamageable
     /// </summary>
     public void Status_Setting()
     {
-        hp = statData.BaseHp // 기본 체력
+        maxHp = statData.BaseHp // 기본 체력
             + statData.SyncUpData[sync].hp // 동기화 체력 
-            + Mathf.RoundToInt(statData.levelUpStat.hp * level * statData.growthFactor.hpFactor); // 레벨업 체력
+            + Mathf.RoundToInt(statData.LevelUpData.hp * level * statData.GrowthFactorData.hpFactor); // 레벨업 체력
+        
+        curHp = maxHp;
 
         attack = statData.BaseAttackPoint
-            + statData.syncUpData[sync].attack
-            + Mathf.RoundToInt(statData.levelUpStat.attack * level * statData.growthFactor.attackFactor);
+            + statData.SyncUpData[sync].attack
+            + Mathf.RoundToInt(statData.LevelUpData.attack * level * statData.GrowthFactorData.attackFactor);
 
         defence = statData.BaseDefencePoint
-            + statData.syncUpData[sync].defence
-            + Mathf.RoundToInt(statData.levelUpStat.defence * level * statData.growthFactor.defenceFactor);
+            + statData.SyncUpData[sync].defence
+            + Mathf.RoundToInt(statData.LevelUpData.defence * level * statData.GrowthFactorData.defenceFactor);
 
-        speed = statData.syncUpData[sync].attackSpeed;
+        speed = statData.SyncUpData[sync].attackSpeed;
 
         foreach(int g in statData.Groggy)
         {
-            groggy.Add(Mathf.RoundToInt(hp * g / 100));
+            groggy.Add(Mathf.RoundToInt(maxHp * g / 100));
         }
     }
     #endregion
@@ -89,7 +111,7 @@ public abstract class Character_Base : MonoBehaviour, IDamageable
         damage *= 1 + step * 0.1f;
         damage = Mathf.Max(1, damage);
 
-        hp -= (int)damage;
+        maxHp -= (int)damage;
     }
 
     public abstract void Die();

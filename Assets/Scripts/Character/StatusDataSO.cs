@@ -11,13 +11,14 @@ public class StatusDataSO : ScriptableObject
     // 3. 동기화 상승 능력치 (동기화 별 증가 스테이터스 수치)
 
     [Header("---Status---")]
+    [SerializeField] private string characterName;
     [SerializeField] private int baseHp;
     [SerializeField] private int baseAttackPoint;
     [SerializeField] private int baseDefencePoint;
     [SerializeField] private List<int> groggy;
-    public GrowthFactor growthFactor;
-    public LevelUpStat levelUpStat;
-    public List<SyncUpStat> syncUpData;
+    [SerializeField] private GrowthFactor growthFactor;
+    [SerializeField] private LevelUpStat levelUpStat;
+    [SerializeField] private List<SyncUpStat> syncUpData;
 
 
     /// <summary>
@@ -60,4 +61,5 @@ public class StatusDataSO : ScriptableObject
     public int BaseDefencePoint { get { return baseDefencePoint; } set { baseDefencePoint = value; } }
     public LevelUpStat LevelUpData { get { return levelUpStat; } set { levelUpStat = value; } }
     public List<SyncUpStat> SyncUpData { get { return syncUpData; } set { syncUpData = value; } }
+    public GrowthFactor GrowthFactorData { get { return growthFactor; } set { growthFactor = value; } }
 }

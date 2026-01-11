@@ -31,7 +31,7 @@ public class StageData
 #endregion
 
 
-public class SaveData_Manager : MonoBehaviour
+public class SaveDataManager : MonoBehaviour
 {
     // 역할 : 세이브 & 로드 매니저
     // 저장 방식 : Json 기반 데이터 저장 / 데이터 경로는 유니티 기본 저장 경로 사용

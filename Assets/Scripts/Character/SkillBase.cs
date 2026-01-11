@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public abstract class Skill_Base : MonoBehaviour
+public abstract class SkillBase : MonoBehaviour
 {
     // 하는 동작
     // 1. 스킬 벨류 (공격 타입, 타격 횟수, 배율)
@@ -15,10 +15,9 @@ public abstract class Skill_Base : MonoBehaviour
     [Header("---Setting---")]
     public AttackType type;
     [SerializeField] private List<CoinInfo> coins;
-    public enum AttackType { Slash, Pierce, Blunt }
 
     [Header("---Component---")]
-    [SerializeField] private Character_Base character;
+    [SerializeField] private CharacterBase character;
     [SerializeField] private Animator anim;
 
 

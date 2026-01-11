@@ -11,8 +11,8 @@ public class CharacterInfo
     public GameObject prefab;
 
 
-    public async void Spawn()
+    public GameObject Spawn()
     {
-
+        return prefab;
     }
 }

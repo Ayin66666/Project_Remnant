@@ -4,7 +4,7 @@ using UnityEngine.Audio;
 using UnityEngine.Rendering.Universal;
 
 
-public class Option_Manager : MonoBehaviour
+public class OptionManager : MonoBehaviour
 {
     [Header("---Component---")]
     [SerializeField] private AudioSource audioSource;

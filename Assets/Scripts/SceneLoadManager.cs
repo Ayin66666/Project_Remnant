@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 
 
-public class SceneLoad_Manager : MonoBehaviour
+public class SceneLoadManager : MonoBehaviour
 {
     [Header("---Setting---")]
     public static string sceneName = "";
@@ -26,8 +26,8 @@ public class SceneLoad_Manager : MonoBehaviour
     /// <param name="sceneName"></param>
     public static void LoadScene(string sceneName, string stageNameText)
     {
-        SceneLoad_Manager.sceneName = sceneName;
-        SceneLoad_Manager.stageName = stageNameText;
+        SceneLoadManager.sceneName = sceneName;
+        SceneLoadManager.stageName = stageNameText;
         SceneManager.LoadScene("Loading_Scene");
     }
 
@@ -69,8 +69,8 @@ public class SceneLoad_Manager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space) && progressbar.value >= 1f && operation.progress >= 0.9f)
             {
                 // Scene Move
-                SceneLoad_Manager.sceneName = "";
-                SceneLoad_Manager.stageName = "";
+                SceneLoadManager.sceneName = "";
+                SceneLoadManager.stageName = "";
                 operation.allowSceneActivation = true;
             }
 
