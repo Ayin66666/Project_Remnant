@@ -8,6 +8,8 @@ public class CharacterUI : MonoBehaviour
 {
     [Header("---Character---")]
     [SerializeField] private CharacterBase character;
+    [SerializeField] private StatusEffectSO test;
+
 
     [Header("---Hp & Groggy---")]
     [SerializeField] private TextMeshProUGUI hpText;
@@ -17,15 +19,27 @@ public class CharacterUI : MonoBehaviour
     [SerializeField] private Dictionary<int, GameObject> groggyLine = new Dictionary<int, GameObject>();
 
     [Header("---Buff & Debuff---")]
-    [SerializeField] private RectTransform statusIconRect;
-    [SerializeField] private GameObject statusIconPrefab;
+    [SerializeField] private RectTransform effectIconRect;
+    [SerializeField] private GameObject effectIconPrefab;
+
+    [SerializeField] private GameObject effectDescripionSet;
+    [SerializeField] private Image effectIconImage;
+    [SerializeField] private TextMeshProUGUI effectNameText;
+    [SerializeField] private TextMeshProUGUI effectDescripionText;
+
 
 
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.G))
         {
-            AddStatusEffectIcon(gameObject);
+            StatusEffectInfo info = new StatusEffectInfo
+            {
+                count = Random.Range(1, 10),
+                power = Random.Range(1, 10),
+                effectSO = test
+            };
+            AddStatusEffectIcon(info);
         }
     }
 
@@ -87,9 +101,11 @@ public class CharacterUI : MonoBehaviour
     /// 버프 & 디버프 추가
     /// </summary>
     /// <param name="debuffInfo"></param>
-    public void AddStatusEffectIcon(GameObject debuffInfo)
+    public void AddStatusEffectIcon(StatusEffectInfo effectInfo)
     {
-        Instantiate(statusIconPrefab, statusIconRect);
+        GameObject obj = Instantiate(effectIconPrefab, effectIconRect);
+        EffectIconUI ui = obj.GetComponent<EffectIconUI>();
+        ui.SetUp(effectInfo, this);
     }
 
     /// <summary>
@@ -98,7 +114,10 @@ public class CharacterUI : MonoBehaviour
     /// <param name="debuffInfo"></param>
     public void ShowStatusEffectTooltip(GameObject debuffInfo)
     {
-
+        effectDescripionSet.SetActive(true);
+        // effectIconImage.sprite = debuffInfo.;
+        effectNameText.text = "";
+        effectDescripionText.text = "";
     }
 
     /// <summary>
@@ -106,6 +125,9 @@ public class CharacterUI : MonoBehaviour
     /// </summary>
     public void HideEffectTooltip()
     {
-
+        effectDescripionSet.SetActive(false);
+        effectIconImage.sprite = null;
+        effectNameText.text = "";
+        effectDescripionText.text = "";
     }
 }

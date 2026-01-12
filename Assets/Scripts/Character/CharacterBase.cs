@@ -28,6 +28,10 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] private AttackSlot[] attackSlots;
 
 
+    [Header("---Status Effect---")]
+    [SerializeField] private StatusEffectContainer statusEffectContainer;
+
+
     [Header("---Component---")]
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Rigidbody2D rigid;
