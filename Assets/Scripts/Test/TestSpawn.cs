@@ -3,10 +3,11 @@ using UnityEngine;
 
 public class TestSpawn : MonoBehaviour
 {
-    [SerializeField] private CharacterInfo info;
+    [SerializeField] private EgoData info;
 
     void Update()
     {
+        /*
         if(Input.GetKeyDown(KeyCode.F))
         {
             GameObject obj = Instantiate(info.Spawn(), transform.position, Quaternion.identity);
@@ -14,5 +15,6 @@ public class TestSpawn : MonoBehaviour
 
             b.SetUp(info.level, info.sync);
         }
+        */
     }
 }

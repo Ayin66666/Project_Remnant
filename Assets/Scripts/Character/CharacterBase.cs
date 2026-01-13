@@ -103,6 +103,28 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     #region Damage
     public void TakeDamage(DamageInfo info)
     {
+        int damage = info.damageType switch
+        {
+            DamageType.Normal => CalNormalDamage(info),
+            DamageType.Keyword => info.keywordDamage,
+            _ => 0,
+        };
+
+        curHp -= damage;
+        if(curHp <= 0)
+        {
+            curHp = 0;
+            Die();
+        }
+    }
+
+    /// <summary>
+    /// 데미지 계산식을 활용한 일반 데미지 계산
+    /// </summary>
+    /// <param name="info"></param>
+    /// <returns></returns>
+    public int CalNormalDamage(DamageInfo info)
+    {
         // 데미지 공식
         // (공격 포인트 * 모션 배율 * 치명타 배율[1.5]) * step
         // step = 공격자의 공격 포인트 - 방어 포인트 했을 때, 얼마나 차이 나는지
@@ -115,8 +137,9 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         damage *= 1 + step * 0.1f;
         damage = Mathf.Max(1, damage);
 
-        maxHp -= (int)damage;
+        return (int)damage;
     }
+
 
     public abstract void Die();
     #endregion

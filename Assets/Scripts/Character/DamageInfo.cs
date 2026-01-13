@@ -4,7 +4,11 @@
 public struct DamageInfo
 {
     /// <summary>
-    /// 공격 타입
+    /// 데미지 종류 - 일반(기존 계산식), 키워드(고정피해)
+    /// </summary>
+    public DamageType damageType;
+    /// <summary>
+    /// 공격 타입 - 참관타
     /// </summary>
     public AttackType attackType;
     /// <summary>
@@ -27,4 +31,8 @@ public struct DamageInfo
     /// 치명타 배율 - 기본 배율은 1.5
     /// </summary>
     public float critMultiplier;
+    /// <summary>
+    /// 키워드 데미지 - damageType이 Keyword일 때 사용
+    /// </summary>
+    public int keywordDamage;
 }
