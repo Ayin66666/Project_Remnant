@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class TestSpawn : MonoBehaviour
 {
-    [SerializeField] private EgoData info;
+    [SerializeField] private IdentityData info;
 
     void Update()
     {

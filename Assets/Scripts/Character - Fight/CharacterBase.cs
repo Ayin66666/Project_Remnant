@@ -20,7 +20,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] private int defence;
     [SerializeField] private Vector2Int speed;
     [SerializeField] private StatusDataSO statData;
-    public int Hp { get { return maxHp; } set {  maxHp = value; } }
+    public int MaxHp { get { return maxHp; } set {  maxHp = value; } }
     public List<int> Groggy { get {  return groggy; } set {  groggy = value; } }
 
 
@@ -83,7 +83,8 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
         speed = statData.SyncUpData[sync].attackSpeed;
 
-        foreach(int g in statData.Groggy)
+        groggy.Clear();
+        foreach (int g in statData.Groggy)
         {
             groggy.Add(Mathf.RoundToInt(maxHp * g / 100));
         }

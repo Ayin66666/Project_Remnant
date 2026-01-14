@@ -8,7 +8,6 @@ public class CharacterUI : MonoBehaviour
 {
     [Header("---Character---")]
     [SerializeField] private CharacterBase character;
-    [SerializeField] private StatusEffectSO test;
 
 
     [Header("---Hp & Groggy---")]
@@ -17,6 +16,7 @@ public class CharacterUI : MonoBehaviour
     [SerializeField] private GameObject groggyLinePrefab;
     [SerializeField] private RectTransform groggyContainer;
     [SerializeField] private Dictionary<int, GameObject> groggyLine = new Dictionary<int, GameObject>();
+
 
     [Header("---Buff & Debuff---")]
     [SerializeField] private RectTransform effectIconRect;
@@ -28,21 +28,6 @@ public class CharacterUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI effectDescripionText;
 
 
-
-    private void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.G))
-        {
-            StatusEffectInfo info = new StatusEffectInfo
-            {
-                count = Random.Range(1, 10),
-                power = Random.Range(1, 10),
-                effectSO = test
-            };
-            AddStatusEffectIcon(info);
-        }
-    }
-
     /// <summary>
     /// 체력 & 그로기 UI 셋팅 (최초 1회)
     /// </summary>
@@ -50,9 +35,9 @@ public class CharacterUI : MonoBehaviour
     public void UI_Setting(CharacterBase character)
     {
         this.character = character;
-        hpSlider.maxValue = character.Hp;
-        hpSlider.value = character.Hp;
-        hpText.text = character.Hp.ToString();
+        hpSlider.maxValue = character.MaxHp;
+        hpSlider.value = character.MaxHp;
+        hpText.text = character.MaxHp.ToString();
 
 
         RectTransform sliderRect = hpSlider.GetComponent<RectTransform>();
@@ -63,7 +48,7 @@ public class CharacterUI : MonoBehaviour
             GameObject marker = Instantiate(groggyLinePrefab, groggyContainer);
             RectTransform rt = marker.GetComponent<RectTransform>();
 
-            float ratio = gHp / (float)character.Hp;
+            float ratio = gHp / (float)character.MaxHp;
             ratio = 1f - ratio;
             float posX = sliderWidth * ratio - sliderWidth * 0.5f;
 
@@ -77,13 +62,13 @@ public class CharacterUI : MonoBehaviour
     /// </summary>
     public void UI_Update()
     {
-        hpSlider.value = character.Hp;
-        hpText.text = character.Hp.ToString();
+        hpSlider.value = character.MaxHp;
+        hpText.text = character.MaxHp.ToString();
 
         List<int> toRemove = new List<int>();
         foreach (var kvp in groggyLine)
         {
-            if (character.Hp <= kvp.Key)
+            if (character.MaxHp <= kvp.Key)
             {
                 Destroy(kvp.Value);
                 toRemove.Add(kvp.Key);
