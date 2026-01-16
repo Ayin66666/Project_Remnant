@@ -1,15 +1,14 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-public class CharacterSlot : MonoBehaviour, IPointerClickHandler
+public class CharacterSlot : MonoBehaviour
 {
     [Header("---Setting---")]
     [SerializeField] private SlotType type;
     [SerializeField] private IdentityData identityInfo;
-    public enum SlotType { Organization, Select }
+    public enum SlotType { Organizing, IdentitySelect }
 
 
     [Header("---UI---")]
@@ -17,11 +16,18 @@ public class CharacterSlot : MonoBehaviour, IPointerClickHandler
     [SerializeField] private Image border;
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private GameObject selectTextSet;
+    [SerializeField] private GameObject buttonSet;
 
     [SerializeField] private GameObject[] rankIcon;
     [SerializeField] private Sprite[] borderSprite;
 
 
+    #region 데이터 설정
+    /// <summary>
+    /// 캐릭터 슬롯 데이터 설정
+    /// </summary>
+    /// <param name="info"></param>
     public void SetUp(IdentityData info)
     {
         characterImage.sprite = info.master.portrait;
@@ -39,6 +45,9 @@ public class CharacterSlot : MonoBehaviour, IPointerClickHandler
         }
     }
 
+    /// <summary>
+    /// 데이터 제거
+    /// </summary>
     public void Clear()
     {
         characterImage.sprite = null;
@@ -51,33 +60,32 @@ public class CharacterSlot : MonoBehaviour, IPointerClickHandler
             icon.SetActive(false);
         }
     }
+    #endregion
 
 
-    public void OnPointerClick(PointerEventData eventData)
+    #region 클릭 이벤트
+    /// <summary>
+    /// 편성창에서 클릭 (인격 선택창 표시)
+    /// </summary>
+    public void ShowIdentityList()
     {
-        switch (type)
-        {
-            // 편성창 슬롯이면
-            case SlotType.Organization: 
-                ClickOrganization();
-                break;
-
-            // 인격 & 에고 선택창 슬롯이면
-            case SlotType.Select: 
-                ClickSelect();
-                break;
-        }
+        // -> 인격 선택창 표시
     }
 
-    private void ClickOrganization()
+    /// <summary>
+    /// 인격 선택창에서 클릭 (해당 인격 선택)
+    /// </summary>
+    public void IdentitySelect()
     {
-        // 편성창에서 클릭했을 때 동작
-        // 인격 & 에고 선택창 표시
+        // -> 인격을 배치함 (1~12번)
     }
 
-    private void ClickSelect()
+    /// <summary>
+    /// 전투창에서 클릭 (인격의 편성 순서 선택)
+    /// </summary>
+    public void Organizing()
     {
-        // 선택창에서 클릭했을 때 동작
-        // 인격 장착 후 편성창으로 돌아감
+        // -> 해당 인격을 장착함
     }
+    #endregion
 }

@@ -39,7 +39,7 @@ public class IdentityMasterSO : ScriptableObject
 [System.Serializable]
 public class IdentityInfo
 {
-    public CharacterId character;
+    public CharacterId sinner;
     public List<IdentityData> info;
 }
 
@@ -49,6 +49,4 @@ public enum CharacterId
     ch02,
     ch03,
     ch04,
-    ch05,
-    ch06
 }
