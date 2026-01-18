@@ -6,9 +6,9 @@ using UnityEngine;
 public class EgoMasterSO : ScriptableObject
 {
     [Header("---Data---")]
-    public CharacterId characterId;
+    public CharacterId sinner;
     public string egoId;
-    public int egoRank;
+    public Rank egoRank;
     [Header("자원 순서 = 분노, 색욕, 나태, 탐식, 우울, 오만, 질투")]
     public List<int> egoCost = new List<int>() { 0, 0, 0, 0, 0, 0, 0 };
 
@@ -25,7 +25,7 @@ public class EgoMasterSO : ScriptableObject
 [System.Serializable]
 public class EgoInfo
 {
-    public CharacterId character;
+    public CharacterId sinner;
     public List<EgoData> info;
 }
 

@@ -1,9 +1,10 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-public class CharacterSlot : MonoBehaviour
+public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("---Setting---")]
     [SerializeField] private SlotType type;
@@ -31,6 +32,7 @@ public class CharacterSlot : MonoBehaviour
     public void SetUp(IdentityData info)
     {
         characterImage.sprite = info.master.portrait;
+        identityInfo = info;
         border.sprite = borderSprite[info.sync >= 3 ? 1 : 0]; // 3동기화 이상일 경우 테두리 변경
         levelText.text = info.level.ToString();
         nameText.text = info.master.identityName;
@@ -70,6 +72,7 @@ public class CharacterSlot : MonoBehaviour
     public void ShowIdentityList()
     {
         // -> 인격 선택창 표시
+        OrganizationManager.instance.OpenCharacterList(identityInfo.master.sinner);
     }
 
     /// <summary>
@@ -78,6 +81,7 @@ public class CharacterSlot : MonoBehaviour
     public void IdentitySelect()
     {
         // -> 인격을 배치함 (1~12번)
+        OrganizationManager.instance.ChangeIdentity(identityInfo);
     }
 
     /// <summary>
@@ -86,6 +90,26 @@ public class CharacterSlot : MonoBehaviour
     public void Organizing()
     {
         // -> 해당 인격을 장착함
+        // 이때 내가 이미 편성된 상태인지, 아닌지에 따라 동작 변경 필요
+        // 내가 편성중이라면 = 편성 해제 & 순서 땡기기
+        // 내가 편성되지 않았다면 = 편성 추가
+
+        Debug.Log("Short Press / 편성하기");
+    }
+    #endregion
+
+
+    #region 선택 슬롯 한정 이벤트
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (type == SlotType.IdentitySelect)
+            selectTextSet.SetActive(true);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (type == SlotType.IdentitySelect)
+            selectTextSet.SetActive(false);
     }
     #endregion
 }

@@ -75,7 +75,6 @@ public class ChatacterSlotButton : MonoBehaviour,
         {
             // 편성하기
             slot.Organizing();
-            Debug.Log("Short Press / 편성하기");
         }
     }
 }
