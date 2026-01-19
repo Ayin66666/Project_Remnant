@@ -39,3 +39,12 @@ public class EgoData
     [Header("---Reference---")]
     public EgoMasterSO master;
 }
+
+public enum Rank
+{
+    ZAYIN,
+    TETH,
+    HE,
+    WAW,
+    ALEPH
+}

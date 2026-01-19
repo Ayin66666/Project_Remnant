@@ -14,7 +14,7 @@ public class OrganizationManager : MonoBehaviour
 
     [Header("---Organization---")]
     [SerializeField] private List<CharacterSlot> characterSlot;
-    [SerializeField] private List<EgoSlot> egoSlot;
+    [SerializeField] private List<EgoEquipSlot> egoSlot;
     private Dictionary<CharacterId, IdentityData> organizationData = new();
     private Dictionary<CharacterId, EgoData> egoOrganizationData = new();
 
@@ -160,9 +160,11 @@ public class OrganizationManager : MonoBehaviour
         EgoInfo info2 = egoInfo.Find(x => x.sinner == id);
         for (int i = 0; i < egoOrganizationData.Count; i++)
         {
-            if (egoOrganizationData[id].isUnlocked)
+            // 에고 해금 여부 & 에고 티어가 동일한지 체크
+            if (egoOrganizationData[id].isUnlocked && egoOrganizationData[id].master.egoRank == rank)
             {
-                EgoSlot slot = pooling.GetEgoSlot();
+                // 에고 추가
+                EgoListSlot slot = pooling.GetEgoSlot();
                 slot.SetUp(egoOrganizationData[id]);
                 slot.gameObject.SetActive(true);
             }
@@ -183,11 +185,6 @@ public class OrganizationManager : MonoBehaviour
         {
             egoOrganizationData.Add(info.master.sinner, info);
         }
-    }
-
-    public void CloseEgoList()
-    {
-
     }
     #endregion
 }

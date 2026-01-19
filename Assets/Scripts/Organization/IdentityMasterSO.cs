@@ -49,4 +49,5 @@ public enum CharacterId
     ch02,
     ch03,
     ch04,
+    None
 }

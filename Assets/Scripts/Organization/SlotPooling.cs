@@ -11,7 +11,7 @@ public class SlotPooling : MonoBehaviour
     [SerializeField] private RectTransform identityListRect;
 
     [Header("---Ego Slot---")]
-    [SerializeField] private List<EgoSlot> egoSlot;
+    [SerializeField] private List<EgoListSlot> egoSlot;
     [SerializeField] private GameObject egoSlotPrefab;
     [SerializeField] private RectTransform egoListRect;
 
@@ -36,11 +36,11 @@ public class SlotPooling : MonoBehaviour
         }
 
         // 에고 슬롯
-        egoSlot = new List<EgoSlot>();
+        egoSlot = new List<EgoListSlot>();
         for (int i = 0; i < 30; i++)
         {
             GameObject slot = Instantiate(egoSlotPrefab, egoListRect);
-            egoSlot.Add(slot.GetComponent<EgoSlot>());
+            egoSlot.Add(slot.GetComponent<EgoListSlot>());
             slot.SetActive(false);
         }
     }
@@ -84,12 +84,12 @@ public class SlotPooling : MonoBehaviour
     /// 슬롯 보내기 & 여유분이 없는 경우 생성
     /// </summary>
     /// <returns></returns>
-    public EgoSlot GetEgoSlot()
+    public EgoListSlot GetEgoSlot()
     {
-        EgoSlot slot = egoSlot.FirstOrDefault(s => !s.gameObject.activeSelf);
+        EgoListSlot slot = egoSlot.FirstOrDefault(s => !s.gameObject.activeSelf);
         if (slot == null)
         {
-            slot = Instantiate(egoSlotPrefab, egoListRect).GetComponent<EgoSlot>();
+            slot = Instantiate(egoSlotPrefab, egoListRect).GetComponent<EgoListSlot>();
             egoSlot.Add(slot);
         }
         slot.Clear();
@@ -102,7 +102,7 @@ public class SlotPooling : MonoBehaviour
     /// </summary>
     public void ClearEgoSlot()
     {
-        foreach (EgoSlot s in egoSlot)
+        foreach (EgoListSlot s in egoSlot)
         {
             s.Clear();
             s.gameObject.SetActive(false);
