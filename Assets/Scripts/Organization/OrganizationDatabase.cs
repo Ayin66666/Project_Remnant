@@ -1,24 +1,34 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 
 public class OrganizationDatabase : MonoBehaviour
 {
-
+    [Header("---Data---")]
     [SerializeField] private List<OrganizationData> organizationList;
 
+
+    public void SetUUp()
+    {
+        organizationList = new List<OrganizationData>();
+        int length = Enum.GetValues(typeof(CharacterId)).Length;
+        for (int i = 0; i < length; i++)
+        {
+            OrganizationData data = new OrganizationData();
+            data.identity = null;
+            data.ego = null;
+
+            organizationList.Add(data);
+        }
+    }
 
     /// <summary>
     /// 편성
     /// </summary>
     public void AddOrganization(OrganizationData data)
     {
-        OrganizationData d = FindOrganizationData(data.identity.master.sinner);
-        
-        if (d == null) 
-            organizationList.Add(data);
-        else 
-            Debug.LogWarning("편성 실패: 이미 편성된 캐릭터");
+
     }
 
     /// <summary>
@@ -26,22 +36,7 @@ public class OrganizationDatabase : MonoBehaviour
     /// </summary>
     public void RemoveOrganization(CharacterId id)
     {
-        OrganizationData data = FindOrganizationData(id);
-        
-        if (data != null) 
-            organizationList.Remove(data);
-        else 
-            Debug.LogWarning("편성 취소 실패: 해당 캐릭터 없음");
-    }
 
-    /// <summary>
-    /// 편성 여부 체크
-    /// </summary>
-    /// <param name="id"></param>
-    public OrganizationData FindOrganizationData(CharacterId id)
-    {
-        OrganizationData data = organizationList.Find(x => x.identity.master.sinner == id);
-        return data;
     }
 
     /// <summary>

@@ -29,7 +29,6 @@ public class EgoListSlot : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void SetUp(EgoData info)
     {
         egoData = info;
-
         egoName.text = info.master.egoName;
         egoImage.sprite = info.master.egoSprite;
         syncIcon.sprite = syncSprite[info.sync];
@@ -82,7 +81,7 @@ public class EgoListSlot : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         else
         {
             // ¿¡°í ÀåÂø
-            OrganizationManager.instance.ChangeEgo(egoData);
+            OrganizationManager.instance.OrganizingEgo(egoData);
         }
     }
     #endregion

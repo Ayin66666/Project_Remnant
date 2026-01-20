@@ -92,6 +92,7 @@ public class SlotPooling : MonoBehaviour
             slot = Instantiate(egoSlotPrefab, egoListRect).GetComponent<EgoListSlot>();
             egoSlot.Add(slot);
         }
+
         slot.Clear();
         slot.gameObject.SetActive(true);
         return slot;

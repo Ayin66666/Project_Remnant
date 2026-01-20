@@ -19,6 +19,8 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private GameObject selectTextSet;
     [SerializeField] private GameObject buttonSet;
+    [SerializeField] private TextMeshProUGUI organizationCountText;
+
 
     [SerializeField] private GameObject[] rankIcon;
     [SerializeField] private Sprite[] borderSprite;
@@ -76,15 +78,6 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     }
 
     /// <summary>
-    /// 인격 선택창에서 클릭 (해당 인격 선택)
-    /// </summary>
-    public void IdentitySelect()
-    {
-        // -> 인격을 배치함 (1~12번)
-        OrganizationManager.instance.ChangeIdentity(identityInfo);
-    }
-
-    /// <summary>
     /// 전투창에서 클릭 (인격의 편성 순서 선택)
     /// </summary>
     public void Organizing()
@@ -95,6 +88,7 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         // 내가 편성되지 않았다면 = 편성 추가
 
         Debug.Log("Short Press / 편성하기");
+        OrganizationManager.instance.OrganizingIdentity(identityInfo);
     }
     #endregion
 
