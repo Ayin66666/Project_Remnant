@@ -39,7 +39,6 @@ public class OrganizationManager : MonoBehaviour
 
         SetUpIdentityData();
         SetUpEgoData();
-        SetUpOrganization();
     }
 
     /// <summary>
@@ -193,21 +192,23 @@ public class OrganizationManager : MonoBehaviour
 
     #region 편성
     /// <summary>
-    /// 편성 ego 변경
-    /// </summary>
-    /// <param name="info"></param>
-    public void OrganizingEgo(EgoData info)
-    {
-
-    }
-
-    /// <summary>
     /// 편성 인격 변경하기
     /// </summary>
     /// <param name="info"></param>
     public void OrganizingIdentity(IdentityData info)
     {
+        // 데이터베이스로 전달
+        OrganizationDatabase.instance.SetOrganization(info);
+    }
 
+    /// <summary>
+    /// 편성 ego 변경
+    /// </summary>
+    /// <param name="info"></param>
+    public void OrganizingEgo(EgoData info)
+    {
+        // 데이터베이스로 전달
+        OrganizationDatabase.instance.SetOrganization(info);
     }
     #endregion
 }
