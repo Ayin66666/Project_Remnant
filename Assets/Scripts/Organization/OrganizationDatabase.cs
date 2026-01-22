@@ -45,7 +45,7 @@ public class OrganizationDatabase : MonoBehaviour
 
 
     /// <summary>
-    /// 인격 편성
+    /// 인격 편성 & 변경
     /// </summary>
     public void SetOrganization(IdentityData data)
     {
@@ -93,25 +93,35 @@ public class OrganizationDatabase : MonoBehaviour
         }
     }
 
+
+    /// <summary>
+    /// 순서 편성
+    /// </summary>
+    /// <param name="sinner"></param>
     public void Organizing(CharacterId sinner)
     {
         int index = organizationList.FindIndex(x => x == sinner);
-        if (index == -1)
+        if (index != -1)
             organizationList.Add(sinner);
         else
             Debug.Log($"중복편성 오류 발생 / {sinner}, {index}");
     }
 
     /// <summary>
-    /// 편성 취소
+    /// 순서 편성 취소
     /// </summary>
-    public void RemoveOrganization(CharacterId id)
+    public void RemoveOrganization(CharacterId sinner)
     {
-        Debug.Log($"편성되지 않은 인격 / {id} / 체크 필요");
+        int index = organizationList.FindIndex(x => x == sinner);
+        if (index != -1)
+            organizationList.Remove(sinner);
+        else
+            Debug.Log($"편성되지 않은 인격 / {sinner} / 체크 필요");
+
     }
 
     /// <summary>
-    /// 편성 데이터 초기화
+    /// 순서 편성 초기화
     /// </summary>
     public void ClearData()
     {

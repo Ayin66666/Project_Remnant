@@ -5,12 +5,17 @@ using UnityEngine.EventSystems;
 public class ChatacterSlotButton : MonoBehaviour,
     IPointerDownHandler, IPointerUpHandler, IPointerExitHandler, IPointerEnterHandler
 {
+    // 1. 편성 리스트에서 1회 클릭 시 = 편성순서
+    // 2. 인격 리스트에서 1회 클릭 시 = 선택하기
+    // 3. 공통 기능 = 꾹 누르면 = 상세정보
+
+
     [Header("---Setting---")]
     [SerializeField] private ButtonType buttonType;
     [SerializeField] private float pressTime;
     [SerializeField] private bool isPress;
     private Coroutine pressCoroutine;
-    private enum ButtonType { Order, Select }
+    private enum ButtonType { OrderButton, ListButton }
 
 
     [Header("---UI---")]
@@ -31,13 +36,15 @@ public class ChatacterSlotButton : MonoBehaviour,
     public void OnPointerDown(PointerEventData eventData)
     {
         switch (buttonType)
-        {
-            case ButtonType.Order: // 클릭 시간에 따른 분기
+        { 
+            // 클릭 시간에 따른 분기 ( 1초 미만 = 순서 / 1초 이상 = 상세 정보 )
+            case ButtonType.OrderButton:
                 if (pressCoroutine != null) StopCoroutine(pressCoroutine);
                 pressCoroutine = StartCoroutine(PressChick());
                 break;
 
-            case ButtonType.Select: // 인격 리스트 표시
+            // 인격 리스트 표시
+            case ButtonType.ListButton: 
                 slot.ShowIdentityList();
                 break;
         }
@@ -47,6 +54,7 @@ public class ChatacterSlotButton : MonoBehaviour,
     {
         isPress = false;
     }
+
 
     /// <summary>
     /// 해당 기능은 슬롯 타입이 
@@ -67,14 +75,13 @@ public class ChatacterSlotButton : MonoBehaviour,
         // 타이머에 따른 분기
         if (timer >= pressTime)
         {
-            // 상세정보
-            Debug.Log("Long Press / 상세정보");
-            // 상세 정보는 어디에서?
+            // 상세 정보
+            slot.ShowIdentityUI();
         }
         else
         {
-            // 편성하기
-            slot.Organizing();
+            // 순서 편성
+            slot.OrderSetting();
         }
     }
 }

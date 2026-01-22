@@ -73,22 +73,23 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     /// </summary>
     public void ShowIdentityList()
     {
-        // -> 인격 선택창 표시
         OrganizationManager.instance.OpenCharacterList(identityInfo.master.sinner);
     }
 
     /// <summary>
-    /// 전투창에서 클릭 (인격의 편성 순서 선택)
+    /// 편성 순서 설정
     /// </summary>
-    public void Organizing()
+    public void OrderSetting()
     {
-        // -> 해당 인격을 장착함
-        // 이때 내가 이미 편성된 상태인지, 아닌지에 따라 동작 변경 필요
-        // 내가 편성중이라면 = 편성 해제 & 순서 땡기기
-        // 내가 편성되지 않았다면 = 편성 추가
+        OrganizationDatabase.instance.Organizing(identityInfo.master.sinner);
+    }
 
-        Debug.Log("Short Press / 편성하기");
-        OrganizationManager.instance.OrganizingIdentity(identityInfo);
+    /// <summary>
+    /// 인격 상세정보 표시
+    /// </summary>
+    public void ShowIdentityUI()
+    {
+
     }
     #endregion
 
