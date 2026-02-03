@@ -30,13 +30,16 @@ public class SkillDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointe
         coinPowerText.text = "";
     }
 
+
+    #region Mouse Event
     public void OnPointerEnter(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        CharacterDescriptionUI.instance.ShowSkillSlotDescription(true, data);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        CharacterDescriptionUI.instance.ShowSkillSlotDescription(false, null);
     }
+    #endregion
 }

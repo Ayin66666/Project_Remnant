@@ -22,6 +22,7 @@ public class IdentityMasterSO : ScriptableObject
     /// </summary>
     public GameObject prefab;
 
+    // 여기에 스킬 데이터 추가 필요!
 
     [Header("---UI---")]
     // UI 데이터는 따로 so 사용 예정
