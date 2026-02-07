@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
+[RequireComponent(typeof(Image))]
 public class SkillDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("---Setting---")]
@@ -60,11 +61,13 @@ public class SkillDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointe
     #region Mouse Event
     public void OnPointerEnter(PointerEventData eventData)
     {
+        Debug.Log("Call MouseA");
         CharacterDescriptionUI.instance.ShowSkillSlotDescription(true, data);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        Debug.Log("Call MouseB");
         CharacterDescriptionUI.instance.ShowSkillSlotDescription(false, null);
     }
     #endregion

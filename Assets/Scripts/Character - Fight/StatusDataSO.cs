@@ -15,6 +15,7 @@ public class StatusDataSO : ScriptableObject
     [SerializeField] private int baseHp;
     [SerializeField] private int baseAttackPoint;
     [SerializeField] private int baseDefencePoint;
+    [SerializeField] private List<float> attackResistance;
     [SerializeField] private List<int> groggy;
     [SerializeField] private GrowthFactor growthFactor;
     [SerializeField] private LevelUpStat levelUpStat;
@@ -59,6 +60,7 @@ public class StatusDataSO : ScriptableObject
     public List<int> Groggy { get { return groggy; } set { groggy = value; } }
     public int BaseAttackPoint { get { return baseAttackPoint; } set { baseAttackPoint = value; } }
     public int BaseDefencePoint { get { return baseDefencePoint; } set { baseDefencePoint = value; } }
+    public List<float> AttackResistance { get { return attackResistance; } set { attackResistance = value; } }
     public LevelUpStat LevelUpData { get { return levelUpStat; } set { levelUpStat = value; } }
     public List<SyncUpStat> SyncUpData { get { return syncUpData; } set { syncUpData = value; } }
     public GrowthFactor GrowthFactorData { get { return growthFactor; } set { growthFactor = value; } }

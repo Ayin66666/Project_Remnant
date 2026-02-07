@@ -19,7 +19,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] private int attack;
     [SerializeField] private int defence;
     [SerializeField] private Vector2Int speed;
-    [SerializeField] private StatusDataSO statData;
     public int MaxHp { get { return maxHp; } set {  maxHp = value; } }
     public List<int> Groggy { get {  return groggy; } set {  groggy = value; } }
 
@@ -44,10 +43,10 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// </summary>
     /// <param name="level"></param>
     /// <param name="sync"></param>
-    public void SetUp(int level, int sync)
+    public void SetUp(StatusDataSO data, int level, int sync)
     {
         Data_Setting(level, sync);
-        Status_Setting();
+        Status_Setting(data);
         characterUI.UI_Setting(this);
     }
     
@@ -65,26 +64,26 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// <summary>
     /// 스테이터스 셋팅
     /// </summary>
-    public void Status_Setting()
+    public void Status_Setting(StatusDataSO data)
     {
-        maxHp = statData.BaseHp // 기본 체력
-            + statData.SyncUpData[sync].hp // 동기화 체력 
-            + Mathf.RoundToInt(statData.LevelUpData.hp * level * statData.GrowthFactorData.hpFactor); // 레벨업 체력
+        maxHp = data.BaseHp // 기본 체력
+            + data.SyncUpData[sync].hp // 동기화 체력 
+            + Mathf.RoundToInt(data.LevelUpData.hp * level * data.GrowthFactorData.hpFactor); // 레벨업 체력
         
         curHp = maxHp;
 
-        attack = statData.BaseAttackPoint
-            + statData.SyncUpData[sync].attack
-            + Mathf.RoundToInt(statData.LevelUpData.attack * level * statData.GrowthFactorData.attackFactor);
+        attack = data.BaseAttackPoint
+            + data.SyncUpData[sync].attack
+            + Mathf.RoundToInt(data.LevelUpData.attack * level * data.GrowthFactorData.attackFactor);
 
-        defence = statData.BaseDefencePoint
-            + statData.SyncUpData[sync].defence
-            + Mathf.RoundToInt(statData.LevelUpData.defence * level * statData.GrowthFactorData.defenceFactor);
+        defence = data.BaseDefencePoint
+            + data.SyncUpData[sync].defence
+            + Mathf.RoundToInt(data.LevelUpData.defence * level * data.GrowthFactorData.defenceFactor);
 
-        speed = statData.SyncUpData[sync].attackSpeed;
+        speed = data.SyncUpData[sync].attackSpeed;
 
         groggy.Clear();
-        foreach (int g in statData.Groggy)
+        foreach (int g in data.Groggy)
         {
             groggy.Add(Mathf.RoundToInt(maxHp * g / 100));
         }

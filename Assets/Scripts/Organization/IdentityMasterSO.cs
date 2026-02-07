@@ -5,13 +5,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Identity_CharacterName_Rank_IdentityName", menuName = "Identity/IdentityMaster", order = int.MaxValue)]
 public class IdentityMasterSO : ScriptableObject
 {
-    [Header("---Setting---")]
-    public SkillType skillType;
-    public SkillVariantType skillVariantType;
-    public enum SkillType { Skill1, Skill2, Skil3, Guard, Attack };
-    public enum SkillVariantType { Base = 0, Enhanced = 1 }
-
-
     [Header("---Data---")]
     public CharacterId sinner;
     /// <summary>
@@ -28,9 +21,14 @@ public class IdentityMasterSO : ScriptableObject
     /// 인게임 전투에서 사용될 캐릭터의 프리팹
     /// </summary>
     public GameObject prefab;
-    // 여기에 스킬 데이터 추가 필요!
+    /// <summary>
+    /// 스킬 데이터를 모아둔 리스트
+    /// </summary>
     public List<SkillSO> skillData;
-
+    /// <summary>
+    /// 능력치 데이터 - 기초 능력치 및 레벨업 당 능력치 증가폭 등
+    /// </summary>
+    public StatusDataSO statData;
 
     [Header("---UI---")]
     // UI 데이터는 따로 so 사용 예정

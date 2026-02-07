@@ -5,6 +5,13 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Skill_SkillName", menuName = "Skill/SkillSO", order = int.MaxValue)]
 public class SkillSO : ScriptableObject
 {
+    [Header("---Type---")]
+    public SkillType skillType;
+    public SkillVariantType skillVariantType;
+    public enum SkillType { Skill1, Skill2, Skil3, Guard, Attack };
+    public enum SkillVariantType { Base = 0, Enhanced = 1 }
+
+
     [Header("---Skill Data---")]
     public AttackType attackType;
     public Crime crimeType;
