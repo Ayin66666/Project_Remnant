@@ -1,27 +1,43 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 
-public class CharacterDescriptionUI : MonoBehaviour
+public class CharacterDescription : MonoBehaviour
 {
-    public static CharacterDescriptionUI instance;
+    public static CharacterDescription instance;
 
     [Header("---Test---")]
     [SerializeField] private OrganizationData tdata;
 
-    [Header("---Setting---")]
+    [Header("---Component---")]
     [SerializeField] private CharacterSummation summation;
-
+    [SerializeField] private DescriptionUI descriptionUI;
 
     [Header("---UI---")]
     [SerializeField] private GameObject[] uiSet;
+
+    [Header("---Left Status UI---")]
     [SerializeField] private TextMeshProUGUI statusText;
     [SerializeField] private TextMeshProUGUI[] resistText;
 
+    [Header("---Right Status UI---")]
+    [SerializeField] private List<GameObject> rankIcon;
+    [SerializeField] private Image characterIcon;
+    [SerializeField] private Sprite[] characterSprite;
+
+    [SerializeField] private Image syncIcon;
+    [SerializeField] private Sprite[] syncSprite;
+
+    [SerializeField] private TextMeshProUGUI identityNameText;
+
+    [SerializeField] private TextMeshProUGUI levelText;
+    [SerializeField] private TextMeshProUGUI expText;
+    [SerializeField] private Slider expSlider;
 
     [Header("---Prefab---")]
     [SerializeField] private GameObject skillSlotPrefab;
-    [SerializeField] private GameObject egoSlotPrefab;
 
 
     private void Awake()
@@ -37,6 +53,7 @@ public class CharacterDescriptionUI : MonoBehaviour
         }
     }
 
+
     #region 최초 & 종료 시 실행 
     public void SetUp(OrganizationData data)
     {
@@ -46,25 +63,27 @@ public class CharacterDescriptionUI : MonoBehaviour
         Clear();
 
         // 캐릭터 능력치 (1번 = hp / 2번 = 속도 / 3번 = 공격 & 방어 포인트)
-        Status(data);
+        StatusL(data);
+
+        // 우상단 이름 & 레벨
+        StatusR(data);
 
         // 요약
         summation.SetUp(data);
 
-        // 에고 UI
+        // 에고
 
-        // 스킬 UI
+        // 스킬
 
         // 패시브
 
     }
 
-    public void Clear()
-    {
-
-    }
-
-    public void Status(OrganizationData data)
+    /// <summary>
+    /// 좌측 능력치 설정
+    /// </summary>
+    /// <param name="data"></param>
+    public void StatusL(OrganizationData data)
     {
         StatusDataSO sd = data.identity.master.statData;
         int level = data.identity.level;
@@ -88,13 +107,60 @@ public class CharacterDescriptionUI : MonoBehaviour
         statusText.text = $"<sprite=1> {hp}  <sprite=2> {speed.x} - {speed.y}  <sprite=3> {attack}/{defence}";
         for (int i = 0; i < resistText.Length; i++)
         {
-            resistText[i].text = $"{data.identity.master.statData.AttackResistance[i]}";
+            resistText[i].text = data.identity.master.statData.AttackResistance[i].ToString("0.0");
         }
+    }
+
+    /// <summary>
+    /// 우측 능력치 설정
+    /// </summary>
+    /// <param name="data"></param>
+    public void StatusR(OrganizationData data)
+    {
+        // 인격 등급
+        for (int i = 0; i < data.identity.master.identityRank; i++)
+        {
+            rankIcon[i].SetActive(true);
+        }
+
+        // 캐릭터 아이콘
+        characterIcon.sprite = characterSprite[(int)data.sinner];
+
+        // 동기화 아이콘
+        syncIcon.sprite = syncSprite[data.identity.sync];
+
+        // 이름
+        identityNameText.text = data.identity.master.identityName;
+
+        // 레벨 & 경험치 바
+        levelText.text = $"Lv {data.identity.level}";
+        expText.text = $"{data.identity.curExp} / {data.identity.maxExp[data.identity.level - 1]}";
+        expSlider.maxValue = data.identity.maxExp[data.identity.level - 1];
+        expSlider.value = data.identity.curExp;
+    }
+
+    /// <summary>
+    /// 캐릭터 설명 UI Off
+    /// </summary>
+    public void Clear()
+    {
+        // 설명 UI
+        descriptionUI.Clear();
+        descriptionUI.gameObject.SetActive(false);
+
+        // 요약 UI
+        summation.Clear();
+
+        // 에고 UI
+
+        // 스킬 UI
+
+        // 패시브
     }
     #endregion
 
 
-    #region 클릭 이벤트
+    #region 버튼 이벤트
     /// <summary>
     /// 0 : Summation
     /// 1 : Skill
@@ -111,6 +177,22 @@ public class CharacterDescriptionUI : MonoBehaviour
 
         uiSet[index].SetActive(true);
     }
+
+    /// <summary>
+    /// 레벨업 - 레벨업 UI
+    /// </summary>
+    public void LevelUp()
+    {
+
+    }
+
+    /// <summary>
+    /// 동기화 - 동기화업 UI
+    /// </summary>
+    public void SyncUp()
+    {
+
+    }
     #endregion
 
 
@@ -123,19 +205,19 @@ public class CharacterDescriptionUI : MonoBehaviour
     public void ShowSkillSlotDescription(bool isOn, SkillSO skill)
     {
         // 받은 정보를 기반으로 데이터 표시
-        // - 이거 UI가 슬롯 옆에 있어야 하는데?
-        Debug.Log("스킬슬롯 마우스 UI표시");
+        descriptionUI.gameObject.SetActive(isOn);
+        if (isOn) descriptionUI.SetUp(skill);
     }
 
     /// <summary>
     /// 인격 상세정보 - 에고 설명 슬롯 클릭 시 호출
     /// </summary>
     /// <param name="info"></param>
-    public void ShowEgoSlotDescription(bool isOn, EgoData info)
+    public void ShowEgoSlotDescription(bool isOn, EgoData ego)
     {
         // 받은 정보를 기반으로 데이터 표시
-        // - 이거 UI가 슬롯 옆에 있어야 하는데?
-        Debug.Log("에고슬롯 마우스 UI표시");
+        descriptionUI.gameObject.SetActive(isOn);
+        if (isOn) descriptionUI.SetUp(ego);
     }
     #endregion
 }

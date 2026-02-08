@@ -9,13 +9,30 @@ public class EgoMasterSO : ScriptableObject
     public CharacterId sinner;
     public string egoId;
     public Rank egoRank;
+    public int targetCount;
+    public List<CoinInfo> coins;
     [Header("자원 순서 = 분노, 색욕, 나태, 탐식, 우울, 오만, 질투")]
     public List<int> egoCost = new List<int>() { 0, 0, 0, 0, 0, 0, 0 };
 
 
     [Header("---UI---")]
     public string egoName;
+    [TextArea] public string egoDescription;
     public Sprite egoSprite;
+
+
+    [System.Serializable]
+    public struct CoinInfo
+    {
+        /// <summary>
+        /// 스킬 배율
+        /// </summary>
+        public float value;
+        /// <summary>
+        /// 타격 횟수 (데미지 / hitCount)
+        /// </summary>
+        public int hitCount;
+    }
 }
 
 
