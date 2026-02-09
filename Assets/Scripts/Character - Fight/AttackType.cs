@@ -30,3 +30,15 @@ public enum Crime
     Pride, // 오만
     Envy // 질투
 }
+
+/// <summary>
+/// 스킬 1~3, 가드, 몬스터 공격(Attack)
+/// </summary>
+public enum SkillType 
+{ 
+    Skill1, 
+    Skill2, 
+    Skil3, 
+    Guard, 
+    Attack 
+};

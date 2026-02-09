@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -9,13 +7,17 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
 
     [Header("---Manager---")]
-    public SaveDataManager saveData_Manager;
-    public OptionManager option_Manager;
-
+    public SaveDataManager saveDataManager;
+    public OptionManager optionManager;
+    public ExpManager expManager;
 
     private void Awake()
     {
-        if (instance == null) instance = this;
-        else Destroy(gameObject);
+        if (instance == null) 
+            instance = this;
+        else 
+            Destroy(gameObject);
+
+        DontDestroyOnLoad(gameObject);
     }
 }

@@ -134,8 +134,9 @@ public class CharacterDescription : MonoBehaviour
 
         // 레벨 & 경험치 바
         levelText.text = $"Lv {data.identity.level}";
-        expText.text = $"{data.identity.curExp} / {data.identity.maxExp[data.identity.level - 1]}";
-        expSlider.maxValue = data.identity.maxExp[data.identity.level - 1];
+        int exp = GameManager.instance.expManager.GetNeedExp(data.identity.level);
+        expText.text = $"{data.identity.curExp} / {exp}";
+        expSlider.maxValue = exp;
         expSlider.value = data.identity.curExp;
     }
 
@@ -144,6 +145,12 @@ public class CharacterDescription : MonoBehaviour
     /// </summary>
     public void Clear()
     {
+        // 우상단 능력치
+        for (int i = 0; i < rankIcon.Count; i++)
+        {
+            rankIcon[i].SetActive(false);
+        }
+
         // 설명 UI
         descriptionUI.Clear();
         descriptionUI.gameObject.SetActive(false);

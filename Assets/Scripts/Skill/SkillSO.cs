@@ -8,7 +8,6 @@ public class SkillSO : ScriptableObject
     [Header("---Type---")]
     public SkillType skillType;
     public SkillVariantType skillVariantType;
-    public enum SkillType { Skill1, Skill2, Skil3, Guard, Attack };
     public enum SkillVariantType { Base = 0, Enhanced = 1 }
 
 
