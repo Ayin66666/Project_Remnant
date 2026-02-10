@@ -4,52 +4,79 @@ using UnityEngine;
 [CustomEditor(typeof(SkillSO))]
 public class SkillSOEditor : Editor
 {
+    // --- Type ---
+    SerializedProperty skillType;
+    SerializedProperty skillVariantType;
+
+    // --- Skill Data ---
     SerializedProperty attackType;
     SerializedProperty crimeType;
     SerializedProperty coinPower;
+    SerializedProperty targetCount;
     SerializedProperty coins;
-    SerializedProperty ui;
-    SerializedProperty skill;
 
+    // --- UI ---
+    SerializedProperty ui;
     SerializedProperty icon;
     SerializedProperty skillName;
     SerializedProperty skillDescription;
 
+    // --- Action ---
+    SerializedProperty skill;
+
     void OnEnable()
     {
+        // Type
+        skillType = serializedObject.FindProperty("skillType");
+        skillVariantType = serializedObject.FindProperty("skillVariantType");
+
+        // Skill Data
         attackType = serializedObject.FindProperty("attackType");
         crimeType = serializedObject.FindProperty("crimeType");
         coinPower = serializedObject.FindProperty("coinPower");
+        targetCount = serializedObject.FindProperty("targetCount");
         coins = serializedObject.FindProperty("coins");
-        ui = serializedObject.FindProperty("ui");
-        skill = serializedObject.FindProperty("skill");
 
+        // UI
+        ui = serializedObject.FindProperty("ui");
         icon = ui.FindPropertyRelative("icon");
         skillName = ui.FindPropertyRelative("skillName");
         skillDescription = ui.FindPropertyRelative("skillDescription");
+
+        // Action
+        skill = serializedObject.FindProperty("skill");
     }
 
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
 
+        // ===== Type =====
+        EditorGUILayout.LabelField("Type", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(skillType);
+        EditorGUILayout.PropertyField(skillVariantType);
+
+        EditorGUILayout.Space(10);
+
+        // ===== Skill Data =====
         EditorGUILayout.LabelField("Skill Data", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(attackType);
         EditorGUILayout.PropertyField(crimeType);
         EditorGUILayout.PropertyField(coinPower);
+        EditorGUILayout.PropertyField(targetCount);
         EditorGUILayout.PropertyField(coins);
 
         EditorGUILayout.Space(10);
 
+        // ===== Skill UI =====
         EditorGUILayout.LabelField("Skill UI", EditorStyles.boldLabel);
-
         DrawIconPreview();
         EditorGUILayout.PropertyField(skillName);
-
         DrawLargeTextArea(skillDescription, 6);
 
         EditorGUILayout.Space(10);
 
+        // ===== Action =====
         EditorGUILayout.LabelField("Action", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(skill);
 
@@ -74,11 +101,13 @@ public class SkillSOEditor : Editor
     {
         EditorGUILayout.LabelField(property.displayName);
 
-        GUIStyle style = new GUIStyle(EditorStyles.textArea);
-        style.wordWrap = true;
+        GUIStyle style = new GUIStyle(EditorStyles.textArea)
+        {
+            wordWrap = true
+        };
 
         float lineHeight = EditorGUIUtility.singleLineHeight;
-        float height = lineHeight * 3 * heightMultiplier;
+        float height = lineHeight * heightMultiplier * 3;
 
         property.stringValue = EditorGUILayout.TextArea(
             property.stringValue,

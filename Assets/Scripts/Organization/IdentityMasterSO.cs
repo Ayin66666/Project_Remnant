@@ -40,14 +40,32 @@ public class IdentityMasterSO : ScriptableObject
     /// 편성창 이름 - 임시
     /// </summary>
     public string identityName;
-}
+    /// <summary>
+    /// 패시브 데이터를 모아둔 리스트
+    /// </summary>
+    public List<Passive> passiveData;
 
+
+    [System.Serializable]
+    public struct Passive
+    {
+        public string passiveName;
+        public int passiveDescription;
+    }
+}
 
 [System.Serializable]
 public class IdentityInfo
 {
     public CharacterId sinner;
     public List<IdentityData> info;
+}
+
+[System.Serializable]
+public class PassiveData // -> 변경필요
+{
+    public string passiveName;
+    public string passiveDescription;
 }
 
 public enum CharacterId

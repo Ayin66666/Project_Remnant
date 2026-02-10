@@ -12,8 +12,10 @@ public class CharacterDescription : MonoBehaviour
     [SerializeField] private OrganizationData tdata;
 
     [Header("---Component---")]
-    [SerializeField] private CharacterSummation summation;
     [SerializeField] private DescriptionUI descriptionUI;
+    [SerializeField] private CharacterSummation summation;
+    [SerializeField] private SkillUI skill;
+
 
     [Header("---UI---")]
     [SerializeField] private GameObject[] uiSet;
@@ -71,9 +73,10 @@ public class CharacterDescription : MonoBehaviour
         // 요약
         summation.SetUp(data);
 
-        // 에고
-
         // 스킬
+        skill.SetUp(data.identity);
+
+        // 에고
 
         // 패시브
 
