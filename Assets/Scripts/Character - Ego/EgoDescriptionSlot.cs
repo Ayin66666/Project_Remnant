@@ -30,7 +30,7 @@ public class EgoDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointerE
     public void SetUp(EgoData data)
     {
         this.data = data;
-        iconImage.sprite = data.master.egoSprite;
+        iconImage.sprite = data.master.egoIcon;
         syncImage.sprite = syncIcon[data.sync];
         nameText.text = data.master.egoName;
     }

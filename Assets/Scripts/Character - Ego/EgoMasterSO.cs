@@ -9,6 +9,7 @@ public class EgoMasterSO : ScriptableObject
     public CharacterId sinner;
     public string egoId;
     public Rank egoRank;
+    public int coinPower;
     public int targetCount;
     public List<CoinInfo> coins;
     [Header("자원 순서 = 분노, 색욕, 나태, 탐식, 우울, 오만, 질투")]
@@ -18,7 +19,7 @@ public class EgoMasterSO : ScriptableObject
     [Header("---UI---")]
     public string egoName;
     [TextArea] public string egoDescription;
-    public Sprite egoSprite;
+    public Sprite egoIcon;
 
 
     [System.Serializable]

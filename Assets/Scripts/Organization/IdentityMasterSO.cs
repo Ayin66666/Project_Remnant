@@ -43,29 +43,37 @@ public class IdentityMasterSO : ScriptableObject
     /// <summary>
     /// 패시브 데이터를 모아둔 리스트
     /// </summary>
-    public List<Passive> passiveData;
+    public List<PassiveUIData> passiveUIData;
 
-
-    [System.Serializable]
-    public struct Passive
-    {
-        public string passiveName;
-        public int passiveDescription;
-    }
+    // 정신력 데이터
+    /// <summary>
+    /// 정신력 아이콘
+    /// </summary>
+    public Sprite mentalityIcon;
+    /// <summary>
+    /// 정신력 이름
+    /// </summary>
+    public string mentalityName;
+    /// <summary>
+    /// 정신력 설명
+    /// </summary>
+    [TextArea] public string mentalityDescription;
 }
+
+
+[System.Serializable]
+public class PassiveUIData
+{
+    public string passiveName;
+    [TextArea] public string passiveDescription;
+}
+
 
 [System.Serializable]
 public class IdentityInfo
 {
     public CharacterId sinner;
     public List<IdentityData> info;
-}
-
-[System.Serializable]
-public class PassiveData // -> 변경필요
-{
-    public string passiveName;
-    public string passiveDescription;
 }
 
 public enum CharacterId

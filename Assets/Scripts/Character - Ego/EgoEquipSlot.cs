@@ -46,7 +46,7 @@ public class EgoEquipSlot : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         {
             equipEgoData = info;
             nameText.text = info.master.egoName;
-            egoImage.sprite = info.master.egoSprite;
+            egoImage.sprite = info.master.egoIcon;
             egoImage.color = new Color(1, 1, 1, 1);
             rankIcon.sprite = rankSprites[(int)info.master.egoRank];
             syncIcon.sprite = syncSprites[info.sync];
@@ -61,7 +61,7 @@ public class EgoEquipSlot : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     {
         equipEgoData = info;
         nameText.text = info.master.egoName;
-        egoImage.sprite = info.master.egoSprite;
+        egoImage.sprite = info.master.egoIcon;
         egoImage.color = new Color(1, 1, 1, 1);
         rankIcon.sprite = rankSprites[(int)info.master.egoRank];
         syncIcon.sprite = syncSprites[info.sync];

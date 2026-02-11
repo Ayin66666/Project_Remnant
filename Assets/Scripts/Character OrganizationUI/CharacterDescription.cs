@@ -15,7 +15,8 @@ public class CharacterDescription : MonoBehaviour
     [SerializeField] private DescriptionUI descriptionUI;
     [SerializeField] private CharacterSummation summation;
     [SerializeField] private SkillUI skill;
-
+    [SerializeField] private EgoUI ego;
+    [SerializeField] private MentalityUI mentality;
 
     [Header("---UI---")]
     [SerializeField] private GameObject[] uiSet;
@@ -59,7 +60,7 @@ public class CharacterDescription : MonoBehaviour
     #region 최초 & 종료 시 실행 
     public void SetUp(OrganizationData data)
     {
-        // 최초 1회 실행 - 캐릭터의 편성 데이터를 받아와서 UI에 전달
+        // 캐릭터의 편성 데이터를 받아와서 UI에 전달
 
         // 데이터 초기화
         Clear();
@@ -77,9 +78,10 @@ public class CharacterDescription : MonoBehaviour
         skill.SetUp(data.identity);
 
         // 에고
+        ego.SetUp(data);
 
-        // 패시브
-
+        // 정신력
+        mentality.SetUp(data.identity);
     }
 
     /// <summary>

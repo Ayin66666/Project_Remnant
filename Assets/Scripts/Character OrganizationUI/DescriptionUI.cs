@@ -76,7 +76,7 @@ public class DescriptionUI : MonoBehaviour
         Clear();
 
         // UI ¼¼ÆÃ
-        icon.sprite = ego.master.egoSprite;
+        icon.sprite = ego.master.egoIcon;
         nameText.text = ego.master.egoName;
         descriptionText.text = ego.master.egoDescription;
 

@@ -30,7 +30,7 @@ public class EgoListSlot : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         egoData = info;
         egoName.text = info.master.egoName;
-        egoImage.sprite = info.master.egoSprite;
+        egoImage.sprite = info.master.egoIcon;
         syncIcon.sprite = syncSprite[info.sync];
         rankIcon.sprite = rankSprite[(int)info.master.egoRank];
     }
