@@ -14,11 +14,9 @@ public class OrganizationUI : MonoBehaviour
 
     [Header("---UI---")]
     [SerializeField] private GameObject selectListUI;
+    [SerializeField] private GameObject identityUI;
     [SerializeField] private GameObject egoListUI;
-    [SerializeField] private GameObject identityDescriptionUI;
-
-
-
+    [SerializeField] private CharacterDescription descriptionUI;
 
 
     private void Start()
@@ -28,32 +26,45 @@ public class OrganizationUI : MonoBehaviour
 
 
     /// <summary>
-    /// 인격 리스트 표시
+    /// 편성창 UI OnOff
+    /// </summary>
+    /// <param name="isOn"></param>
+    public void OrganizationUISetting(bool isOn)
+    {
+        // 기본적으로 UI는 identityUI 가 켜지는게 기본
+        selectListUI.SetActive(isOn);
+        IdentityListUI(isOn);
+    }
+
+    /// <summary>
+    /// 인격 리스트 OnOff
     /// </summary>
     /// <param name="isOn"></param>
     public void IdentityListUI(bool isOn)
     {
-        selectListUI.SetActive(isOn);
-        if(!isOn) egoListUI.SetActive(false);
+        identityUI.SetActive(isOn);
+        egoListUI.SetActive(false);
     }
 
     /// <summary>
-    /// 에고 UI 표시
+    /// 에고 UI OnOff
     /// </summary>
     /// <param name="isOn"></param>
     public void EgoListUI(bool isOn)
     {
-        egoListUI.SetActive(!isOn);
+        egoListUI.SetActive(isOn);
+        identityUI.SetActive(false);
     }
 
     /// <summary>
-    /// 인격 상세정보 표시 - 캐릭터 슬롯 꾹 클릭
+    /// 인격 상세정보 표시 - 캐릭터 슬롯 꾹 클릭으로 동작
     /// </summary>
-    public void ShowSinnerDescriptionUI(bool isOn, CharacterId sinner)
+    public void ShowSinnerDescriptionUI(bool isOn, OrganizationData data)
     {
         // UI 설정
+        if(isOn) descriptionUI.SetUp(data);
 
         // UI On
-        identityDescriptionUI.SetActive(isOn);
+        descriptionUI.gameObject.SetActive(isOn);
     }
 }

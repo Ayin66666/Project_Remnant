@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,28 +6,19 @@ public class OrganizationManager : MonoBehaviour
 {
     public static OrganizationManager instance;
 
-    [Header("---Setting / Data---")]
-    [SerializeField] private List<IdentityInfo> identityInfo;
-    [SerializeField] private List<EgoInfo> egoInfo;
 
-    [Header("---Organization---")]
+    [Header("---현제 편성중인 캐릭터의 데이터---")]
     [SerializeField] private CharacterId curSinner;
     [SerializeField] private List<CharacterSlot> characterSlot;
     [SerializeField] private List<EgoEquipSlot> egoSlot;
-
 
     [Header("---UI---")]
     [SerializeField] private GameObject selectUI;
     [SerializeField] private GameObject identityListUI;
     [SerializeField] private GameObject egoListUI;
 
-
     [Header("---Component---")]
     [SerializeField] private SlotPooling pooling;
-
-
-    [Header("---Test / 테스트 종료 후 삭제 예정!---")]
-    [SerializeField] private IdentityData[] testInfo;
 
 
     #region 시작 데이터 세팅 로직
@@ -37,70 +27,9 @@ public class OrganizationManager : MonoBehaviour
         instance = this;
         Application.targetFrameRate = 30;
 
-        SetUpIdentityData();
-        SetUpEgoData();
+        SetUpOrganization();
     }
 
-    /// <summary>
-    /// 보유중인 인격 데이터 설정
-    /// </summary>
-    public void SetUpIdentityData()
-    {
-        identityInfo = new List<IdentityInfo>();
-        foreach (CharacterId characterId in Enum.GetValues(typeof(CharacterId)))
-        {
-            IdentityInfo egoInfo = new IdentityInfo();
-            egoInfo.sinner = characterId;
-
-            // 경로 지정 & 데이터 로드
-            string path = $"Identity/{characterId.ToString().ToUpper()}";
-            IdentityMasterSO[] masters = Resources.LoadAll<IdentityMasterSO>(path);
-
-            // 런타임 데이터 생성
-            egoInfo.info = new List<IdentityData>(masters.Length);
-            foreach (IdentityMasterSO master in masters)
-            {
-                // Json 이 없을 경우 데이터 생성 로직임!
-                IdentityData data = new IdentityData();
-                data.isUnlocked = true;
-                data.level = 1;
-                data.sync = 1;
-                data.master = master;
-
-                egoInfo.info.Add(data);
-            }
-
-            identityInfo.Add(egoInfo);
-        }
-    }
-
-    /// <summary>
-    /// 보유중인 에고 데이터 설정
-    /// </summary>
-    public void SetUpEgoData()
-    {
-        egoInfo = new List<EgoInfo>();
-        foreach(CharacterId characterId in Enum.GetValues(typeof(CharacterId)))
-        {
-            EgoInfo egoInfo = new EgoInfo();
-            egoInfo.sinner = characterId;
-
-            string path = $"Ego/{characterId.ToString().ToUpper()}";
-            EgoMasterSO[] masters = Resources.LoadAll<EgoMasterSO>(path);
-            egoInfo.info = new List<EgoData>(masters.Length);
-            foreach(EgoMasterSO master in masters)
-            {
-                EgoData data = new EgoData();
-                data.isUnlocked = true;
-                data.sync = 1;
-                data.master = master;
-
-                egoInfo.info.Add(data);
-            }
-
-            this.egoInfo.Add(egoInfo);
-        }
-    }
 
     /// <summary>
     /// 게임 시작 시 편성 데이터 로드 & 초기값 설정
@@ -108,8 +37,14 @@ public class OrganizationManager : MonoBehaviour
     public void SetUpOrganization()
     {
         // 데이터가 있다면 - 로드
-
-        // 데이터가 없다면 - 현재는 무조건 초기값 세팅
+        if(false)
+        {
+            // OrganizationDatabase.instance.LoadData();
+        }
+        else
+        {
+            // 데이터가 없다면 - 현재는 무조건 초기값 세팅
+        }
     }
     #endregion
 
@@ -122,7 +57,7 @@ public class OrganizationManager : MonoBehaviour
     public void OpenCharacterList(CharacterId id)
     {
         curSinner = id;
-
+        /*
         // 데이터 세팅 - 인격
         IdentityInfo info1 = identityInfo.Find(x => x.sinner == id);
         for (int i = 0; i < info1.info.Count; i++)
@@ -139,6 +74,7 @@ public class OrganizationManager : MonoBehaviour
         selectUI.SetActive(true);
         identityListUI.SetActive(true);
         egoListUI.SetActive(false);
+        */
     }
 
     /// <summary>
@@ -165,7 +101,7 @@ public class OrganizationManager : MonoBehaviour
     {
         // 리스트 클리어
         pooling.ClearEgoSlot();
-
+        /*
         // 데이터 세팅 - ego
         EgoInfo info2 = egoInfo.Find(x => x.sinner == curSinner);
         Debug.Log(info2);
@@ -186,6 +122,7 @@ public class OrganizationManager : MonoBehaviour
         egoListUI.SetActive(true);
         selectUI.SetActive(true);
         identityListUI.SetActive(false);
+        */
     }
     #endregion
 
@@ -198,7 +135,7 @@ public class OrganizationManager : MonoBehaviour
     public void OrganizingIdentity(IdentityData info)
     {
         // 데이터베이스로 전달
-        OrganizationDatabase.instance.SetOrganization(info);
+        OrganizationDatabase.instance.SetIdentity(info);
     }
 
     /// <summary>
@@ -208,7 +145,7 @@ public class OrganizationManager : MonoBehaviour
     public void OrganizingEgo(EgoData info)
     {
         // 데이터베이스로 전달
-        OrganizationDatabase.instance.SetOrganization(info);
+        OrganizationDatabase.instance.SetEgo(info);
     }
     #endregion
 }

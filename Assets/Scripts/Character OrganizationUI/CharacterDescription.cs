@@ -82,6 +82,13 @@ public class CharacterDescription : MonoBehaviour
 
         // Á¤½Å·Â
         mentality.SetUp(data.identity);
+
+        // UI OnOff
+        foreach(GameObject obj in uiSet)
+        {
+            obj.SetActive(false);
+        }
+        uiSet[0].SetActive(true);
     }
 
     /// <summary>

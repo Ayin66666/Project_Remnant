@@ -81,7 +81,19 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     /// </summary>
     public void OrderSetting()
     {
-        OrganizationDatabase.instance.Organizing(identityInfo.master.sinner);
+        if (identityInfo == null) return;
+
+        // 편성 체크
+        if (OrganizationDatabase.instance.OrganizingCheck(identityInfo.master.sinner))
+        {
+            // 편성
+            OrganizationDatabase.instance.OrganizationOrderSetting(identityInfo.master.sinner);
+        }
+        else
+        {
+            // 편성해제
+            OrganizationDatabase.instance.RemoveOrganizationOrder(identityInfo.master.sinner);
+        }
     }
 
     /// <summary>
@@ -89,6 +101,13 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     /// </summary>
     public void ShowIdentityUI()
     {
+        if(identityInfo == null) return;
+
+        OrganizationData data = OrganizationDatabase.instance.GetOrganizationData(identityInfo.master.sinner);
+        if (data != null)
+            CharacterDescription.instance.SetUp(data);
+        else
+            Debug.Log("오류발생 / 인격 편성 체크필요");
 
     }
     #endregion
