@@ -159,17 +159,6 @@ public class OrganizationDatabase : MonoBehaviour
 
     #region 데이터 체크 & 전달
     /// <summary>
-    /// 이미 순서가 편성되어 있는지 체크
-    /// </summary>
-    /// <param name="sinner"></param>
-    public bool OrganizingCheck(CharacterId sinner)
-    {
-        int index = organizationList.FindIndex(x => x == sinner);
-        if (index != -1) return true;
-        else return false;
-    }
-
-    /// <summary>
     /// 편성된 인격 & 에고 데이터 전달
     /// </summary>
     /// <param name="sinner"></param>
@@ -184,34 +173,41 @@ public class OrganizationDatabase : MonoBehaviour
             return null;
         }
     }
+
+    /// <summary>
+    /// 지정된 인격의 보유 데이터 전달
+    /// </summary>
+    /// <param name="sinner"></param>
+    /// <returns></returns>
+    public IdentityInfo GetIdentityInfo(CharacterId sinner)
+    {
+        int index = identityInfo.FindIndex(x => x.sinner == sinner);
+        if (index != -1)
+            return identityInfo[index];
+        else
+        {
+            Debug.Log($"인격 정보 없음 / {sinner}");
+            return null;
+        }
+    }
     #endregion
 
 
     #region 편성 순서 로직
-    /// <summary>
-    /// 지정 인격 편성
-    /// </summary>
-    /// <param name="sinner"></param>
     public void OrganizationOrderSetting(CharacterId sinner)
     {
+        // 1. 편성 여부 체크
         int index = organizationList.FindIndex(x => x == sinner);
         if (index != -1)
-            organizationList.Add(sinner);
-        else
-            Debug.Log($"중복편성 오류 발생 / {sinner}, {index}");
-    }
-
-    /// <summary>
-    /// 지정 인격의 편성 취소
-    /// </summary>
-    public void RemoveOrganizationOrder(CharacterId sinner)
-    {
-        int index = organizationList.FindIndex(x => x == sinner);
-        if (index != -1)
+        {
+            // 편성중이라면 - 편성 해제
             organizationList.Remove(sinner);
+        }
         else
-            Debug.Log($"편성되지 않은 인격 / {sinner} / 체크 필요");
-
+        {
+            // 미편성이라면 - 편성
+            organizationList.Add(sinner);
+        }
     }
 
     /// <summary>

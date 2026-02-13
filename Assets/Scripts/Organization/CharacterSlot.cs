@@ -8,6 +8,7 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 {
     [Header("---Setting---")]
     [SerializeField] private SlotType type;
+    [SerializeField] private CharacterId slotOnwer;
     [SerializeField] private IdentityData identityInfo;
     public enum SlotType { Organizing, IdentitySelect }
 
@@ -33,6 +34,7 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     /// <param name="info"></param>
     public void SetUp(IdentityData info)
     {
+        slotOnwer = info.master.sinner;
         characterImage.sprite = info.master.portrait;
         identityInfo = info;
         border.sprite = borderSprite[info.sync >= 3 ? 1 : 0]; // 3동기화 이상일 경우 테두리 변경
@@ -73,7 +75,8 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     /// </summary>
     public void ShowIdentityList()
     {
-        OrganizationManager.instance.OpenCharacterList(identityInfo.master.sinner);
+        Debug.Log(OrganizationManager.instance);
+        OrganizationManager.instance.OpenCharacterList(slotOnwer);
     }
 
     /// <summary>
@@ -82,18 +85,7 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public void OrderSetting()
     {
         if (identityInfo == null) return;
-
-        // 편성 체크
-        if (OrganizationDatabase.instance.OrganizingCheck(identityInfo.master.sinner))
-        {
-            // 편성
-            OrganizationDatabase.instance.OrganizationOrderSetting(identityInfo.master.sinner);
-        }
-        else
-        {
-            // 편성해제
-            OrganizationDatabase.instance.RemoveOrganizationOrder(identityInfo.master.sinner);
-        }
+        OrganizationDatabase.instance.OrganizationOrderSetting(slotOnwer);
     }
 
     /// <summary>
@@ -103,7 +95,7 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         if(identityInfo == null) return;
 
-        OrganizationData data = OrganizationDatabase.instance.GetOrganizationData(identityInfo.master.sinner);
+        OrganizationData data = OrganizationDatabase.instance.GetOrganizationData(slotOnwer);
         if (data != null)
             CharacterDescription.instance.SetUp(data);
         else

@@ -22,11 +22,14 @@ public class OrganizationManager : MonoBehaviour
 
 
     #region 시작 데이터 세팅 로직
-    private void Start()
+    private void Awake()
     {
-        instance = this;
-        Application.targetFrameRate = 30;
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
 
+        Application.targetFrameRate = 30;
         SetUpOrganization();
     }
 
@@ -37,7 +40,7 @@ public class OrganizationManager : MonoBehaviour
     public void SetUpOrganization()
     {
         // 데이터가 있다면 - 로드
-        if(false)
+        if (false)
         {
             // OrganizationDatabase.instance.LoadData();
         }
@@ -57,9 +60,17 @@ public class OrganizationManager : MonoBehaviour
     public void OpenCharacterList(CharacterId id)
     {
         curSinner = id;
-        /*
+
         // 데이터 세팅 - 인격
-        IdentityInfo info1 = identityInfo.Find(x => x.sinner == id);
+        IdentityInfo info1 = OrganizationDatabase.instance.GetIdentityInfo(id);
+        Debug.Log(info1);
+        if (info1 == null)
+        {
+            Debug.Log("인격 정보 없음");
+            return;
+        }
+
+        // 슬롯에 데이터 전달
         for (int i = 0; i < info1.info.Count; i++)
         {
             if (info1.info[i].isUnlocked)
@@ -74,7 +85,6 @@ public class OrganizationManager : MonoBehaviour
         selectUI.SetActive(true);
         identityListUI.SetActive(true);
         egoListUI.SetActive(false);
-        */
     }
 
     /// <summary>
