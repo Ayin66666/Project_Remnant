@@ -1,16 +1,13 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class CharacterSlot : MonoBehaviour
 {
     [Header("---Setting---")]
-    [SerializeField] private SlotType type;
     [SerializeField] private CharacterId slotOnwer;
     [SerializeField] private IdentityData identityInfo;
-    public enum SlotType { Organizing, IdentitySelect }
 
 
     [Header("---UI---")]
@@ -18,7 +15,6 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [SerializeField] private Image border;
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI nameText;
-    [SerializeField] private GameObject selectTextSet;
     [SerializeField] private GameObject buttonSet;
     [SerializeField] private TextMeshProUGUI organizationCountText;
 
@@ -80,7 +76,7 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     }
 
     /// <summary>
-    /// 편성 순서 설정
+    /// 편성하기 (순서)
     /// </summary>
     public void OrderSetting()
     {
@@ -101,21 +97,6 @@ public class CharacterSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         else
             Debug.Log("오류발생 / 인격 편성 체크필요");
 
-    }
-    #endregion
-
-
-    #region 선택 슬롯 한정 이벤트
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        if (type == SlotType.IdentitySelect)
-            selectTextSet.SetActive(true);
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        if (type == SlotType.IdentitySelect)
-            selectTextSet.SetActive(false);
     }
     #endregion
 }

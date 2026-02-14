@@ -75,8 +75,10 @@ public class OrganizationManager : MonoBehaviour
         {
             if (info1.info[i].isUnlocked)
             {
-                CharacterSlot slot = pooling.GetIdentitySlot();
-                slot.SetUp(info1.info[i]);
+                CharacterSelectSlot slot = pooling.GetIdentitySlot();
+
+                // 여기 일단은 false로 넣긴 하는데, 원래는 편성 여부 체크해서 넣어야 함!
+                slot.SetUp(info1.info[i], false); 
                 slot.gameObject.SetActive(true);
             }
         }

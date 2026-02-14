@@ -6,7 +6,7 @@ using UnityEngine;
 public class SlotPooling : MonoBehaviour
 {
     [Header("---Identity Slot---")]
-    [SerializeField] private List<CharacterSlot> selectSlot;
+    [SerializeField] private List<CharacterSelectSlot> selectSlot;
     [SerializeField] private GameObject inentitySlotPrefab;
     [SerializeField] private RectTransform identityListRect;
 
@@ -27,11 +27,11 @@ public class SlotPooling : MonoBehaviour
     public void SlotSetUp()
     {
         // 인격 슬롯
-        selectSlot = new List<CharacterSlot>();
+        selectSlot = new List<CharacterSelectSlot>();
         for (int i = 0; i < 30; i++)
         {
             GameObject slot = Instantiate(inentitySlotPrefab, identityListRect);
-            selectSlot.Add(slot.GetComponent<CharacterSlot>());
+            selectSlot.Add(slot.GetComponent<CharacterSelectSlot>());
             slot.SetActive(false);
         }
 
@@ -51,12 +51,12 @@ public class SlotPooling : MonoBehaviour
     /// 슬롯 보내기 & 여유분이 없는 경우 생성
     /// </summary>
     /// <returns></returns>
-    public CharacterSlot GetIdentitySlot()
+    public CharacterSelectSlot GetIdentitySlot()
     {
-        CharacterSlot slot = selectSlot.FirstOrDefault(s => !s.gameObject.activeSelf);
+        CharacterSelectSlot slot = selectSlot.FirstOrDefault(s => !s.gameObject.activeSelf);
         if (slot == null)
         {
-            slot = Instantiate(inentitySlotPrefab, identityListRect).GetComponent<CharacterSlot>();
+            slot = Instantiate(inentitySlotPrefab, identityListRect).GetComponent<CharacterSelectSlot>();
             selectSlot.Add(slot);
         }
 
@@ -70,7 +70,7 @@ public class SlotPooling : MonoBehaviour
     /// </summary>
     public void ClearIdentitySlot()
     {
-        foreach (CharacterSlot s in selectSlot)
+        foreach (CharacterSelectSlot s in selectSlot)
         {
             s.Clear();
             s.gameObject.SetActive(false);
