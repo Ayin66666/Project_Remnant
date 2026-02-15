@@ -8,7 +8,7 @@ public class CharacterSlot : MonoBehaviour
     [Header("---Setting---")]
     [SerializeField] private CharacterId slotOnwer;
     [SerializeField] private IdentityData identityInfo;
-
+    public CharacterId SlotOnwer { get { return slotOnwer; } private set { slotOnwer = value; } }
 
     [Header("---UI---")]
     [SerializeField] private Image characterImage;
@@ -71,7 +71,6 @@ public class CharacterSlot : MonoBehaviour
     /// </summary>
     public void ShowIdentityList()
     {
-        Debug.Log(OrganizationManager.instance);
         OrganizationManager.instance.OpenCharacterList(slotOnwer);
     }
 

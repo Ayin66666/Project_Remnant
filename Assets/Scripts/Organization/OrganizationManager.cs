@@ -63,7 +63,6 @@ public class OrganizationManager : MonoBehaviour
 
         // 데이터 세팅 - 인격
         IdentityInfo info1 = OrganizationDatabase.instance.GetIdentityInfo(id);
-        Debug.Log(info1);
         if (info1 == null)
         {
             Debug.Log("인격 정보 없음");
@@ -100,6 +99,23 @@ public class OrganizationManager : MonoBehaviour
         egoListUI.SetActive(false);
         selectUI.SetActive(false);
         identityListUI.SetActive(false);
+    }
+
+    /// <summary>
+    /// 인격 선택 후 슬롯 데이터 업데이트
+    /// </summary>
+    public void CharacterSlotUpdata(IdentityData data)
+    {
+        // 해당 캐릭터의 슬롯 찾기
+        CharacterSlot slot = characterSlot.Find(x => x.SlotOnwer == data.master.sinner);
+        if(slot != null)
+        {
+            slot.SetUp(data);
+        }
+        else
+        {
+            Debug.Log("해당 캐릭터의 슬롯이 존재하지 않습니다.");
+        }
     }
     #endregion
 
@@ -139,7 +155,7 @@ public class OrganizationManager : MonoBehaviour
     #endregion
 
 
-    #region 편성
+    #region 편성 -> 이쪽 데이터베이스가 이동한다 치면 필요없을듯?
     /// <summary>
     /// 편성 인격 변경하기
     /// </summary>

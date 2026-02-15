@@ -124,14 +124,22 @@ public class OrganizationDatabase : MonoBehaviour
     /// </summary>
     public void SetIdentity(IdentityData data)
     {
+        // 혹시 모를 인격 미편성 체크
         bool haveData = organizationData.ContainsKey(data.master.sinner);
         if (haveData)
         {
+            // 데이터 저장
             organizationData[data.master.sinner].identity = data;
+
+            // 편성창 슬롯 업데이트
+            OrganizationManager.instance.CharacterSlotUpdata(data);
+
+            // 로그
+            Debug.Log($"인격 편성 완료 / {organizationData[data.master.sinner].identity}");
         }
         else
         {
-            // 모종의 이유로 수감자의 데이터가 제대로 편성되지 않았을 경우
+            // 모종의 이유로 수감자의 데이터가 제대로 설정되지 않았을 경우
             Debug.Log($"에러 발생 / 인격 데이터 설정 오류 / {data.master.sinner}");
         }
     }
