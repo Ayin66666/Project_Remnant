@@ -30,6 +30,7 @@ public class CharacterSlot : MonoBehaviour
     /// <param name="info"></param>
     public void SetUp(IdentityData info)
     {
+        Debug.Log($"슬롯 업데이트 {info}");
         slotOnwer = info.master.sinner;
         characterImage.sprite = info.master.portrait;
         identityInfo = info;

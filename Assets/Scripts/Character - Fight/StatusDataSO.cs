@@ -11,7 +11,6 @@ public class StatusDataSO : ScriptableObject
     // 3. 동기화 상승 능력치 (동기화 별 증가 스테이터스 수치)
 
     [Header("---Status---")]
-    [SerializeField] private string characterName;
     [SerializeField] private int baseHp;
     [SerializeField] private int baseAttackPoint;
     [SerializeField] private int baseDefencePoint;
