@@ -1,6 +1,5 @@
-using UnityEngine;
 using System.IO;
-using System.Collections.Generic;
+using UnityEngine;
 
 
 public class SaveData
@@ -14,20 +13,9 @@ public class SaveData
 
     public int version;
     public bool playTutorial;
-    public List<ChapterData> chapterData;
 }
 
 #region Chapter
-public class ChapterData
-{
-    public List<StageData> stageData;
-}
-
-public class StageData
-{
-    public bool isClear;
-    public bool isExClear;
-}
 #endregion
 
 

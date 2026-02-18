@@ -8,7 +8,7 @@ public class OrganizationDatabase : MonoBehaviour
     public static OrganizationDatabase instance;
 
     [Header("---편성 데이터---")]
-    [SerializeField] private List<CharacterId> organizationList;
+    [SerializeField] private List<CharacterId> organizationOrderList;
     [SerializeField] private Dictionary<CharacterId, OrganizationData> organizationData;
 
     [Header("---보유 데이터---")]
@@ -19,15 +19,21 @@ public class OrganizationDatabase : MonoBehaviour
     private void Awake()
     {
         instance = this;
+        DataSetting();
+    }
 
-        // 인격 & 에고 & 편성 데이터 로드
+
+    #region 파일에서 인격 & 에고 데이터 읽기
+    /// <summary>
+    /// 인격 & 에고 & 편성 데이터 가져오기
+    /// </summary>
+    public void DataSetting()
+    {
         SetUpIdentityData();
         SetUpEgoData();
         SetUpOrganizationData();
     }
 
-
-    #region 인격 & 에고 데이터 로드
     /// <summary>
     /// 파일에서 인격 데이터 로드
     /// </summary>
@@ -36,15 +42,15 @@ public class OrganizationDatabase : MonoBehaviour
         identityInfo = new List<IdentityInfo>();
         foreach (CharacterId characterId in Enum.GetValues(typeof(CharacterId)))
         {
-            IdentityInfo egoInfo = new IdentityInfo();
-            egoInfo.sinner = characterId;
+            IdentityInfo identityInfo = new IdentityInfo();
+            identityInfo.sinner = characterId;
 
             // 경로 지정 & 데이터 로드
             string path = $"Identity/{characterId.ToString().ToUpper()}";
             IdentityMasterSO[] masters = Resources.LoadAll<IdentityMasterSO>(path);
 
             // 런타임 데이터 생성
-            egoInfo.info = new List<IdentityData>(masters.Length);
+            identityInfo.info = new List<IdentityData>(masters.Length);
             foreach (IdentityMasterSO master in masters)
             {
                 // Json 이 없을 경우 데이터 생성 로직임!
@@ -54,10 +60,12 @@ public class OrganizationDatabase : MonoBehaviour
                 data.sync = 1;
                 data.master = master;
 
-                egoInfo.info.Add(data);
+                identityInfo.info.Add(data);
+
+                Debug.Log($"데이터 생성 : {data.master}");
             }
 
-            identityInfo.Add(egoInfo);
+            this.identityInfo.Add(identityInfo);
         }
     }
 
@@ -103,12 +111,12 @@ public class OrganizationDatabase : MonoBehaviour
         {
             // 로드 데이터가 없다면 기본값 생성
             organizationData = new Dictionary<CharacterId, OrganizationData>();
-            int length = Enum.GetValues(typeof(CharacterId)).Length;
+            int length = Enum.GetValues(typeof(CharacterId)).Length-1;
             for (int i = 0; i < length; i++)
             {
                 OrganizationData data = new OrganizationData();
                 data.sinner = (CharacterId)i;
-                data.identity = null;
+                data.identity = identityInfo.Find(x => x.sinner == data.sinner).info[0];
                 data.ego = new List<EgoData>();
 
                 organizationData.Add((CharacterId)i, data);
@@ -174,7 +182,10 @@ public class OrganizationDatabase : MonoBehaviour
     public OrganizationData GetOrganizationData(CharacterId sinner)
     {
         if (organizationData.ContainsKey(sinner))
+        {
+            Debug.Log($"편성 데이터 있음 / {organizationData[sinner].identity}");
             return organizationData[sinner];
+        }
         else
         {
             Debug.Log($"편성 데이터 없음 / {sinner}");
@@ -205,16 +216,16 @@ public class OrganizationDatabase : MonoBehaviour
     public void OrganizationOrderSetting(CharacterId sinner)
     {
         // 1. 편성 여부 체크
-        int index = organizationList.FindIndex(x => x == sinner);
+        int index = organizationOrderList.FindIndex(x => x == sinner);
         if (index != -1)
         {
             // 편성중이라면 - 편성 해제
-            organizationList.Remove(sinner);
+            organizationOrderList.Remove(sinner);
         }
         else
         {
             // 미편성이라면 - 편성
-            organizationList.Add(sinner);
+            organizationOrderList.Add(sinner);
         }
     }
 
@@ -223,7 +234,7 @@ public class OrganizationDatabase : MonoBehaviour
     /// </summary>
     public void ClearOrganizationOrder()
     {
-        organizationList.Clear();
+        organizationOrderList.Clear();
     }
     #endregion
 }

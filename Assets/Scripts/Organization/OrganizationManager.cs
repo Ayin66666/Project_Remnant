@@ -30,9 +30,16 @@ public class OrganizationManager : MonoBehaviour
             Destroy(gameObject);
 
         Application.targetFrameRate = 30;
-        SetUpOrganization();
     }
 
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            SetUpOrganization();
+        }
+    }
 
     /// <summary>
     /// 게임 시작 시 편성 데이터 로드 & 초기값 설정
@@ -47,6 +54,19 @@ public class OrganizationManager : MonoBehaviour
         else
         {
             // 데이터가 없다면 - 현재는 무조건 초기값 세팅
+            for (int i = 0; i < characterSlot.Count; i++)
+            {
+                OrganizationData data = OrganizationDatabase.instance.GetOrganizationData((CharacterId)i);
+                if (data != null)
+                {
+                    Debug.Log($"데이터 셋팅 / 캐릭터 : {(CharacterId)(i)}");
+                    characterSlot[i].SetUp(data.identity);
+                }
+                else
+                {
+                    Debug.Log($"데이터 없음 / 캐릭터 : {(CharacterId)(i)}");
+                }
+            }
         }
     }
     #endregion
@@ -77,7 +97,7 @@ public class OrganizationManager : MonoBehaviour
                 CharacterSelectSlot slot = pooling.GetIdentitySlot();
 
                 // 여기 일단은 false로 넣긴 하는데, 원래는 편성 여부 체크해서 넣어야 함!
-                slot.SetUp(info1.info[i], false); 
+                slot.SetUp(info1.info[i], false);
                 slot.gameObject.SetActive(true);
             }
         }
@@ -108,7 +128,7 @@ public class OrganizationManager : MonoBehaviour
     {
         // 해당 캐릭터의 슬롯 찾기
         CharacterSlot slot = characterSlot.Find(x => x.SlotOnwer == data.master.sinner);
-        if(slot != null)
+        if (slot != null)
         {
             slot.SetUp(data);
         }
