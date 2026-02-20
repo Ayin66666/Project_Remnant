@@ -8,10 +8,7 @@ using UnityEngine.UI;
 public class CantoContainerUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("---Setting---")]
-    [SerializeField] private string cantoName;
-    [SerializeField] private int cantoCount;
-    [SerializeField] private Sprite cantoSprite;
-    
+    [SerializeField] private CantoData data;
 
     [Header("---UI---")]
     [SerializeField] private Image cantoImage;
@@ -22,8 +19,9 @@ public class CantoContainerUI : MonoBehaviour, IPointerClickHandler, IPointerEnt
 
     public void SetUp(CantoData data, bool isOn)
     {
+        this.data = data;
         cantoNameText.text = data.CantoName;
-        cantoCountText.text = $"{data.CantoCount} ¿Â";
+        cantoCountText.text = $"{data.cantoCount} ¿Â";
         cantoImage.sprite = data.cantoSprite;
     }
 
@@ -32,7 +30,7 @@ public class CantoContainerUI : MonoBehaviour, IPointerClickHandler, IPointerEnt
     public void OnPointerClick(PointerEventData eventData)
     {
         Debug.Log("Click Canto Container");
-        StageManager.instance.CantoUI(true, cantoCount);
+        StageManager.instance.CantoUI(true, data.cantoCount);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

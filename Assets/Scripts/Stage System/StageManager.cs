@@ -11,6 +11,9 @@ public class StageManager : MonoBehaviour
     [SerializeField] private GameObject materialUI;
     [SerializeField] private GameObject[] cantoUI;
 
+    [Header("---Test---")]
+    [SerializeField] private List<CantoData> cantoDataList; // 테스트용 데이터 -> 나중에 데이터베이스에서 가져올 것
+
 
     private void Awake()
     {
@@ -23,6 +26,12 @@ public class StageManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    private void Start()
+    {
+        SetUp(cantoDataList);
+    }
+
 
     /// <summary>
     /// 칸토 & 경험치 & 끈 던전 클리어 여부 데이터 가져오기
@@ -84,7 +93,7 @@ public class CantoData
     /// <summary>
     /// (N장) 칸토 순서
     /// </summary>
-    public int CantoCount;
+    public int cantoCount;
     /// <summary>
     /// 스테이지 클리어 & ex클리어 여부
     /// </summary>
