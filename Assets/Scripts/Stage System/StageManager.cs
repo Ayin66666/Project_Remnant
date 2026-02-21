@@ -1,140 +1,38 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * 구조는 칸토 매니저 -> 스테이지 매니저 -> 스테이지 슬롯
+ * 데이터 전달도 칸토 매니저 -> 스테이지 매니저 -> 스테이지 슬롯
+ * 클리어 후 데이터 전달은 스테이지 슬롯 -> 칸토 매니저 -> 스테이지 매니저 -> 스테이지 슬롯
+*/
 
 public class StageManager : MonoBehaviour
 {
-    public static StageManager instance;
+    [Header("---Setting---")]
+    [SerializeField] private CantoData data;
 
-    [Header("---UI---")]
-    [SerializeField] private CantoContainerUI[] cantoSlot;
-    [SerializeField] private GameObject materialUI;
-    [SerializeField] private GameObject[] cantoUI;
-
-    [Header("---Test---")]
-    [SerializeField] private List<CantoData> cantoDataList; // 테스트용 데이터 -> 나중에 데이터베이스에서 가져올 것
+    [SerializeField] private List<StageSlot> stageSlots;
+    [SerializeField] private int clearCount = 0;
+    [SerializeField] private int exCount = 0;
 
 
-    private void Awake()
+    public void SetUp(CantoData data)
     {
-        if (instance == null)
+        this.data = data;
+
+        // 스테이지 슬롯에 데이터 전달
+        for (int i = 0; i < data.stageData.Count; i++)
         {
-            instance = this;
+            stageSlots[i].SetUp(data.stageData[i]);
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+
+        // 보상 데이터 체크
+        CheckClearReward();
     }
-
-    private void Start()
+    
+    public void CheckClearReward()
     {
-        SetUp(cantoDataList);
-    }
-
-
-    /// <summary>
-    /// 칸토 & 경험치 & 끈 던전 클리어 여부 데이터 가져오기
-    /// </summary>
-    public void SetUp(List<CantoData> data)
-    {
-        // 클리어데이터 체크 -> 지금은 무조건 false
-        if(false)
-        {
-
-        }
-        else
-        {
-            for(int i = 0; i < data.Count; i++)
-            {
-                cantoSlot[i].SetUp(data[i], data[i].isClear);
-            }
-        }
-    }
-
-    /// <summary>
-    /// 경험치 & 끈 던전 UI OnOff
-    /// </summary>
-    /// <param name="isOn"></param>
-    public void MaterialStageUI(bool isOn)
-    {
-        materialUI.SetActive(isOn);
-    }
-
-    /// <summary>
-    /// 메인 스토리(Canto) OnOff
-    /// </summary>
-    /// <param name="index"></param>
-    public void CantoUI(bool isOn, int index)
-    {
-        foreach (GameObject ui in cantoUI)
-        {
-            ui.SetActive(false);
-        }
-
-        cantoUI[index].SetActive(isOn);
+        // 일단은 기능 다 만들고 만들 것
     }
 }
-
-/*
- * 칸토 데이터 구현했고, 실 기능과 연계 필요함
- * 기존 컨테이너에 바로 넣었던 UI 전부 제거하고 데이터에 UI 이동할 것!
- * 데이터 관리는 CantoDataBase 스크립트 구현하는게 맞을듯?
-*/
-
-[System.Serializable]
-public class CantoData
-{
-    [Header("---Data---")]
-    /// <summary>
-    /// 칸토 클리어 여부
-    /// </summary>
-    public bool isClear;
-    /// <summary>
-    /// (N장) 칸토 순서
-    /// </summary>
-    public int cantoCount;
-    /// <summary>
-    /// 스테이지 클리어 & ex클리어 여부
-    /// </summary>
-    public List<StageData> stageData;
-
-    [Header("---UI---")]
-    /// <summary>
-    /// 칸토 이름
-    /// </summary>
-    public string CantoName;
-    /// <summary>
-    /// 칸토 이미지
-    /// </summary>
-    public Sprite cantoSprite;
-}
-
-[System.Serializable]
-public class StageData
-{
-    [Header("---Data---")]
-    /// <summary>
-    /// 스테이지 클리어 여부
-    /// </summary>
-    public bool isClear;
-    /// <summary>
-    /// N-NN 스테이지 순서
-    /// </summary>
-    public int stageCount;
-    /// <summary>
-    /// 출현 적 데이터 리스트
-    /// </summary>
-    public List<IdentityMasterSO> enemyData;
-
-    [Header("---UI---")]
-    /// <summary>
-    /// 스테이지 이름
-    /// </summary>
-    public string stageName;
-    /// <summary>
-    /// 스테이지 이미지
-    /// </summary>
-    public Sprite stageSprite;
-}
-

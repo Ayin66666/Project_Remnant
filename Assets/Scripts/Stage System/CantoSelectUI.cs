@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 
 
-public class CantoContainerUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class CantoSelectUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("---Setting---")]
     [SerializeField] private CantoData data;
@@ -30,7 +30,7 @@ public class CantoContainerUI : MonoBehaviour, IPointerClickHandler, IPointerEnt
     public void OnPointerClick(PointerEventData eventData)
     {
         Debug.Log("Click Canto Container");
-        StageManager.instance.CantoUI(true, data.cantoCount);
+        CantoManager.instance.CantoUI(true, data.cantoCount);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

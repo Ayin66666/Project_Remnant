@@ -26,7 +26,7 @@ public class MainSceneManager : MonoBehaviour
         {
             ui.SetActive(false);
         }
-
+        
         mainUI[uiNum].SetActive(true);
     }
 }
