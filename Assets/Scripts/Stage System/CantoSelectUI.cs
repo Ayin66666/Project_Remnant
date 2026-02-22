@@ -30,7 +30,7 @@ public class CantoSelectUI : MonoBehaviour, IPointerClickHandler, IPointerEnterH
     public void OnPointerClick(PointerEventData eventData)
     {
         Debug.Log("Click Canto Container");
-        CantoManager.instance.CantoUI(true, data.cantoCount);
+        StageManager.instance.CantoUI(true, data.cantoCount);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

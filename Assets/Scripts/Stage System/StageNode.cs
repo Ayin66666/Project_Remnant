@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-public class StageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class StageNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [Header("---Setting---")]
     [SerializeField] private StageData data;
@@ -67,7 +67,7 @@ public class StageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         if (data.canEnter)
         {
             // 스테이지 설명 UI 표시
-            CantoManager.instance.StageUI(data);
+            StageManager.instance.StageUI(data);
         }
 
     }
