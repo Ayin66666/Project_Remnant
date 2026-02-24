@@ -18,8 +18,14 @@ public class OrganizationDatabase : MonoBehaviour
 
     private void Awake()
     {
-        instance = this;
-        DataSetting();
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
 
@@ -28,10 +34,9 @@ public class OrganizationDatabase : MonoBehaviour
     /// 인격 & 에고 & 편성 데이터 가져오기
     /// </summary>
     public void DataSetting()
-    {
+        {
         SetUpIdentityData();
         SetUpEgoData();
-        SetUpOrganizationData();
     }
 
     /// <summary>
@@ -51,6 +56,7 @@ public class OrganizationDatabase : MonoBehaviour
 
             // 런타임 데이터 생성
             identityInfo.info = new List<IdentityData>(masters.Length);
+
             foreach (IdentityMasterSO master in masters)
             {
                 // Json 이 없을 경우 데이터 생성 로직임!
@@ -96,31 +102,33 @@ public class OrganizationDatabase : MonoBehaviour
             this.egoInfo.Add(egoInfo);
         }
     }
+    #endregion
+
+
+    #region 세이브 파일 로드 & 신규 데이터 생성
+    /// <summary>
+    /// 편성 데이터 로드
+    /// </summary>
+    public void LoadOrganiztionData()
+    {
+
+    }
 
     /// <summary>
-    /// 파일에서 편성 데이터 로드
+    /// 신규 편성 데이터 생성 (기본 인격 지급)
     /// </summary>
-    public void SetUpOrganizationData()
+    public void CreativeData()
     {
-        // 데이터 로드
-        if (false)
+        organizationData = new Dictionary<CharacterId, OrganizationData>();
+        int length = Enum.GetValues(typeof(CharacterId)).Length - 1;
+        for (int i = 0; i < length; i++)
         {
-            // saveLoadManager로부터 데이터 로드
-        }
-        else
-        {
-            // 로드 데이터가 없다면 기본값 생성
-            organizationData = new Dictionary<CharacterId, OrganizationData>();
-            int length = Enum.GetValues(typeof(CharacterId)).Length-1;
-            for (int i = 0; i < length; i++)
-            {
-                OrganizationData data = new OrganizationData();
-                data.sinner = (CharacterId)i;
-                data.identity = identityInfo.Find(x => x.sinner == data.sinner).info[0];
-                data.ego = new List<EgoData>();
+            OrganizationData data = new OrganizationData();
+            data.sinner = (CharacterId)i;
+            data.identity = identityInfo.Find(x => x.sinner == data.sinner).info[0];
+            data.ego = new List<EgoData>();
 
-                organizationData.Add((CharacterId)i, data);
-            }
+            organizationData.Add((CharacterId)i, data);
         }
     }
     #endregion

@@ -46,6 +46,21 @@ public class SaveDataManager : MonoBehaviour
         path = Path.Combine(Application.persistentDataPath, fileName);
     }
 
+    public void Start()
+    {
+        if(CheckData())
+        {
+            // 데이터 로드 후 전달
+            SaveData data = LoadData();
+
+        }
+        else
+        {
+            // 신규 데이터 생성
+            NewData();
+        }
+    }
+
 
     #region 데이터 저장 & 로드
     /// <summary>
@@ -119,7 +134,21 @@ public class SaveDataManager : MonoBehaviour
     /// <returns></returns>
     public SaveData NewData()
     {
-        SaveData data = new SaveData();
+        SaveData data = new SaveData
+        {
+            version = Application.version,
+            playTutorial = false,
+            organizationDatas = new List<OrganizationData>(),
+            ownedIdentity = new List<IdentityInfo>(),
+            ownedEgo = new List<EgoInfo>(),
+        };
+
+        // 초기 편성 데이터 생성
+        OrganizationDatabase.instance.CreativeData();
+
+        // 초기 보유 데이터 생성
+
+
         return data;
     }
     #endregion
