@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 
+[System.Serializable]
 public class SaveData
 {
     /* 저장해야하는 데이터
@@ -48,17 +50,20 @@ public class SaveDataManager : MonoBehaviour
 
     public void Start()
     {
-        if(CheckData())
-        {
-            // 데이터 로드 후 전달
-            SaveData data = LoadData();
-
-        }
-        else
+        // 데이터 로드
+        SaveData data = LoadData();
+        if (data == null)
         {
             // 신규 데이터 생성
-            NewData();
+            data = NewData();
         }
+
+        // 보유 & 편성 데이터 전달
+        OrganizationDatabase.instance.LoadData(data);
+
+        // 인벤토리
+
+        // 스테이지
     }
 
 
@@ -91,7 +96,7 @@ public class SaveDataManager : MonoBehaviour
         {
             // 저장된 데이터가 없을 경우 - 생성
             Debug.LogError("저장된 데이터가 없습니다.");
-            return NewData();
+            return null;
         }
 
         // 저장된 데이터가 있을 경우 - 로드
@@ -104,7 +109,7 @@ public class SaveDataManager : MonoBehaviour
             if (string.IsNullOrWhiteSpace(json))
             {
                 Debug.LogError("세이브 파일이 비어있거나 손상됨");
-                return NewData();
+                return null;
             }
             
             // 데이터 역직렬화
@@ -114,7 +119,7 @@ public class SaveDataManager : MonoBehaviour
             if (saveData == null)
             {
                 Debug.LogError("역직렬화 실패 - 파일 손상 가능성");
-                return NewData();
+                return null;
             }
 
             // 데이터 반환
@@ -124,7 +129,7 @@ public class SaveDataManager : MonoBehaviour
         {
             // 로드 중 오류 발생 시
             Debug.LogError("데이터 로드 중 오류 발생: " + e.Message);
-            return NewData();
+            return null;
         }
     }
 
@@ -143,11 +148,17 @@ public class SaveDataManager : MonoBehaviour
             ownedEgo = new List<EgoInfo>(),
         };
 
-        // 초기 편성 데이터 생성
-        OrganizationDatabase.instance.CreativeData();
+        // 편성 데이터 = null 이 맞음 / 제작 X
 
-        // 초기 보유 데이터 생성
+        // 인격 데이터 제작
+        OrganizationDatabase.instance.NewIdentityData();
 
+        // 에고 데이터 제작
+        OrganizationDatabase.instance.NewEgoData();
+
+        // 인벤토리 데이터 제작
+
+        // 스테이지 데이터 제작
 
         return data;
     }

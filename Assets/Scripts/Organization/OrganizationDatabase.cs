@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Timeline;
 
 
 public class OrganizationDatabase : MonoBehaviour
@@ -29,20 +31,11 @@ public class OrganizationDatabase : MonoBehaviour
     }
 
 
-    #region 파일에서 인격 & 에고 데이터 읽기
-    /// <summary>
-    /// 인격 & 에고 & 편성 데이터 가져오기
-    /// </summary>
-    public void DataSetting()
-        {
-        SetUpIdentityData();
-        SetUpEgoData();
-    }
-
+    #region 파일에서 인격 & 에고 데이터 읽어오기
     /// <summary>
     /// 파일에서 인격 데이터 로드
     /// </summary>
-    public void SetUpIdentityData()
+    public void SetUpIdentityData(SaveData saveData)
     {
         identityInfo = new List<IdentityInfo>();
         foreach (CharacterId characterId in Enum.GetValues(typeof(CharacterId)))
@@ -57,9 +50,9 @@ public class OrganizationDatabase : MonoBehaviour
             // 런타임 데이터 생성
             identityInfo.info = new List<IdentityData>(masters.Length);
 
+            // Json 이 없을 경우 데이터 생성 로직임!
             foreach (IdentityMasterSO master in masters)
             {
-                // Json 이 없을 경우 데이터 생성 로직임!
                 IdentityData data = new IdentityData();
                 data.isUnlocked = true;
                 data.level = 1;
@@ -70,6 +63,7 @@ public class OrganizationDatabase : MonoBehaviour
 
                 Debug.Log($"데이터 생성 : {data.master}");
             }
+            
 
             this.identityInfo.Add(identityInfo);
         }
@@ -107,29 +101,82 @@ public class OrganizationDatabase : MonoBehaviour
 
     #region 세이브 파일 로드 & 신규 데이터 생성
     /// <summary>
-    /// 편성 데이터 로드
+    /// 데이터 로드
     /// </summary>
-    public void LoadOrganiztionData()
+    public void LoadData(SaveData data)
     {
-
+        // 로드 데이터 전달해주기
+        identityInfo = data.ownedIdentity;
+        egoInfo = data.ownedEgo;
     }
 
     /// <summary>
-    /// 신규 편성 데이터 생성 (기본 인격 지급)
+    /// 신규 데이터 생성 시 호출 - 각 인격의 첫번째 인격만 열린 상태로 보내줌
     /// </summary>
-    public void CreativeData()
+    /// <returns></returns>
+    public List<IdentityInfo> NewIdentityData()
     {
-        organizationData = new Dictionary<CharacterId, OrganizationData>();
-        int length = Enum.GetValues(typeof(CharacterId)).Length - 1;
-        for (int i = 0; i < length; i++)
+        List<IdentityInfo> newData = new List<IdentityInfo>();
+        foreach (CharacterId characterId in Enum.GetValues(typeof(CharacterId)))
         {
-            OrganizationData data = new OrganizationData();
-            data.sinner = (CharacterId)i;
-            data.identity = identityInfo.Find(x => x.sinner == data.sinner).info[0];
-            data.ego = new List<EgoData>();
+            IdentityInfo identityInfo = new IdentityInfo();
+            identityInfo.sinner = characterId;
 
-            organizationData.Add((CharacterId)i, data);
+            // 경로 지정 & 데이터 로드
+            string path = $"Identity/{characterId.ToString().ToUpper()}";
+            IdentityMasterSO[] masters = Resources.LoadAll<IdentityMasterSO>(path);
+
+            // 런타임 데이터 생성
+            identityInfo.info = new List<IdentityData>(masters.Length);
+
+            for (int i = 0; i < masters.Length; i++)
+            {
+                IdentityData data = new IdentityData()
+                {
+                    isUnlocked = i == 0,
+                    level = 1,
+                    sync = 1,
+                    master = masters[i]
+                };
+            }
+
+            newData.Add(identityInfo);
         }
+
+        return newData;
+    }
+
+    /// <summary>
+    /// 신규 데이터 생서 시 호출 - 각 인격의 첫번째 에고만 열린 상태로 보내줌
+    /// </summary>
+    /// <returns></returns>
+    public List<EgoInfo> NewEgoData()
+    {
+        List<EgoInfo> newData = new List<EgoInfo>();
+        foreach (CharacterId characterId in Enum.GetValues(typeof(CharacterId)))
+        {
+            EgoInfo egoInfo = new EgoInfo();
+            egoInfo.sinner = characterId;
+
+            string path = $"Ego/{characterId.ToString().ToUpper()}";
+            EgoMasterSO[] masters = Resources.LoadAll<EgoMasterSO>(path);
+            egoInfo.info = new List<EgoData>(masters.Length);
+            for (int i = 0; i < masters.Length; i++)
+            {
+                EgoData data = new EgoData()
+                {
+                    isUnlocked = i == 0,
+                    sync = 1,
+                    master = masters[i]
+                };
+
+                egoInfo.info.Add(data);
+            }
+
+            newData.Add(egoInfo);
+        }
+
+        return newData;
     }
     #endregion
 
