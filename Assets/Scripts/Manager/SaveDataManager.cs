@@ -48,22 +48,35 @@ public class SaveDataManager : MonoBehaviour
         path = Path.Combine(Application.persistentDataPath, fileName);
     }
 
-    public void Start()
+    private void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.F))
+        {
+            SetUp();
+        }
+    }
+
+    public void SetUp()
     {
         // 데이터 로드
         SaveData data = LoadData();
-        if (data == null)
+        Debug.Log(CheckData());
+        if (CheckData())
+        {
+            // 인격&에고 데이터 전달
+            OrganizationDatabase.instance.ApplyIdentityData(data);
+            OrganizationDatabase.instance.ApplyEgoData(data);
+
+            // 인벤토리
+
+            // 스테이지
+        }
+        else
         {
             // 신규 데이터 생성
             data = NewData();
+            Debug.Log("Ca");
         }
-
-        // 보유 & 편성 데이터 전달
-        OrganizationDatabase.instance.LoadData(data);
-
-        // 인벤토리
-
-        // 스테이지
     }
 
 
@@ -111,7 +124,7 @@ public class SaveDataManager : MonoBehaviour
                 Debug.LogError("세이브 파일이 비어있거나 손상됨");
                 return null;
             }
-            
+
             // 데이터 역직렬화
             SaveData saveData = JsonUtility.FromJson<SaveData>(json);
 
@@ -143,22 +156,20 @@ public class SaveDataManager : MonoBehaviour
         {
             version = Application.version,
             playTutorial = false,
+
+            // 편성 데이터 = null 이 맞음 / 제작 X
             organizationDatas = new List<OrganizationData>(),
-            ownedIdentity = new List<IdentityInfo>(),
-            ownedEgo = new List<EgoInfo>(),
+
+            // 인격 보유 데이터
+            ownedIdentity = OrganizationDatabase.instance.CreateIdentityData(),
+
+            // 에고 보유 데이터
+            ownedEgo = OrganizationDatabase.instance.CreateEgoData(),
+
+            // 인벤토리 데이터 제작
+
+            // 스테이지 데이터 제작
         };
-
-        // 편성 데이터 = null 이 맞음 / 제작 X
-
-        // 인격 데이터 제작
-        OrganizationDatabase.instance.NewIdentityData();
-
-        // 에고 데이터 제작
-        OrganizationDatabase.instance.NewEgoData();
-
-        // 인벤토리 데이터 제작
-
-        // 스테이지 데이터 제작
 
         return data;
     }

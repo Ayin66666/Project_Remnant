@@ -78,9 +78,9 @@ public class IdentityInfo
 
 public enum CharacterId
 {
-    ch01,
-    ch02,
-    ch03,
-    ch04,
+    Ch01,
+    Ch02,
+    Ch03,
+    Ch04,
     None
 }
