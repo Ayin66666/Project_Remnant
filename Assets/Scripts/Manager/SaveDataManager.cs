@@ -40,12 +40,15 @@ public class SaveDataManager : MonoBehaviour
     // 저장 방식 : Json 기반 데이터 저장 / 데이터 경로는 유니티 기본 저장 경로 사용
 
     [Header("---Setting---")]
-    [SerializeField] private string path;
-    [SerializeField] private string fileName;
+    [SerializeField] private string directoryPath; // 폴더 위치
+    [SerializeField] private string filePath; // 저장 데이터 위치
+    [SerializeField] private string fileName = "savefile"; // 저장 데이터 이름
+
 
     private void Awake()
     {
-        path = Path.Combine(Application.persistentDataPath, fileName);
+        directoryPath = Path.Combine(Application.persistentDataPath, "Save");
+        filePath = Path.Combine(directoryPath, fileName);
     }
 
     private void Update()
@@ -56,26 +59,34 @@ public class SaveDataManager : MonoBehaviour
         }
     }
 
+
     public void SetUp()
     {
-        // 데이터 로드
-        SaveData data = LoadData();
-        Debug.Log(CheckData());
+        // 세이브 데이터 존재 여부 체크
         if (CheckData())
         {
-            // 인격&에고 데이터 전달
-            OrganizationDatabase.instance.ApplyIdentityData(data);
-            OrganizationDatabase.instance.ApplyEgoData(data);
+            // 데이터 로드
+            SaveData data = LoadData();
+            if(data == null)
+            {
+                Debug.LogWarning("데이터 로드 실패 / 신규 데이터 생성");
+                NewData();
+            }
+            else
+            {
+                // 인격 & 에고 데이터 전달
+                OrganizationDatabase.instance.ApplyIdentityData(data);
+                OrganizationDatabase.instance.ApplyEgoData(data);
 
-            // 인벤토리
+                // 인벤토리
 
-            // 스테이지
+                // 스테이지
+            }
         }
         else
         {
             // 신규 데이터 생성
-            data = NewData();
-            Debug.Log("Ca");
+            NewData();
         }
     }
 
@@ -86,7 +97,7 @@ public class SaveDataManager : MonoBehaviour
     /// </summary>
     public bool CheckData()
     {
-        return File.Exists(path);
+        return File.Exists(filePath);
     }
 
     /// <summary>
@@ -105,7 +116,7 @@ public class SaveDataManager : MonoBehaviour
     /// </summary>
     public SaveData LoadData()
     {
-        if (!File.Exists(path))
+        if (!File.Exists(filePath))
         {
             // 저장된 데이터가 없을 경우 - 생성
             Debug.LogError("저장된 데이터가 없습니다.");
@@ -116,7 +127,7 @@ public class SaveDataManager : MonoBehaviour
         try
         {
             // 데이터 로드 시도
-            string json = File.ReadAllText(path);
+            string json = File.ReadAllText(filePath);
 
             // 데이터가 비어있거나 손상된 경우 체크
             if (string.IsNullOrWhiteSpace(json))
@@ -150,7 +161,7 @@ public class SaveDataManager : MonoBehaviour
     /// 신규 데이터 생성
     /// </summary>
     /// <returns></returns>
-    public SaveData NewData()
+    public void NewData()
     {
         SaveData data = new SaveData
         {
@@ -171,7 +182,21 @@ public class SaveDataManager : MonoBehaviour
             // 스테이지 데이터 제작
         };
 
-        return data;
+        // Json 파일로 저장
+        try
+        {
+            // 저장 위치 생성 - 있다면 무시
+            Directory.CreateDirectory(directoryPath);
+
+            // 저장
+            string save = JsonUtility.ToJson(data, true);
+            File.WriteAllText(filePath, save);
+        }
+        catch (System.Exception e)
+        {
+            // 저장 실패 시 호출
+            Debug.LogError($"[SaveDataManager] 신규 데이터 저장 실패\n{e}");
+        }
     }
     #endregion
 }
