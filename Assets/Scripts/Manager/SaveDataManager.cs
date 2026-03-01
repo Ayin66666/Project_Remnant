@@ -23,6 +23,7 @@ public class SaveData
 
     [Header("---인격 & 에고 & 편성---")]
     public List<OrganizationData> organizationDatas;
+    public List<CharacterId> organizationOrder;
     public List<IdentityInfo> ownedIdentity;
     public List<EgoInfo> ownedEgo;
 
@@ -74,6 +75,8 @@ public class SaveDataManager : MonoBehaviour
             }
             else
             {
+                Debug.Log("데이터 로드");
+
                 // 인격 & 에고 데이터 전달
                 OrganizationDatabase.instance.ApplyIdentityData(data);
                 OrganizationDatabase.instance.ApplyEgoData(data);
@@ -86,6 +89,7 @@ public class SaveDataManager : MonoBehaviour
         else
         {
             // 신규 데이터 생성
+            Debug.Log("신규 데이터 생성");
             NewData();
         }
     }
@@ -108,7 +112,36 @@ public class SaveDataManager : MonoBehaviour
         // 각 매니저에서 데이터 받아오기
 
         // 데이터 저장
-        SaveData saveData = new SaveData();
+        SaveData saveData = new SaveData()
+        {
+            // 버전
+            version = Application.version,
+            playTutorial = true,
+
+            // 인격 & 에고 소유
+            ownedIdentity = OrganizationDatabase.instance.GetIdentityData(),
+            ownedEgo = OrganizationDatabase.instance.GetEgoInfo(),
+
+            // 수감자 편성
+            organizationDatas = OrganizationDatabase.instance.GetOrganiztionData(),
+            organizationOrder = OrganizationDatabase.instance.GetOrganizationOrderData(),
+
+            // 스테이지
+
+            // 인벤토리
+        };
+
+        try
+        {
+            Directory.CreateDirectory(directoryPath);
+
+            string save = JsonUtility.ToJson(saveData);
+            File.WriteAllText(filePath, save);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[SaveDataManager] 데이터 저장 실패\n{e}");
+        }
     }
 
     /// <summary>
@@ -163,18 +196,19 @@ public class SaveDataManager : MonoBehaviour
     /// <returns></returns>
     public void NewData()
     {
+        // 데이터 생성
         SaveData data = new SaveData
         {
+            // 기본 데이터
             version = Application.version,
             playTutorial = false,
 
-            // 편성 데이터 = null 이 맞음 / 제작 X
-            organizationDatas = new List<OrganizationData>(),
+            // 편성 데이터  (편성 순서 & 값 없는 게 정상)
+            organizationDatas = OrganizationDatabase.instance.CreatOrganizationData(),
+            organizationOrder = new List<CharacterId>(0), 
 
-            // 인격 보유 데이터
+            // 인격 & 에고 보유 데이터
             ownedIdentity = OrganizationDatabase.instance.CreateIdentityData(),
-
-            // 에고 보유 데이터
             ownedEgo = OrganizationDatabase.instance.CreateEgoData(),
 
             // 인벤토리 데이터 제작

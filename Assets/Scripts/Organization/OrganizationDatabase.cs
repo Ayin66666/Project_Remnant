@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 
 public class OrganizationDatabase : MonoBehaviour
@@ -35,7 +34,7 @@ public class OrganizationDatabase : MonoBehaviour
     }
 
 
-    #region 세이브 파일 로드 & 신규 데이터 생성
+    #region 파일에서 인격 & 에고 데이터 로드
     /// <summary>
     /// 파일에서 SO 데이터를 읽은 후 런타임 데이터 생성
     /// </summary>
@@ -103,7 +102,10 @@ public class OrganizationDatabase : MonoBehaviour
             this.egoInfo.Add(egoInfo);
         }
     }
+    #endregion
 
+
+    #region 세이브 파일 로드 & 신규 데이터 생성
     /// <summary>
     /// 생성된 기초 런타임 데이터에 세이브 데이터 주입
     /// </summary>
@@ -162,6 +164,41 @@ public class OrganizationDatabase : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// 신규 데이터 생성 시 호출 - 각 인격의 첫번째 인격만 배치한 상태로 보내줌
+    /// </summary>
+    /// <returns></returns>
+    public List<OrganizationData> CreatOrganizationData()
+    {
+        /*
+        // 각 인격 순회
+        List<OrganizationData> list = new List<OrganizationData>();
+        for (int i = 0; i < identityInfo.Count; i++)
+        {
+            // 데이터 생성
+            OrganizationData data = new OrganizationData()
+            {
+                sinner = identityInfo[i].sinner,
+                identity = identityInfo[i].info[0],
+                ego = new List<EgoData>()
+            };
+
+            list.Add(data);
+        }
+        return list;
+        */
+
+        var data = identityInfo
+            .Select(x => new OrganizationData
+            {
+                sinner = x.sinner,
+                identity = x.info[0],
+                ego = new List<EgoData>()
+            })
+            .ToList();
+
+        return data;
+    }
 
     /// <summary>
     /// 신규 데이터 생성 시 호출 - 각 인격의 첫번째 인격만 열린 상태로 보내줌
@@ -191,6 +228,60 @@ public class OrganizationDatabase : MonoBehaviour
                 ego.info[0].isUnlocked = true;
         }
 
+        return egoInfo;
+    }
+    #endregion
+
+
+    #region 세이브용 데이터 전달
+    /// <summary>
+    /// 편성 순서 데이터 전달
+    /// </summary>
+    /// <returns></returns>
+    public List<CharacterId> GetOrganizationOrderData()
+    {
+        return organizationOrderList;
+    }
+
+    /// <summary>
+    /// 각 수감자의 인격 & 에고 편성 데이터 전달
+    /// </summary>
+    /// <returns></returns>
+    public List<OrganizationData> GetOrganiztionData()
+    {
+        /*
+        List<OrganizationData> data = new List<OrganizationData>();
+        int l = Enum.GetValues(typeof(CharacterId)).Length;
+        for (int i = 0; i < l; i++)
+        {
+            data.Add(organizationData[(CharacterId)i]);
+        }
+        
+        return data;
+        */
+
+        // Linq 동작하는지 테스트 필요!
+        return organizationOrderList
+            .Where(id => id != CharacterId.None && organizationData.ContainsKey(id))
+            .Select(id => organizationData[id])
+            .ToList();
+    }
+
+    /// <summary>
+    /// 인격 보유 데이터 전달
+    /// </summary>
+    /// <returns></returns>
+    public List<IdentityInfo> GetIdentityData()
+    {
+        return identityInfo;
+    }
+
+    /// <summary>
+    /// 에고 보유 데이터 전달
+    /// </summary>
+    /// <returns></returns>
+    public List<EgoInfo> GetEgoInfo()
+    {
         return egoInfo;
     }
     #endregion
