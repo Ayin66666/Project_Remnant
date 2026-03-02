@@ -27,11 +27,11 @@ public class SaveData
     public List<IdentityInfo> ownedIdentity;
     public List<EgoInfo> ownedEgo;
 
+    [Header("---스테이지---")]
+    public List<CantoData> cantoData;
+
     // [Header("---인벤토리---")]
     // 아직 미구현
-
-    // [Header("---스테이지---")]
-    // public List<StageData> stage;
 }
 
 
@@ -68,7 +68,7 @@ public class SaveDataManager : MonoBehaviour
         {
             // 데이터 로드
             SaveData data = LoadData();
-            if(data == null)
+            if (data == null)
             {
                 Debug.LogWarning("데이터 로드 실패 / 신규 데이터 생성");
                 NewData();
@@ -81,9 +81,11 @@ public class SaveDataManager : MonoBehaviour
                 OrganizationDatabase.instance.ApplyIdentityData(data);
                 OrganizationDatabase.instance.ApplyEgoData(data);
 
+                // 스테이지
+                StageManager.instance.LoadCantoData(data);
+
                 // 인벤토리
 
-                // 스테이지
             }
         }
         else
@@ -127,16 +129,19 @@ public class SaveDataManager : MonoBehaviour
             organizationOrder = OrganizationDatabase.instance.GetOrganizationOrderData(),
 
             // 스테이지
+            cantoData = StageManager.instance.GetCantoData(),
 
             // 인벤토리
+            // inventoryData = InventoryManager.instance.GetInventoryData()
         };
 
         try
         {
             Directory.CreateDirectory(directoryPath);
-
-            string save = JsonUtility.ToJson(saveData);
+            string save = JsonUtility.ToJson(saveData, true);
             File.WriteAllText(filePath, save);
+
+            Debug.Log("데이터 저장 성공");
         }
         catch (System.Exception e)
         {
@@ -205,15 +210,17 @@ public class SaveDataManager : MonoBehaviour
 
             // 편성 데이터  (편성 순서 & 값 없는 게 정상)
             organizationDatas = OrganizationDatabase.instance.CreatOrganizationData(),
-            organizationOrder = new List<CharacterId>(0), 
+            organizationOrder = new List<CharacterId>(0),
 
             // 인격 & 에고 보유 데이터
             ownedIdentity = OrganizationDatabase.instance.CreateIdentityData(),
             ownedEgo = OrganizationDatabase.instance.CreateEgoData(),
 
+            // 스테이지 데이터 제작
+            cantoData = StageManager.instance.CreateCantoData(),
+
             // 인벤토리 데이터 제작
 
-            // 스테이지 데이터 제작
         };
 
         // Json 파일로 저장

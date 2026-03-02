@@ -37,6 +37,39 @@ public class StageManager : MonoBehaviour
     }
 
 
+    #region 세이브 & 로드 로직
+    /// <summary>
+    /// 세이브 용 칸토 데이터 전달
+    /// </summary>
+    /// <returns></returns>
+    public List<CantoData> GetCantoData()
+    {
+        return cantoDataList;
+    }
+
+    /// <summary>
+    /// 저장 데이터 로드 후 주입
+    /// </summary>
+    /// <param name="data"></param>
+    public void LoadCantoData(SaveData data)
+    {
+        // 로직 구현 필요
+    }
+
+    /// <summary>
+    /// 신규 칸토 데이터 생성
+    /// </summary>
+    /// <returns></returns>
+    public List<CantoData> CreateCantoData()
+    {
+        cantoDataList = new List<CantoData>();
+        // 칸토의 총 갯수 확인 데이터가 필요할듯
+        // 로직 구현 필요
+        return cantoDataList;
+    }
+    #endregion
+
+
     /// <summary>
     /// 칸토 & 경험치 & 끈 던전 클리어 여부 데이터 가져오기
     /// </summary>
