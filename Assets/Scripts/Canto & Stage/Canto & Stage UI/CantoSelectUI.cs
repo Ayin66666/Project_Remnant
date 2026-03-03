@@ -20,9 +20,9 @@ public class CantoSelectUI : MonoBehaviour, IPointerClickHandler, IPointerEnterH
     public void SetUp(CantoData data, bool isOn)
     {
         this.data = data;
-        cantoNameText.text = data.CantoName;
-        cantoCountText.text = $"{data.cantoCount} ¿Â";
-        cantoImage.sprite = data.cantoSprite;
+        cantoNameText.text = data.cantoData.CantoName;
+        cantoCountText.text = $"{data.cantoData.CantoOrder} ¿Â";
+        cantoImage.sprite = data.cantoData.CantoSprte;
     }
 
 
@@ -30,7 +30,7 @@ public class CantoSelectUI : MonoBehaviour, IPointerClickHandler, IPointerEnterH
     public void OnPointerClick(PointerEventData eventData)
     {
         Debug.Log("Click Canto Container");
-        StageManager.instance.CantoUI(true, data.cantoCount);
+        StageManager.instance.CantoUI(true, data.cantoData.CantoOrder);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

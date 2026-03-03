@@ -133,6 +133,9 @@ public class StageManager : MonoBehaviour
 
 
 [System.Serializable]
+/// <summary>
+/// 칸토 런타임 데이터
+/// </summary>
 public class CantoData
 {
     [Header("---Data---")]
@@ -145,35 +148,20 @@ public class CantoData
     /// </summary>
     public bool canEnter;
     /// <summary>
-    /// (N장) 칸토 순서
-    /// </summary>
-    public int cantoCount;
-    /// <summary>
     /// 스테이지 클리어 & ex클리어 여부
     /// </summary>
     public List<StageData> stageData;
     /// <summary>
     ///스테이지 클리어에 대한 보상 리스트
     /// </summary>
-    public List<RewardData> rewardData;
+    public List<bool> rewardData;
 
-    [Header("---UI---")]
     /// <summary>
-    /// 칸토 이름
+    /// 칸토의 정적 데이터
     /// </summary>
-    public string CantoName;
-    /// <summary>
-    /// 칸토 이미지
-    /// </summary>
-    public Sprite cantoSprite;
+    public CantoMasterSO cantoData;
 }
 
-[System.Serializable]
-public class RewardData
-{
-    public bool isGet;
-    public int value;
-}
 
 [System.Serializable]
 public class StageData
