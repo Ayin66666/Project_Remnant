@@ -22,6 +22,7 @@ public class StageNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
         this.data = data;
 
+        /*
         stageImage.sprite = data.stageSprite;
         stageName.text = data.stageName;
         switch (data.stageClearType)
@@ -38,6 +39,7 @@ public class StageNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
                 clearImage.color = Color.green;
                 break;
         }
+        */
     }
 
     public void Reset()

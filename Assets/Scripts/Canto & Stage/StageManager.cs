@@ -1,6 +1,8 @@
+using Game.Canto;
+using Game.Stage;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.TextCore.Text;
 
 public class StageManager : MonoBehaviour
 {
@@ -36,6 +38,23 @@ public class StageManager : MonoBehaviour
         SetUp(cantoDataList);
     }
 
+    #region 파일 읽기 로직
+    /// <summary>
+    /// 파일에서 칸토 & 스테이지 so 읽어오기
+    /// </summary>
+    public void LoadCantoData()
+    {
+        // 데이터 로드
+        CantoDatabaseSO data = Resources.Load<CantoDatabaseSO>("CantoDatabase");
+        if(data == null)
+        {
+            Debug.LogError("칸토 데이터 so 로드 실패!");
+            return;
+        }
+
+
+    }
+    #endregion
 
     #region 세이브 & 로드 로직
     /// <summary>
@@ -64,7 +83,8 @@ public class StageManager : MonoBehaviour
     {
         cantoDataList = new List<CantoData>();
         // 칸토의 총 갯수 확인 데이터가 필요할듯
-        // 로직 구현 필요
+        // -> 파일 읽어서 so만큼 생성
+
         return cantoDataList;
     }
     #endregion
@@ -123,10 +143,9 @@ public class StageManager : MonoBehaviour
     /// <summary>
     /// 스테이지 진입
     /// </summary>
-    /// <param name="data"></param>
-    public void StageIn(StageData data)
+    public void StageIn()
     {
-        SceneLoadManager.LoadScene(data.sceneName, data.stageCount.ToString());
+        // SceneLoadManager.LoadScene(data.sceneName, data.stageCount.ToString());
     }
     #endregion
 }
@@ -175,38 +194,10 @@ public class StageData
     /// 스테이지 입장가능 여부
     /// </summary>
     public bool canEnter;
-    /// <summary>
-    /// N-NN 스테이지 순서
-    /// </summary>
-    public int stageCount;
-    /// <summary>
-    /// 스테이지의 씬 이름
-    /// </summary>
-    public string sceneName;
-    /// <summary>
-    /// 출현 적 데이터 리스트
-    /// </summary>
-    public List<IdentityMasterSO> enemyData;
 
-    [Header("---UI---")]
     /// <summary>
-    /// 스테이지 이름
+    /// 스테이지의 정적 데이터
     /// </summary>
-    public string stageName;
-    /// <summary>
-    /// 스테이지 이미지
-    /// </summary>
-    public Sprite stageSprite;
-}
-
-
-/// <summary>
-/// 공용 enum / 스테이지 클리어 타입 체크 (클리어X, 일반, Ex)
-/// </summary>
-public enum StageClearType
-{
-    None,
-    Clear,
-    ExClear
+    public StageMasterSO stageData;
 }
 
