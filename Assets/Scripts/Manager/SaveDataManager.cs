@@ -82,7 +82,7 @@ public class SaveDataManager : MonoBehaviour
                 OrganizationDatabase.instance.ApplyEgoData(data);
 
                 // 스테이지
-                StageManager.instance.LoadCantoData(data);
+                StageManager.instance.ApplyCantoData(data);
 
                 // 인벤토리
 

@@ -36,7 +36,7 @@ namespace Game.Canto
         public string CantoName { get { return cantoName; } set { cantoName = value; } }
         public int CantoOrder { get { return cantoOrder; } set { cantoOrder = value; } }
         public List<StageMasterSO> StageData { get { return stageData; } set { stageData = value; } }
-        public List<CantoRewardSO> RewardCount { get { return rewardData; } private set { rewardData = value; } }
+        public List<CantoRewardSO> RewardData { get { return rewardData; } private set { rewardData = value; } }
         public Sprite CantoSprte { get { return cantoSprte; } set { cantoSprte = value; } }
     }
 }

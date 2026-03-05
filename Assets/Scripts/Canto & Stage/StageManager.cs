@@ -1,6 +1,7 @@
 using Game.Canto;
 using Game.Stage;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
@@ -10,15 +11,11 @@ public class StageManager : MonoBehaviour
 
     [Header("---UI---")]
     [SerializeField] private CantoSelectUI[] cantoSlot;
-    [SerializeField] private GameObject materialUI; // 재화던전
     [SerializeField] private CantoManager[] cantoUI; // 스토리던전
 
-
-    [Header("---StageEnterUI---")] // 이거 여기에 있어야 하나?
-    [SerializeField] private GameObject stageEnterUI;
-
-    [Header("---Test---")]
-    [SerializeField] private List<CantoData> cantoDataList; // 테스트용 데이터 -> 나중에 데이터베이스에서 가져올 것
+    [Header("---Runtime Data---")]
+    [SerializeField] private CantoDatabaseSO cantoDatabaseSO;
+    [SerializeField] private List<CantoData> cantoDataList;
 
 
     private void Awake()
@@ -35,28 +32,75 @@ public class StageManager : MonoBehaviour
 
     private void Start()
     {
-        SetUp(cantoDataList);
+        SetUp();
     }
 
-    #region 파일 읽기 로직
+
+    #region 시작 로직
+    /// <summary>
+    /// 칸토 클리어 여부 데이터 가져오기
+    /// </summary>
+    public void SetUp()
+    {
+        LoadCantoData();
+    }
+
     /// <summary>
     /// 파일에서 칸토 & 스테이지 so 읽어오기
     /// </summary>
-    public void LoadCantoData()
+    private void LoadCantoData()
     {
-        // 데이터 로드
+        // - 기존의 파일에서 ReadAll 방식에서 so를 묶은 파일 1개만 로드하는 방식으로 전환함
         CantoDatabaseSO data = Resources.Load<CantoDatabaseSO>("CantoDatabase");
-        if(data == null)
+        if (data == null)
         {
             Debug.LogError("칸토 데이터 so 로드 실패!");
             return;
         }
 
-
+        cantoDatabaseSO = data;
     }
     #endregion
 
+
     #region 세이브 & 로드 로직
+    /// <summary>
+    /// 신규 칸토 데이터 생성
+    /// </summary>
+    /// <returns></returns>
+    public List<CantoData> CreateCantoData()
+    {
+        // 런타임 데이터 생성
+        cantoDataList = new List<CantoData>(cantoDatabaseSO.CantoData.Count);
+        for (int i = 0; i < cantoDatabaseSO.CantoData.Count; i++)
+        {
+            // 칸토 데이터 삽입
+            CantoData cantoData = new CantoData(cantoDatabaseSO.CantoData[i]);
+
+            // 스테이지 데이터 제작
+            for (int j = 0; j < cantoDatabaseSO.CantoData[i].StageData.Count; j++)
+            {
+                StageData stageData = new StageData(cantoDatabaseSO.CantoData[i].StageData[j]);
+                cantoData.stageData.Add(stageData);
+            }
+
+            // 런타임 데이터 리스트에 추가
+            cantoDataList.Add(cantoData);
+        }
+
+        return cantoDataList;
+    }
+
+    /// <summary>
+    /// 저장 데이터 로드 후 주입
+    /// </summary>
+    /// <param name="data"></param>
+    public void ApplyCantoData(SaveData data)
+    {
+        // 런타임 데이터 생성
+        cantoDataList = data.cantoData;
+    }
+
     /// <summary>
     /// 세이브 용 칸토 데이터 전달
     /// </summary>
@@ -65,58 +109,10 @@ public class StageManager : MonoBehaviour
     {
         return cantoDataList;
     }
-
-    /// <summary>
-    /// 저장 데이터 로드 후 주입
-    /// </summary>
-    /// <param name="data"></param>
-    public void LoadCantoData(SaveData data)
-    {
-        // 로직 구현 필요
-    }
-
-    /// <summary>
-    /// 신규 칸토 데이터 생성
-    /// </summary>
-    /// <returns></returns>
-    public List<CantoData> CreateCantoData()
-    {
-        cantoDataList = new List<CantoData>();
-        // 칸토의 총 갯수 확인 데이터가 필요할듯
-        // -> 파일 읽어서 so만큼 생성
-
-        return cantoDataList;
-    }
     #endregion
 
 
-    /// <summary>
-    /// 칸토 & 경험치 & 끈 던전 클리어 여부 데이터 가져오기
-    /// </summary>
-    public void SetUp(List<CantoData> data)
-    {
-        // 데이터 로드 -> 지금은 없음
-
-        // 각 칸토에 데이터 주입 -> 지금은 테스트용 데이터 주입중
-        for (int i = 0; i < cantoDataList.Count; i++)
-        {
-            // 외부 선택 슬롯
-            cantoSlot[i].SetUp(data[i], data[i].canEnter);
-
-            // 칸토 매니저
-            cantoUI[i].SetUp(data[i]);
-        }
-    }
-
-    /// <summary>
-    /// 경험치 & 끈 던전 UI OnOff
-    /// </summary>
-    /// <param name="isOn"></param>
-    public void MaterialStageUI(bool isOn)
-    {
-        materialUI.SetActive(isOn);
-    }
-
+    #region UI
     /// <summary>
     /// 메인 스토리(Canto) OnOff
     /// </summary>
@@ -129,23 +125,6 @@ public class StageManager : MonoBehaviour
         }
 
         cantoUI[index].gameObject.SetActive(isOn);
-    }
-
-
-    #region 스테이지 진입 로직 -> 이거 여기에 있어야하나?
-    public void StageUI(StageData data)
-    {
-        // 데이터를 받아와서 UI 활성화
-        // 설명하는 UI 관련 스크립트 따로 분할해도 될듯?
-        stageEnterUI.SetActive(true);
-    }
-
-    /// <summary>
-    /// 스테이지 진입
-    /// </summary>
-    public void StageIn()
-    {
-        // SceneLoadManager.LoadScene(data.sceneName, data.stageCount.ToString());
     }
     #endregion
 }
@@ -179,8 +158,21 @@ public class CantoData
     /// 칸토의 정적 데이터
     /// </summary>
     public CantoMasterSO cantoData;
-}
 
+
+    /// <summary>
+    /// 생성자 - 초기화 로직
+    /// </summary>
+    /// <param name="so"></param>
+    public CantoData(CantoMasterSO so)
+    {
+        isClear = false;
+        canEnter = false;
+        cantoData = so;
+        rewardData = so.RewardData.ConvertAll(reward => false);
+        stageData = so.StageData.ConvertAll(stage => new StageData(stage));
+    }
+}
 
 [System.Serializable]
 public class StageData
@@ -199,5 +191,17 @@ public class StageData
     /// 스테이지의 정적 데이터
     /// </summary>
     public StageMasterSO stageData;
+
+
+    /// <summary>
+    /// 생성자 - 초기화 로직
+    /// </summary>
+    /// <param name="data"></param>
+    public StageData(StageMasterSO so)
+    {
+        stageClearType = StageClearType.None;
+        canEnter = false;
+        stageData = so;
+    }
 }
 

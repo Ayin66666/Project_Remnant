@@ -69,7 +69,6 @@ public class StageNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         if (data.canEnter)
         {
             // 스테이지 설명 UI 표시
-            StageManager.instance.StageUI(data);
         }
 
     }
