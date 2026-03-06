@@ -52,11 +52,16 @@ public class SaveDataManager : MonoBehaviour
         filePath = Path.Combine(directoryPath, fileName);
     }
 
+    private void Start()
+    {
+        SetUp();
+    }
+
     private void Update()
     {
         if (Input.GetKeyUp(KeyCode.F))
         {
-            SetUp();
+            
         }
     }
 
@@ -75,7 +80,8 @@ public class SaveDataManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("데이터 로드");
+                Debug.Log($"데이터 로드 / {data}");
+
 
                 // 인격 & 에고 데이터 전달
                 OrganizationDatabase.instance.ApplyIdentityData(data);

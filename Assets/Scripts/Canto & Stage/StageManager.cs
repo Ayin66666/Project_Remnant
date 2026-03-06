@@ -11,7 +11,7 @@ public class StageManager : MonoBehaviour
 
     [Header("---UI---")]
     [SerializeField] private CantoSelectUI[] cantoSlot;
-    [SerializeField] private CantoManager[] cantoUI; // 스토리던전
+    [SerializeField] private CantoManager[] cantoManager; // 스토리던전
 
     [Header("---Runtime Data---")]
     [SerializeField] private CantoDatabaseSO cantoDatabaseSO;
@@ -28,10 +28,7 @@ public class StageManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
 
-    private void Start()
-    {
         SetUp();
     }
 
@@ -51,14 +48,21 @@ public class StageManager : MonoBehaviour
     private void LoadCantoData()
     {
         // - 기존의 파일에서 ReadAll 방식에서 so를 묶은 파일 1개만 로드하는 방식으로 전환함
-        CantoDatabaseSO data = Resources.Load<CantoDatabaseSO>("CantoDatabase");
+        CantoDatabaseSO data = Resources.Load<CantoDatabaseSO>("Canto/CantoDatabase");
         if (data == null)
         {
             Debug.LogError("칸토 데이터 so 로드 실패!");
             return;
         }
-
         cantoDatabaseSO = data;
+
+        // 런타임 데이터 생성
+        cantoDataList = new List<CantoData>(cantoDatabaseSO.CantoData.Count);
+        foreach(var canto in cantoDatabaseSO.CantoData)
+        {
+            CantoData cantoData = new CantoData(canto);
+            cantoDataList.Add(cantoData);
+        }
     }
     #endregion
 
@@ -77,17 +81,17 @@ public class StageManager : MonoBehaviour
             // 칸토 데이터 삽입
             CantoData cantoData = new CantoData(cantoDatabaseSO.CantoData[i]);
 
-            // 스테이지 데이터 제작
-            for (int j = 0; j < cantoDatabaseSO.CantoData[i].StageData.Count; j++)
-            {
-                StageData stageData = new StageData(cantoDatabaseSO.CantoData[i].StageData[j]);
-                cantoData.stageData.Add(stageData);
-            }
+
 
             // 런타임 데이터 리스트에 추가
             cantoDataList.Add(cantoData);
         }
 
+        // 1장 - 1 스테이지 진입 가능하게 전환
+        cantoDataList[0].canEnter = true;
+        cantoDataList[0].stageData[0].canEnter = true;
+
+        SetCantoUI();
         return cantoDataList;
     }
 
@@ -99,6 +103,7 @@ public class StageManager : MonoBehaviour
     {
         // 런타임 데이터 생성
         cantoDataList = data.cantoData;
+        SetCantoUI();
     }
 
     /// <summary>
@@ -114,17 +119,31 @@ public class StageManager : MonoBehaviour
 
     #region UI
     /// <summary>
+    /// 칸토 슬롯에 데이터 주입
+    /// </summary>
+    private void SetCantoUI()
+    {
+        // 슬롯 활성화
+        for (int i = 0; i < cantoDataList.Count; i++)
+        {
+            // 데이터 & 진입가능 여부 주입
+            cantoSlot[i].SetUp(cantoDataList[i], cantoDataList[i].canEnter);
+            cantoManager[i].SetUp(cantoDataList[i]);
+        }
+    }
+
+    /// <summary>
     /// 메인 스토리(Canto) OnOff
     /// </summary>
     /// <param name="index"></param>
     public void CantoUI(bool isOn, int index)
     {
-        foreach (CantoManager ui in cantoUI)
+        foreach (CantoManager ui in cantoManager)
         {
             ui.gameObject.SetActive(false);
         }
 
-        cantoUI[index].gameObject.SetActive(isOn);
+        cantoManager[index].gameObject.SetActive(isOn);
     }
     #endregion
 }
@@ -190,7 +209,7 @@ public class StageData
     /// <summary>
     /// 스테이지의 정적 데이터
     /// </summary>
-    public StageMasterSO stageData;
+    public StageMasterSO stageSO;
 
 
     /// <summary>
@@ -201,7 +220,7 @@ public class StageData
     {
         stageClearType = StageClearType.None;
         canEnter = false;
-        stageData = so;
+        stageSO = so;
     }
 }
 

@@ -19,6 +19,8 @@ public class CantoSelectUI : MonoBehaviour, IPointerClickHandler, IPointerEnterH
 
     public void SetUp(CantoData data, bool isOn)
     {
+        Debug.Log($"슬롯 데이터 주입 / {data} / {isOn}");
+
         this.data = data;
         cantoNameText.text = data.cantoData.CantoName;
         cantoCountText.text = $"{data.cantoData.CantoOrder} 장";

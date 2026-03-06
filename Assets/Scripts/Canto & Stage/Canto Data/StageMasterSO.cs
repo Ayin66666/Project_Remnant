@@ -17,11 +17,11 @@ namespace Game.Stage
         /// </summary>
         [SerializeField] private string stageOrder;
         /// <summary>
-        /// 전투 씬 이름
+        /// 스테이지 이미지
         /// </summary>
-        [SerializeField] private string scenePath;
+        [SerializeField] private Sprite stageImage;
         /// <summary>
-        /// 스테이지 진입 제약 조건
+        ///  스테이지 진입 제약 조건
         /// </summary>
         [SerializeField] private List<StageLimitData> limitData;
         /// <summary>
@@ -37,7 +37,7 @@ namespace Game.Stage
         #region 프로퍼티
         public string StageName { get { return stageName; } }
         public string StageOrder { get { return stageOrder; } }
-        public string ScenePath { get { return scenePath; } }
+        public Sprite StageSprite { get { return stageImage; } }
         public ExClearCondition ExClearCondition { get { return exClearCondition; } }
         public List<StageLimitData> LimitData { get { return limitData; } }
         public List<EnemyWaveData> EnemyWaveData { get { return enemyWaveData; } }
