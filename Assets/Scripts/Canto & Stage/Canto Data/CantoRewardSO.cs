@@ -8,7 +8,7 @@ namespace Game.Canto
     public class CantoRewardSO : ScriptableObject
     {
         [Header("---Setting---")]
-        public int rewardValue;
         public int rewardTerms;
+        public int rewardValue;
     }
 }

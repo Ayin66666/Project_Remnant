@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public OptionManager optionManager;
     public ExpManager expManager;
 
+
     private void Awake()
     {
         if (instance == null) 

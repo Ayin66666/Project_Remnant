@@ -1,21 +1,20 @@
 using Game.Canto;
 using Game.Stage;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
-public class StageManager : MonoBehaviour
+
+public class BattleContentManager : MonoBehaviour
 {
-    public static StageManager instance;
-
-    [Header("---UI---")]
-    [SerializeField] private CantoSelectUI[] cantoSlot;
-    [SerializeField] private CantoManager[] cantoManager; // 스토리던전
+    public static BattleContentManager instance;
 
     [Header("---Runtime Data---")]
     [SerializeField] private CantoDatabaseSO cantoDatabaseSO;
     [SerializeField] private List<CantoData> cantoDataList;
+
+    [Header("---UI---")]
+    [SerializeField] private CantoSelectUI[] cantoSlot;
+    [SerializeField] private CantoManager[] cantoManagers;
 
 
     private void Awake()
@@ -56,7 +55,7 @@ public class StageManager : MonoBehaviour
         }
         cantoDatabaseSO = data;
 
-        // 런타임 데이터 생성
+        // 런타임 칸토 데이터 생성
         cantoDataList = new List<CantoData>(cantoDatabaseSO.CantoData.Count);
         foreach(var canto in cantoDatabaseSO.CantoData)
         {
@@ -80,8 +79,6 @@ public class StageManager : MonoBehaviour
         {
             // 칸토 데이터 삽입
             CantoData cantoData = new CantoData(cantoDatabaseSO.CantoData[i]);
-
-
 
             // 런타임 데이터 리스트에 추가
             cantoDataList.Add(cantoData);
@@ -117,6 +114,18 @@ public class StageManager : MonoBehaviour
     #endregion
 
 
+    #region 런타임 데이터 업데이트
+    /// <summary>
+    /// 칸토 데이터 업데이트
+    /// </summary>
+    /// <param name="cantoIndex"></param>
+    public void UpdataCantoData(int index, CantoData data)
+    {
+        cantoDataList[index] = data;
+    }
+    #endregion
+
+
     #region UI
     /// <summary>
     /// 칸토 슬롯에 데이터 주입
@@ -128,7 +137,7 @@ public class StageManager : MonoBehaviour
         {
             // 데이터 & 진입가능 여부 주입
             cantoSlot[i].SetUp(cantoDataList[i], cantoDataList[i].canEnter);
-            cantoManager[i].SetUp(cantoDataList[i]);
+            cantoManagers[i].SetUp(cantoDataList[i]);
         }
     }
 
@@ -136,14 +145,14 @@ public class StageManager : MonoBehaviour
     /// 메인 스토리(Canto) OnOff
     /// </summary>
     /// <param name="index"></param>
-    public void CantoUI(bool isOn, int index)
+    public void CantoSelect(bool isOn, int index)
     {
-        foreach (CantoManager ui in cantoManager)
+        foreach (CantoManager ui in cantoManagers)
         {
             ui.gameObject.SetActive(false);
         }
 
-        cantoManager[index].gameObject.SetActive(isOn);
+        if (isOn) cantoManagers[index].gameObject.SetActive(isOn);
     }
     #endregion
 }
@@ -165,18 +174,18 @@ public class CantoData
     /// </summary>
     public bool canEnter;
     /// <summary>
+    /// 칸토의 정적 데이터
+    /// </summary>
+    public CantoMasterSO cantoData;
+    /// <summary>
     /// 스테이지 클리어 & ex클리어 여부
     /// </summary>
     public List<StageData> stageData;
     /// <summary>
     ///스테이지 클리어에 대한 보상 리스트
     /// </summary>
-    public List<bool> rewardData;
+    public List<RewardData> rewardData;
 
-    /// <summary>
-    /// 칸토의 정적 데이터
-    /// </summary>
-    public CantoMasterSO cantoData;
 
 
     /// <summary>
@@ -188,7 +197,8 @@ public class CantoData
         isClear = false;
         canEnter = false;
         cantoData = so;
-        rewardData = so.RewardData.ConvertAll(reward => false);
+
+        rewardData = so.RewardData.ConvertAll(reward => new RewardData(reward));
         stageData = so.StageData.ConvertAll(stage => new StageData(stage));
     }
 }
@@ -205,7 +215,6 @@ public class StageData
     /// 스테이지 입장가능 여부
     /// </summary>
     public bool canEnter;
-
     /// <summary>
     /// 스테이지의 정적 데이터
     /// </summary>
@@ -223,4 +232,29 @@ public class StageData
         stageSO = so;
     }
 }
+
+[System.Serializable]
+/// <summary>
+/// 칸토 리워드 데이터
+/// </summary>
+public class RewardData
+{
+    [Header("---Data---")]
+    public GetReward getReward;
+    public int rewardIndex;
+    public CantoRewardSO rewardSO;
+
+
+    /// <summary>
+    /// 생성자
+    /// </summary>
+    /// <param name="so"></param>
+    public RewardData(CantoRewardSO so)
+    {
+        getReward = GetReward.Disabled;
+        rewardIndex = 0;
+        rewardSO = so;
+    }
+}
+
 

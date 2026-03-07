@@ -39,6 +39,12 @@ namespace Game.Canto
         public List<CantoRewardSO> RewardData { get { return rewardData; } private set { rewardData = value; } }
         public Sprite CantoSprte { get { return cantoSprte; } set { cantoSprte = value; } }
     }
+
+
+    /// <summary>
+    /// º¸»ó È¹µæ¿©ºÎ enum (ºñÈ°¼ºÈ­, È¹µæ°¡´É, È¹µæµÊ)
+    /// </summary>
+    public enum GetReward { Disabled, Available, Obtained }
 }
 
 

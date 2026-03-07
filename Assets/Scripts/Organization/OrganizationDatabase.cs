@@ -124,6 +124,7 @@ public class OrganizationDatabase : MonoBehaviour
             // 데이터 주입
             foreach (IdentityData runtimeData in loadData.info)
             {
+                Debug.Log(info.info[0].master);
                 IdentityData save = info.info.Find(x => x.master.identityId == runtimeData.master.identityId);
                 if (save != null)
                 {

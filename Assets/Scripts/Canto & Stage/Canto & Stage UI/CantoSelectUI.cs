@@ -17,6 +17,11 @@ public class CantoSelectUI : MonoBehaviour, IPointerClickHandler, IPointerEnterH
     [SerializeField] private Image borderImage;
 
 
+    /// <summary>
+    /// 칸토 데이터 주입
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="isOn"></param>
     public void SetUp(CantoData data, bool isOn)
     {
         Debug.Log($"슬롯 데이터 주입 / {data} / {isOn}");
@@ -32,7 +37,7 @@ public class CantoSelectUI : MonoBehaviour, IPointerClickHandler, IPointerEnterH
     public void OnPointerClick(PointerEventData eventData)
     {
         Debug.Log("Click Canto Container");
-        StageManager.instance.CantoUI(true, data.cantoData.CantoOrder);
+        BattleContentManager.instance.CantoSelect(true, data.cantoData.CantoOrder);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

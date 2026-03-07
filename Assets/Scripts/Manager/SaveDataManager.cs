@@ -57,14 +57,6 @@ public class SaveDataManager : MonoBehaviour
         SetUp();
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyUp(KeyCode.F))
-        {
-            
-        }
-    }
-
 
     public void SetUp()
     {
@@ -88,7 +80,7 @@ public class SaveDataManager : MonoBehaviour
                 OrganizationDatabase.instance.ApplyEgoData(data);
 
                 // 스테이지
-                StageManager.instance.ApplyCantoData(data);
+                BattleContentManager.instance.ApplyCantoData(data);
 
                 // 인벤토리
 
@@ -135,7 +127,7 @@ public class SaveDataManager : MonoBehaviour
             organizationOrder = OrganizationDatabase.instance.GetOrganizationOrderData(),
 
             // 스테이지
-            cantoData = StageManager.instance.GetCantoData(),
+            cantoData = BattleContentManager.instance.GetCantoData(),
 
             // 인벤토리
             // inventoryData = InventoryManager.instance.GetInventoryData()
@@ -223,7 +215,7 @@ public class SaveDataManager : MonoBehaviour
             ownedEgo = OrganizationDatabase.instance.CreateEgoData(),
 
             // 스테이지 데이터 제작
-            cantoData = StageManager.instance.CreateCantoData(),
+            cantoData = BattleContentManager.instance.CreateCantoData(),
 
             // 인벤토리 데이터 제작
 

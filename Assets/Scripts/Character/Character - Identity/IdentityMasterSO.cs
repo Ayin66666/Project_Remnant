@@ -12,7 +12,7 @@ public class IdentityMasterSO : ScriptableObject
     /// 1. 캐릭터 Id (2자리) + 인격 성급 (1자리) + 인격 번호 (3자리)
     /// 예시) ch1의 2성 1번째 인격 -> 012001 (읽을때는 01 2 001)
     /// </summary>
-    public string identityId;
+    public int identityId;
     /// <summary>
     /// 인격의 성급 (1성 ~ 3성)
     /// </summary>
