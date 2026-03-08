@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
+using Game.Character;
 
 
 public class EgoDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler

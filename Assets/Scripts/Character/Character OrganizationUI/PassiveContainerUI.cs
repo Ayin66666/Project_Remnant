@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static IdentityMasterSO;
+using Game.Character;
 
 
 public class PassiveContainerUI : MonoBehaviour

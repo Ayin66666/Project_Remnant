@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-
+using Game.Character;
 
 public class OrganizationManager : MonoBehaviour
 {

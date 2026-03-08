@@ -2,6 +2,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Game.Character;
 
 
 public class SkillContainerUI : MonoBehaviour

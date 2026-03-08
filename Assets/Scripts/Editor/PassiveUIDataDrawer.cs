@@ -1,5 +1,7 @@
 using UnityEditor;
 using UnityEngine;
+using Game.Character;
+
 
 [CustomPropertyDrawer(typeof(PassiveUIData))]
 public class PassiveUIDataDrawer : PropertyDrawer
