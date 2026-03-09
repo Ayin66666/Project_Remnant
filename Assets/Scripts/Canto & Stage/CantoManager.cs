@@ -28,7 +28,6 @@ public class CantoManager : MonoBehaviour
         this.data = data;
 
         // 스테이지 슬롯에 데이터 전달
-        Debug.Log($"데이터 사이즈 {data.stageData.Count}");
         for (int i = 0; i < data.stageData.Count; i++)
         {
             stageNodes[i].SetUp(data.stageData[i]);

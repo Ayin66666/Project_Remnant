@@ -9,7 +9,7 @@ namespace Game.Character
     {
         [Header("---Data---")]
         public CharacterId sinner;
-        public string egoId;
+        public int egoId;
         public Rank egoRank;
         public int coinPower;
         public int targetCount;

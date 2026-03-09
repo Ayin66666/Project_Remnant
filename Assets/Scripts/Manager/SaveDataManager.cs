@@ -74,7 +74,6 @@ public class SaveDataManager : MonoBehaviour
             {
                 Debug.Log($"데이터 로드 / {data}");
 
-
                 // 인격 & 에고 데이터 전달
                 OrganizationDatabase.instance.ApplyIdentityData(data);
                 OrganizationDatabase.instance.ApplyEgoData(data);

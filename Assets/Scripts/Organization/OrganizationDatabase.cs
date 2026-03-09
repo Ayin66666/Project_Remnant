@@ -13,8 +13,8 @@ public class OrganizationDatabase : MonoBehaviour
     [SerializeField] private Dictionary<CharacterId, OrganizationData> organizationData;
 
     [Header("---보유 데이터---")]
-    [SerializeField] private List<IdentityInfo> identityInfo;
-    [SerializeField] private List<EgoInfo> egoInfo;
+    [SerializeField] private List<IdentityInfo> identityRuntimeData;
+    [SerializeField] private List<EgoInfo> egoRuntimeData;
 
 
     private void Awake()
@@ -29,20 +29,21 @@ public class OrganizationDatabase : MonoBehaviour
         }
 
         // 데이터 로드
-        LoadIdentityData();
-        LoadEgoData();
+        CreateIdentityRuntimeData();
+        CreateEgoRuntimeData();
     }
 
 
-    #region 파일에서 인격 & 에고 데이터 로드
+    #region 런타임 데이터 생성
     /// <summary>
-    /// 파일에서 SO 데이터를 읽은 후 런타임 데이터 생성
+    /// 로더에서 데이터 획득 후 런타임 베이스 데이터 생성
     /// </summary>
-    public void LoadIdentityData()
+    public void CreateIdentityRuntimeData()
     {
+        
         // enum 기반 로드 방식 (구형)
         // 기본 데이터 로드
-        identityInfo = new List<IdentityInfo>();
+        identityRuntimeData = new List<IdentityInfo>();
         foreach (CharacterId characterId in Enum.GetValues(typeof(CharacterId)))
         {
             // None은 건너뛰기 -> 임시로직
@@ -68,16 +69,17 @@ public class OrganizationDatabase : MonoBehaviour
                 };
                 identityInfo.info.Add(data);
             }
-            this.identityInfo.Add(identityInfo);
+            identityRuntimeData.Add(identityInfo);
         }
+        
     }
 
     /// <summary>
-    /// 파일에서 SO 데이터를 읽은 후 런타임 데이터 생성
+    /// 로더에서 데이터 획득 후 런타임 베이스 데이터 생성
     /// </summary>
-    public void LoadEgoData()
+    public void CreateEgoRuntimeData()
     {
-        egoInfo = new List<EgoInfo>();
+        egoRuntimeData = new List<EgoInfo>();
         foreach (CharacterId characterId in Enum.GetValues(typeof(CharacterId)))
         {
             // None은 건너뛰기 -> 임시로직
@@ -99,7 +101,7 @@ public class OrganizationDatabase : MonoBehaviour
                 egoInfo.info.Add(data);
             }
 
-            this.egoInfo.Add(egoInfo);
+            this.egoRuntimeData.Add(egoInfo);
         }
     }
     #endregion
@@ -114,7 +116,7 @@ public class OrganizationDatabase : MonoBehaviour
     {
         // 세이브 데이터 덮어쓰기
         Dictionary<CharacterId, IdentityInfo> saveDict = saveData.ownedIdentity.ToDictionary(x => x.sinner);
-        foreach (IdentityInfo loadData in identityInfo)
+        foreach (IdentityInfo loadData in identityRuntimeData)
         {
             // 수감자 선택
             IdentityInfo info;
@@ -124,7 +126,6 @@ public class OrganizationDatabase : MonoBehaviour
             // 데이터 주입
             foreach (IdentityData runtimeData in loadData.info)
             {
-                Debug.Log(info.info[0].master);
                 IdentityData save = info.info.Find(x => x.master.identityId == runtimeData.master.identityId);
                 if (save != null)
                 {
@@ -144,7 +145,7 @@ public class OrganizationDatabase : MonoBehaviour
     public void ApplyEgoData(SaveData saveData)
     {
         Dictionary<CharacterId, EgoInfo> saveDict = saveData.ownedEgo.ToDictionary(x => x.sinner);
-        foreach (EgoInfo loadData in egoInfo)
+        foreach (EgoInfo loadData in egoRuntimeData)
         {
             // 수감자 선택
             EgoInfo info;
@@ -171,25 +172,7 @@ public class OrganizationDatabase : MonoBehaviour
     /// <returns></returns>
     public List<OrganizationData> CreatOrganizationData()
     {
-        /*
-        // 각 인격 순회
-        List<OrganizationData> list = new List<OrganizationData>();
-        for (int i = 0; i < identityInfo.Count; i++)
-        {
-            // 데이터 생성
-            OrganizationData data = new OrganizationData()
-            {
-                sinner = identityInfo[i].sinner,
-                identity = identityInfo[i].info[0],
-                ego = new List<EgoData>()
-            };
-
-            list.Add(data);
-        }
-        return list;
-        */
-
-        var data = identityInfo
+        var data = identityRuntimeData
             .Select(x => new OrganizationData
             {
                 sinner = x.sinner,
@@ -208,28 +191,28 @@ public class OrganizationDatabase : MonoBehaviour
     public List<IdentityInfo> CreateIdentityData()
     {
         // 1번 인격만 언락
-        foreach (IdentityInfo character in identityInfo)
+        foreach (IdentityInfo character in identityRuntimeData)
         {
             if (character.info != null && character.info.Count > 0)
                 character.info[0].isUnlocked = true;
         }
 
-        return identityInfo;
+        return identityRuntimeData;
     }
 
     /// <summary>
-    /// 신규 데이터 생서 시 호출 - 각 인격의 첫번째 에고만 열린 상태로 보내줌
+    /// 신규 데이터 생성 시 호출 - 각 인격의 첫번째 에고만 열린 상태로 보내줌
     /// </summary>
     /// <returns></returns>
     public List<EgoInfo> CreateEgoData()
     {
-        foreach (EgoInfo ego in egoInfo)
+        foreach (EgoInfo ego in egoRuntimeData)
         {
             if (ego.info != null && ego.info.Count > 0)
                 ego.info[0].isUnlocked = true;
         }
 
-        return egoInfo;
+        return egoRuntimeData;
     }
     #endregion
 
@@ -274,7 +257,7 @@ public class OrganizationDatabase : MonoBehaviour
     /// <returns></returns>
     public List<IdentityInfo> GetIdentityData()
     {
-        return identityInfo;
+        return identityRuntimeData;
     }
 
     /// <summary>
@@ -283,7 +266,7 @@ public class OrganizationDatabase : MonoBehaviour
     /// <returns></returns>
     public List<EgoInfo> GetEgoInfo()
     {
-        return egoInfo;
+        return egoRuntimeData;
     }
     #endregion
 
@@ -362,9 +345,9 @@ public class OrganizationDatabase : MonoBehaviour
     /// <returns></returns>
     public IdentityInfo GetIdentityInfo(CharacterId sinner)
     {
-        int index = identityInfo.FindIndex(x => x.sinner == sinner);
+        int index = identityRuntimeData.FindIndex(x => x.sinner == sinner);
         if (index != -1)
-            return identityInfo[index];
+            return identityRuntimeData[index];
         else
         {
             Debug.Log($"인격 정보 없음 / {sinner}");
