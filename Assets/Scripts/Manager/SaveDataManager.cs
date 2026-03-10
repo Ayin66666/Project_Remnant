@@ -75,8 +75,8 @@ public class SaveDataManager : MonoBehaviour
                 Debug.Log($"데이터 로드 / {data}");
 
                 // 인격 & 에고 데이터 전달
-                OrganizationDatabase.instance.ApplyIdentityData(data);
-                OrganizationDatabase.instance.ApplyEgoData(data);
+                CharacterRosterManager.instance.ApplySaveData(data);
+                CharacterRosterManager.instance.ApplyEgoData(data);
 
                 // 스테이지
                 BattleContentManager.instance.ApplyCantoData(data);
@@ -118,12 +118,12 @@ public class SaveDataManager : MonoBehaviour
             playTutorial = true,
 
             // 인격 & 에고 소유
-            ownedIdentity = OrganizationDatabase.instance.GetIdentityData(),
-            ownedEgo = OrganizationDatabase.instance.GetEgoInfo(),
+            ownedIdentity = CharacterRosterManager.instance.GetIdentityData(),
+            ownedEgo = CharacterRosterManager.instance.GetEgoInfo(),
 
             // 수감자 편성
-            organizationDatas = OrganizationDatabase.instance.GetOrganiztionData(),
-            organizationOrder = OrganizationDatabase.instance.GetOrganizationOrderData(),
+            organizationDatas = CharacterRosterManager.instance.GetOrganiztionData(),
+            organizationOrder = CharacterRosterManager.instance.GetOrganizationOrderData(),
 
             // 스테이지
             cantoData = BattleContentManager.instance.GetCantoData(),
@@ -206,12 +206,12 @@ public class SaveDataManager : MonoBehaviour
             playTutorial = false,
 
             // 편성 데이터  (편성 순서 & 값 없는 게 정상)
-            organizationDatas = OrganizationDatabase.instance.CreatOrganizationData(),
+            organizationDatas = CharacterRosterManager.instance.CreatOrganizationData(),
             organizationOrder = new List<CharacterId>(0),
 
             // 인격 & 에고 보유 데이터
-            ownedIdentity = OrganizationDatabase.instance.CreateIdentityData(),
-            ownedEgo = OrganizationDatabase.instance.CreateEgoData(),
+            ownedIdentity = CharacterRosterManager.instance.CreateIdentityData(),
+            ownedEgo = CharacterRosterManager.instance.CreateEgoData(),
 
             // 스테이지 데이터 제작
             cantoData = BattleContentManager.instance.CreateCantoData(),

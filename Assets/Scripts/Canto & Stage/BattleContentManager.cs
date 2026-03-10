@@ -46,15 +46,6 @@ public class BattleContentManager : MonoBehaviour
     /// </summary>
     private void LoadCantoData()
     {
-        // - 기존의 파일에서 ReadAll 방식에서 so를 묶은 파일 1개만 로드하는 방식으로 전환함
-        CantoDatabaseSO data = Resources.Load<CantoDatabaseSO>("Canto/CantoDatabase");
-        if (data == null)
-        {
-            Debug.LogError("칸토 데이터 so 로드 실패!");
-            return;
-        }
-        cantoDatabaseSO = data;
-
         // 런타임 칸토 데이터 생성
         cantoDataList = new List<CantoData>(cantoDatabaseSO.CantoData.Count);
         foreach(var canto in cantoDatabaseSO.CantoData)

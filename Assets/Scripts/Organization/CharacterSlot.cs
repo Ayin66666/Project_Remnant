@@ -82,7 +82,7 @@ public class CharacterSlot : MonoBehaviour
     public void OrderSetting()
     {
         if (identityInfo == null) return;
-        OrganizationDatabase.instance.OrganizationOrderSetting(slotOnwer);
+        CharacterRosterManager.instance.OrganizationOrderSetting(slotOnwer);
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public class CharacterSlot : MonoBehaviour
     {
         if(identityInfo == null) return;
 
-        OrganizationData data = OrganizationDatabase.instance.GetOrganizationData(slotOnwer);
+        OrganizationData data = CharacterRosterManager.instance.GetOrganizationData(slotOnwer);
         if (data != null)
             CharacterDescription.instance.SetUp(data);
         else

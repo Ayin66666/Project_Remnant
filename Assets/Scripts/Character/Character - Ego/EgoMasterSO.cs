@@ -58,6 +58,18 @@ namespace Game.Character
 
         [Header("---Reference---")]
         public EgoMasterSO master;
+
+
+        /// <summary>
+        /// »ý¼ºÀÚ
+        /// </summary>
+        /// <param name="so"></param>
+        public EgoData(EgoMasterSO so)
+        {
+            isUnlocked = false;
+            sync = 1;
+            master = so;
+        }
     }
 
     public enum Rank

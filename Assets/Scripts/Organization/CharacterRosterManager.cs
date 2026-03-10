@@ -1,12 +1,12 @@
-using System;
+using Game.Character;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Game.Character;
 
-public class OrganizationDatabase : MonoBehaviour
+
+public class CharacterRosterManager : MonoBehaviour
 {
-    public static OrganizationDatabase instance;
+    public static CharacterRosterManager instance;
 
     [Header("---편성 데이터---")]
     [SerializeField] private List<CharacterId> organizationOrderList;
@@ -15,6 +15,9 @@ public class OrganizationDatabase : MonoBehaviour
     [Header("---보유 데이터---")]
     [SerializeField] private List<IdentityInfo> identityRuntimeData;
     [SerializeField] private List<EgoInfo> egoRuntimeData;
+
+    [Header("---신규 런타임 데이터 (인격 & 에고 통합)---")]
+    [SerializeField] private Dictionary<CharacterId, SinnerRuntimeData> runtimeInfo;
 
 
     private void Awake()
@@ -27,10 +30,12 @@ public class OrganizationDatabase : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
 
+    private void Start()
+    {
         // 데이터 로드
         CreateIdentityRuntimeData();
-        CreateEgoRuntimeData();
     }
 
 
@@ -40,68 +45,47 @@ public class OrganizationDatabase : MonoBehaviour
     /// </summary>
     public void CreateIdentityRuntimeData()
     {
-        
-        // enum 기반 로드 방식 (구형)
-        // 기본 데이터 로드
-        identityRuntimeData = new List<IdentityInfo>();
-        foreach (CharacterId characterId in Enum.GetValues(typeof(CharacterId)))
+        // 데이터 로드
+        IdentityDatabaseSO identityData = DataLoader.instance.IdentityDatabaseSO;
+        EgoDatabaseSO egoData = DataLoader.instance.EgoDatabaseSO;
+
+        runtimeInfo = 
+            new Dictionary<CharacterId, SinnerRuntimeData>(identityData.SOContainers.Count);
+
+        // 신규 데이터 생성 & 할당
+        foreach(var data in identityData.SOContainers)
         {
-            // None은 건너뛰기 -> 임시로직
-            if (characterId == CharacterId.None) continue;
-
-            IdentityInfo identityInfo = new IdentityInfo();
-            identityInfo.sinner = characterId;
-
-            // 경로 지정 & 데이터 로드
-            string path = $"Identity/{characterId.ToString().ToUpper()}";
-            IdentityMasterSO[] masters = Resources.LoadAll<IdentityMasterSO>(path);
-
-            // 런타임 데이터 생성
-            identityInfo.info = new List<IdentityData>(masters.Length);
-            foreach (IdentityMasterSO master in masters)
+            // 수감자 런타임 데이터 생성
+            SinnerRuntimeData runtimeData = new SinnerRuntimeData()
             {
-                IdentityData data = new IdentityData()
+                sinner = data.Sinner,
+                identityDic = new Dictionary<int, IdentityData>(),
+                egoDic = new Dictionary<int, EgoData>()
+            };
+
+            // 수감자 전원의 인격 런타임 데이터 생성 & 할당
+            foreach(var identity in data.so)
+            {
+                runtimeData.identityDic.Add(identity.identityId, new IdentityData(identity));
+            }
+
+            // 수감자 전원의 에고 런타임 데이터 생성 & 할당
+            var matchingEgo = egoData.SOContainers.FirstOrDefault(e => e.Sinner == data.Sinner);
+            if (matchingEgo != null)
+            {
+                foreach(var egoSO in matchingEgo.so)
                 {
-                    isUnlocked = false,
-                    level = 1,
-                    sync = 1,
-                    master = master
-                };
-                identityInfo.info.Add(data);
+                    runtimeData.egoDic.Add(egoSO.egoId, new EgoData(egoSO));
+                }
             }
-            identityRuntimeData.Add(identityInfo);
+
+            // 런타임 딕셔너리에 추가
+            runtimeInfo.Add(data.Sinner, runtimeData);
         }
-        
-    }
 
-    /// <summary>
-    /// 로더에서 데이터 획득 후 런타임 베이스 데이터 생성
-    /// </summary>
-    public void CreateEgoRuntimeData()
-    {
-        egoRuntimeData = new List<EgoInfo>();
-        foreach (CharacterId characterId in Enum.GetValues(typeof(CharacterId)))
+        foreach(var data in runtimeInfo)
         {
-            // None은 건너뛰기 -> 임시로직
-            if (characterId == CharacterId.None) continue;
-
-            EgoInfo egoInfo = new EgoInfo();
-            egoInfo.sinner = characterId;
-
-            string path = $"Ego/{characterId.ToString().ToUpper()}";
-            EgoMasterSO[] masters = Resources.LoadAll<EgoMasterSO>(path);
-            egoInfo.info = new List<EgoData>(masters.Length);
-            foreach (EgoMasterSO master in masters)
-            {
-                EgoData data = new EgoData();
-                data.isUnlocked = true;
-                data.sync = 1;
-                data.master = master;
-
-                egoInfo.info.Add(data);
-            }
-
-            this.egoRuntimeData.Add(egoInfo);
+            Debug.Log($"데이터 체크 {data.Key}번 / {data.Value} 데이터");
         }
     }
     #endregion
@@ -109,11 +93,12 @@ public class OrganizationDatabase : MonoBehaviour
 
     #region 세이브 파일 로드 & 신규 데이터 생성
     /// <summary>
-    /// 생성된 기초 런타임 데이터에 세이브 데이터 주입
+    /// 생성된 런타임 데이터에 세이브 데이터 주입
     /// </summary>
     /// <param name="saveData"></param>
-    public void ApplyIdentityData(SaveData saveData)
+    public void ApplySaveData(SaveData saveData)
     {
+        /*
         // 세이브 데이터 덮어쓰기
         Dictionary<CharacterId, IdentityInfo> saveDict = saveData.ownedIdentity.ToDictionary(x => x.sinner);
         foreach (IdentityInfo loadData in identityRuntimeData)
@@ -135,6 +120,13 @@ public class OrganizationDatabase : MonoBehaviour
                     runtimeData.curExp = save.curExp;
                 }
             }
+        }
+        */
+
+        
+        foreach (var info in runtimeInfo.Values)
+        {
+
         }
     }
 
@@ -395,3 +387,43 @@ public class OrganizationData
     public IdentityData identity;
     public List<EgoData> ego;
 }
+
+
+/// <summary>
+/// 신규 런타임 인격 보유 데이터
+/// </summary>
+[System.Serializable]
+public class SinnerRuntimeData
+{
+    public CharacterId sinner;
+    public Dictionary<int, IdentityData> identityDic;
+    public Dictionary<int, EgoData> egoDic;
+}
+
+[System.Serializable]
+public class IdentityData
+{
+    [Header("---Status---")]
+    public bool isUnlocked;
+    public int sync;
+    public int level;
+    public int curExp;
+
+    [Header("---Reference---")]
+    public IdentityMasterSO master;
+
+
+    /// <summary>
+    /// 생성자
+    /// </summary>
+    /// <param name="so"></param>
+    public IdentityData(IdentityMasterSO so)
+    {
+        isUnlocked = false;
+        sync = 1;
+        level = 1;
+        curExp = 0;
+        master = so;
+    }
+}
+

@@ -56,7 +56,7 @@ public class OrganizationManager : MonoBehaviour
             // 데이터가 없다면 - 현재는 무조건 초기값 세팅
             for (int i = 0; i < characterSlot.Count; i++)
             {
-                OrganizationData data = OrganizationDatabase.instance.GetOrganizationData((CharacterId)i);
+                OrganizationData data = CharacterRosterManager.instance.GetOrganizationData((CharacterId)i);
                 if (data != null)
                 {
                     Debug.Log($"데이터 셋팅 / 캐릭터 : {(CharacterId)(i)}");
@@ -82,7 +82,7 @@ public class OrganizationManager : MonoBehaviour
         curSinner = id;
 
         // 데이터 세팅 - 인격
-        IdentityInfo info1 = OrganizationDatabase.instance.GetIdentityInfo(id);
+        IdentityInfo info1 = CharacterRosterManager.instance.GetIdentityInfo(id);
         if (info1 == null)
         {
             Debug.Log("인격 정보 없음");
@@ -183,7 +183,7 @@ public class OrganizationManager : MonoBehaviour
     public void OrganizingIdentity(IdentityData info)
     {
         // 데이터베이스로 전달
-        OrganizationDatabase.instance.SetIdentity(info);
+        CharacterRosterManager.instance.SetIdentity(info);
     }
 
     /// <summary>
@@ -193,7 +193,7 @@ public class OrganizationManager : MonoBehaviour
     public void OrganizingEgo(EgoData info)
     {
         // 데이터베이스로 전달
-        OrganizationDatabase.instance.SetEgo(info);
+        CharacterRosterManager.instance.SetEgo(info);
     }
     #endregion
 }

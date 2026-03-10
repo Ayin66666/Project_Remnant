@@ -58,7 +58,7 @@ public class CharacterSelectSlot : MonoBehaviour, IPointerClickHandler, IPointer
         {
             isSelected = true;
             selectTextSet.SetActive(true);
-            OrganizationDatabase.instance.SetIdentity(identityInfo);
+            CharacterRosterManager.instance.SetIdentity(identityInfo);
         }
         else
         {
