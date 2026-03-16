@@ -12,10 +12,6 @@ public class CharacterRosterManager : MonoBehaviour
     [SerializeField] private List<CharacterId> organizationOrderList;
     [SerializeField] private Dictionary<CharacterId, OrganizationData> organizationData;
 
-    [Header("---보유 데이터---")]
-    [SerializeField] private List<IdentityInfo> identityRuntimeData;
-    [SerializeField] private List<EgoInfo> egoRuntimeData;
-
     [Header("---신규 런타임 데이터 (인격 & 에고 통합)---")]
     [SerializeField] private Dictionary<CharacterId, SinnerRuntimeData> runtimeInfo;
 
@@ -49,11 +45,11 @@ public class CharacterRosterManager : MonoBehaviour
         IdentityDatabaseSO identityData = DataLoader.instance.IdentityDatabaseSO;
         EgoDatabaseSO egoData = DataLoader.instance.EgoDatabaseSO;
 
-        runtimeInfo = 
+        runtimeInfo =
             new Dictionary<CharacterId, SinnerRuntimeData>(identityData.SOContainers.Count);
 
         // 신규 데이터 생성 & 할당
-        foreach(var data in identityData.SOContainers)
+        foreach (var data in identityData.SOContainers)
         {
             // 수감자 런타임 데이터 생성
             SinnerRuntimeData runtimeData = new SinnerRuntimeData()
@@ -64,7 +60,7 @@ public class CharacterRosterManager : MonoBehaviour
             };
 
             // 수감자 전원의 인격 런타임 데이터 생성 & 할당
-            foreach(var identity in data.so)
+            foreach (var identity in data.so)
             {
                 runtimeData.identityDic.Add(identity.identityId, new IdentityData(identity));
             }
@@ -73,7 +69,7 @@ public class CharacterRosterManager : MonoBehaviour
             var matchingEgo = egoData.SOContainers.FirstOrDefault(e => e.Sinner == data.Sinner);
             if (matchingEgo != null)
             {
-                foreach(var egoSO in matchingEgo.so)
+                foreach (var egoSO in matchingEgo.so)
                 {
                     runtimeData.egoDic.Add(egoSO.egoId, new EgoData(egoSO));
                 }
@@ -83,7 +79,7 @@ public class CharacterRosterManager : MonoBehaviour
             runtimeInfo.Add(data.Sinner, runtimeData);
         }
 
-        foreach(var data in runtimeInfo)
+        foreach (var data in runtimeInfo)
         {
             Debug.Log($"데이터 체크 {data.Key}번 / {data.Value} 데이터");
         }
@@ -93,118 +89,101 @@ public class CharacterRosterManager : MonoBehaviour
 
     #region 세이브 파일 로드 & 신규 데이터 생성
     /// <summary>
-    /// 생성된 런타임 데이터에 세이브 데이터 주입
+    /// 런타임 데이터에 세이브 데이터 주입
     /// </summary>
     /// <param name="saveData"></param>
     public void ApplySaveData(SaveData saveData)
     {
-        /*
-        // 세이브 데이터 덮어쓰기
-        Dictionary<CharacterId, IdentityInfo> saveDict = saveData.ownedIdentity.ToDictionary(x => x.sinner);
-        foreach (IdentityInfo loadData in identityRuntimeData)
+        foreach (var owned in saveData.ownedCharacterData)
         {
-            // 수감자 선택
-            IdentityInfo info;
-            saveDict.TryGetValue(loadData.sinner, out info);
-            if (info == null) continue;
+            if (runtimeInfo.TryGetValue(owned.sinner, out var runtime))
+                continue;
 
-            // 데이터 주입
-            foreach (IdentityData runtimeData in loadData.info)
+            // Identity
+            foreach (var saveIdentity in owned.identity)
             {
-                IdentityData save = info.info.Find(x => x.master.identityId == runtimeData.master.identityId);
-                if (save != null)
+                if (runtime.identityDic.TryGetValue(saveIdentity.identityId, out IdentityData runtimeIdentity))
                 {
-                    runtimeData.isUnlocked = save.isUnlocked;
-                    runtimeData.level = save.level;
-                    runtimeData.sync = save.sync;
-                    runtimeData.curExp = save.curExp;
+                    runtimeIdentity.isUnlocked = saveIdentity.isUnlock;
+                    runtimeIdentity.sync = saveIdentity.sync;
+                    runtimeIdentity.level = saveIdentity.level;
+                    runtimeIdentity.curExp = saveIdentity.curExp;
                 }
             }
-        }
-        */
 
-        
-        foreach (var info in runtimeInfo.Values)
-        {
-
-        }
-    }
-
-    /// <summary>
-    /// 생성된 기초 런타임 데이터에 세이브 데이터 주입
-    /// </summary>
-    /// <param name="saveData"></param>
-    public void ApplyEgoData(SaveData saveData)
-    {
-        Dictionary<CharacterId, EgoInfo> saveDict = saveData.ownedEgo.ToDictionary(x => x.sinner);
-        foreach (EgoInfo loadData in egoRuntimeData)
-        {
-            // 수감자 선택
-            EgoInfo info;
-            saveDict.TryGetValue(loadData.sinner, out info);
-            if (info == null) continue;
-
-            // 데이터 주입
-            foreach (EgoData runtimeData in loadData.info)
+            // Ego
+            foreach (var saveEgo in owned.ego)
             {
-                EgoData save = info.info.Find(x => x.master.egoId == runtimeData.master.egoId);
-                if (save != null)
+                if (runtime.egoDic.TryGetValue(saveEgo.egoId, out EgoData runtimeEgo))
                 {
-                    runtimeData.isUnlocked = save.isUnlocked;
-                    runtimeData.sync = save.sync;
+                    runtimeEgo.isUnlocked = saveEgo.isUnlock;
+                    runtimeEgo.sync = saveEgo.sync;
                 }
             }
         }
     }
 
-
     /// <summary>
-    /// 신규 데이터 생성 시 호출 - 각 인격의 첫번째 인격만 배치한 상태로 보내줌
+    /// 신규 데이터 생성 시 호출 / 편성 데이터 제작 (각 수감자의 기본 인격 배정)
     /// </summary>
     /// <returns></returns>
     public List<OrganizationData> CreatOrganizationData()
     {
-        var data = identityRuntimeData
-            .Select(x => new OrganizationData
-            {
-                sinner = x.sinner,
-                identity = x.info[0],
-                ego = new List<EgoData>()
-            })
-            .ToList();
+        // 편성 리스트 만들기 (세이브용) - so 컨테이너 so 에서 각 인격의 1번 데이터 호출
+        List<OrganizationData> organizationData = new List<OrganizationData>();
+        IdentityDatabaseSO so = DataLoader.instance.IdentityDatabaseSO;
+        foreach (var soContainer in so.SOContainers)
+        {
+            if (soContainer.so.Count == 0) 
+                continue;
 
-        return data;
+            int baseId = soContainer.so[0].identityId;
+            organizationData.Add(new OrganizationData()
+            {
+                sinner = soContainer.Sinner,
+                identity = runtimeInfo[soContainer.Sinner].identityDic[baseId],
+                ego = new List<EgoData>()
+
+            });
+        }
+
+        // 딕셔너리에 데이터 넣기(런타임용)
+
+
+        // 반환
+        return organizationData;
     }
 
     /// <summary>
-    /// 신규 데이터 생성 시 호출 - 각 인격의 첫번째 인격만 열린 상태로 보내줌
+    /// 신규 데이터 생성 시 호출 / 인격 & 에고 보유 데이터 제작
     /// </summary>
     /// <returns></returns>
-    public List<IdentityInfo> CreateIdentityData()
+    public List<OwnedSaveData> CreatData()
+    {
+        // 신규 데이터 생성
+        CreateIdentityData();
+        CreateEgoData();
+
+        // 세이브 데이터 형태 (List<OwnedSaveData>) 로 변환 후 전달
+        return GetOwendData();
+    }
+
+    /// <summary>
+    /// 신규 데이터 생성 시 호출 - 각 인격의 첫번째 인격만 열린 상태로 변경
+    /// </summary>
+    /// <returns></returns>
+    private void CreateIdentityData()
     {
         // 1번 인격만 언락
-        foreach (IdentityInfo character in identityRuntimeData)
-        {
-            if (character.info != null && character.info.Count > 0)
-                character.info[0].isUnlocked = true;
-        }
-
-        return identityRuntimeData;
     }
 
     /// <summary>
-    /// 신규 데이터 생성 시 호출 - 각 인격의 첫번째 에고만 열린 상태로 보내줌
+    /// 신규 데이터 생성 시 호출 - 각 인격의 첫번째 에고만 열린 상태로 변경
     /// </summary>
     /// <returns></returns>
-    public List<EgoInfo> CreateEgoData()
+    private void CreateEgoData()
     {
-        foreach (EgoInfo ego in egoRuntimeData)
-        {
-            if (ego.info != null && ego.info.Count > 0)
-                ego.info[0].isUnlocked = true;
-        }
-
-        return egoRuntimeData;
+        // 1번 에고만 언락
     }
     #endregion
 
@@ -225,17 +204,6 @@ public class CharacterRosterManager : MonoBehaviour
     /// <returns></returns>
     public List<OrganizationData> GetOrganiztionData()
     {
-        /*
-        List<OrganizationData> data = new List<OrganizationData>();
-        int l = Enum.GetValues(typeof(CharacterId)).Length;
-        for (int i = 0; i < l; i++)
-        {
-            data.Add(organizationData[(CharacterId)i]);
-        }
-        
-        return data;
-        */
-
         // Linq 동작하는지 테스트 필요!
         return organizationOrderList
             .Where(id => id != CharacterId.None && organizationData.ContainsKey(id))
@@ -244,21 +212,54 @@ public class CharacterRosterManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 인격 보유 데이터 전달
+    /// 수감자의 인격 & 에고 보유 데이터 전달
     /// </summary>
     /// <returns></returns>
-    public List<IdentityInfo> GetIdentityData()
+    public List<OwnedSaveData> GetOwendData()
     {
-        return identityRuntimeData;
-    }
+        // 세이브 데이터 형태로 가공 후 전달
+        List<OwnedSaveData> list = new List<OwnedSaveData>();
+        foreach (var runtime in runtimeInfo.Values)
+        {
+            // 인격 데이터 전환
+            List<OwnedSaveData.Identity> identity = new List<OwnedSaveData.Identity>();
+            foreach (var iData in runtime.identityDic.Values)
+            {
+                identity.Add(new OwnedSaveData.Identity
+                {
+                    isUnlock = iData.isUnlocked,
+                    identityId = iData.master.identityId,
+                    curExp = iData.curExp,
+                    level = iData.level,
+                    sync = iData.sync,
+                });
+            }
 
-    /// <summary>
-    /// 에고 보유 데이터 전달
-    /// </summary>
-    /// <returns></returns>
-    public List<EgoInfo> GetEgoInfo()
-    {
-        return egoRuntimeData;
+            // 에고 데이터 전환
+            List<OwnedSaveData.Ego> ego = new List<OwnedSaveData.Ego>();
+            foreach (var eData in runtime.egoDic.Values)
+            {
+                ego.Add(new OwnedSaveData.Ego
+                {
+                    isUnlock = eData.isUnlocked,
+                    egoId = eData.master.egoId,
+                    sync = eData.sync,
+                });
+            }
+
+            // 데이터 삽입
+            OwnedSaveData data = new OwnedSaveData
+            {
+                sinner = runtime.sinner,
+                identity = identity,
+                ego = ego,
+            };
+
+            // 전체 리스트에 추가
+            list.Add(data);
+        }
+
+        return list;
     }
     #endregion
 
@@ -337,14 +338,7 @@ public class CharacterRosterManager : MonoBehaviour
     /// <returns></returns>
     public IdentityInfo GetIdentityInfo(CharacterId sinner)
     {
-        int index = identityRuntimeData.FindIndex(x => x.sinner == sinner);
-        if (index != -1)
-            return identityRuntimeData[index];
-        else
-        {
-            Debug.Log($"인격 정보 없음 / {sinner}");
-            return null;
-        }
+        return null;
     }
     #endregion
 

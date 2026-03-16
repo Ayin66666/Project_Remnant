@@ -22,10 +22,9 @@ public class SaveData
     public bool playTutorial;
 
     [Header("---인격 & 에고 & 편성---")]
-    public List<OrganizationData> organizationDatas;
-    public List<CharacterId> organizationOrder;
-    public List<IdentityInfo> ownedIdentity;
-    public List<EgoInfo> ownedEgo;
+    public List<OrganizationData> organizationDatas; // 인격 구성 데이터 (장착 인격 & 에고)
+    public List<CharacterId> organizationOrder; // 인격 편성 순서 데이터
+    public List<OwnedSaveData> ownedCharacterData; // 보유 인격 & 에고 데이터
 
     [Header("---스테이지---")]
     public List<CantoData> cantoData;
@@ -34,6 +33,35 @@ public class SaveData
     // 아직 미구현
 }
 
+[System.Serializable]
+/// <summary>
+/// 인격 & 에고 세이브용 데이터 클래스
+/// </summary>
+public class OwnedSaveData
+{
+    public CharacterId sinner;
+    public List<Identity> identity;
+    public List<Ego> ego;
+
+
+    [System.Serializable]
+    public struct Ego
+    {
+        public bool isUnlock;
+        public int egoId;
+        public int sync;
+    }
+
+    [System.Serializable]
+    public struct Identity
+    {
+        public bool isUnlock;
+        public int identityId;
+        public int sync;
+        public int level;
+        public int curExp;
+    }
+}
 
 public class SaveDataManager : MonoBehaviour
 {
@@ -76,7 +104,6 @@ public class SaveDataManager : MonoBehaviour
 
                 // 인격 & 에고 데이터 전달
                 CharacterRosterManager.instance.ApplySaveData(data);
-                CharacterRosterManager.instance.ApplyEgoData(data);
 
                 // 스테이지
                 BattleContentManager.instance.ApplyCantoData(data);
@@ -118,8 +145,7 @@ public class SaveDataManager : MonoBehaviour
             playTutorial = true,
 
             // 인격 & 에고 소유
-            ownedIdentity = CharacterRosterManager.instance.GetIdentityData(),
-            ownedEgo = CharacterRosterManager.instance.GetEgoInfo(),
+            ownedCharacterData = CharacterRosterManager.instance.GetOwendData(),
 
             // 수감자 편성
             organizationDatas = CharacterRosterManager.instance.GetOrganiztionData(),
@@ -205,18 +231,15 @@ public class SaveDataManager : MonoBehaviour
             version = Application.version,
             playTutorial = false,
 
-            // 편성 데이터  (편성 순서 & 값 없는 게 정상)
+            // 수감자 세팅, 편성 순서, 인격 & 에고 보유 데이터
             organizationDatas = CharacterRosterManager.instance.CreatOrganizationData(),
             organizationOrder = new List<CharacterId>(0),
+            ownedCharacterData = CharacterRosterManager.instance.CreatData(),
 
-            // 인격 & 에고 보유 데이터
-            ownedIdentity = CharacterRosterManager.instance.CreateIdentityData(),
-            ownedEgo = CharacterRosterManager.instance.CreateEgoData(),
-
-            // 스테이지 데이터 제작
+            // 스테이지 데이터
             cantoData = BattleContentManager.instance.CreateCantoData(),
 
-            // 인벤토리 데이터 제작
+            // 인벤토리 데이터
 
         };
 
