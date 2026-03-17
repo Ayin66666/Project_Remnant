@@ -58,7 +58,7 @@ public class CharacterSlot : MonoBehaviour
         border.sprite = borderSprite[0];
         levelText.text = "";
         nameText.text = "";
-
+        organizationCountText.text = "";
         foreach (GameObject icon in rankIcon)
         {
             icon.SetActive(false);
@@ -82,7 +82,14 @@ public class CharacterSlot : MonoBehaviour
     public void OrderSetting()
     {
         if (identityInfo == null) return;
+
+        // 편성
         CharacterRosterManager.instance.OrganizationOrderSetting(slotOnwer);
+
+        // UI
+        (bool isSelected, int order) = CharacterRosterManager.instance.GetIdentityOrderData(slotOnwer);
+        organizationCountText.text = $"{order}번";
+        organizationCountText.gameObject.SetActive(true);
     }
 
     /// <summary>
@@ -97,7 +104,6 @@ public class CharacterSlot : MonoBehaviour
             CharacterDescription.instance.SetUp(data);
         else
             Debug.Log("오류발생 / 인격 편성 체크필요");
-
     }
     #endregion
 }

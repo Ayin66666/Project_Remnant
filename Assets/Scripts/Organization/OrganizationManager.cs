@@ -1,6 +1,7 @@
-using System.Collections.Generic;
-using UnityEngine;
 using Game.Character;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using UnityEngine;
 
 public class OrganizationManager : MonoBehaviour
 {
@@ -81,6 +82,7 @@ public class OrganizationManager : MonoBehaviour
     {
         curSinner = id;
 
+        /* 구버전
         // 데이터 세팅 - 인격
         IdentityInfo info1 = CharacterRosterManager.instance.GetIdentityInfo(id);
         if (info1 == null)
@@ -98,6 +100,30 @@ public class OrganizationManager : MonoBehaviour
 
                 // 여기 일단은 false로 넣긴 하는데, 원래는 편성 여부 체크해서 넣어야 함!
                 slot.SetUp(info1.info[i], false);
+                slot.gameObject.SetActive(true);
+            }
+        }
+        */
+
+        // 런타임 데이터 받아오기
+        SinnerRuntimeData data = CharacterRosterManager.instance.GetIdentityData(id);
+        if(data == null)
+        {
+            Debug.LogError($"에러 발생 {id} 인격 데이터가 없음!");
+            return;
+        }
+
+        // 데이터 세팅
+        foreach(var iden in data.identityDic.Values)
+        {
+            if(iden.isUnlocked)
+            {
+                // 풀링에서 슬롯 받아오기
+                CharacterSelectSlot slot = pooling.GetIdentitySlot();
+
+                // 슬롯 데이터 할당 (인격 정보 & 편성 여부)
+                (bool, int) result = CharacterRosterManager.instance.GetIdentityOrderData(iden.master.sinner);
+                slot.SetUp(iden, result);
                 slot.gameObject.SetActive(true);
             }
         }

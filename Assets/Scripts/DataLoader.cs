@@ -41,7 +41,7 @@ public class DataLoader : MonoBehaviour
     /// <summary>
     /// 최초 1회 실행 - 파일에서 so 읽어오기
     /// </summary>
-    public void LoadData()
+    private void LoadData()
     {
         // 인격
         LoadIdentityData();

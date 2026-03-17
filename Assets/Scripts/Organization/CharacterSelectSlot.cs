@@ -24,13 +24,11 @@ public class CharacterSelectSlot : MonoBehaviour, IPointerClickHandler, IPointer
     /// 슬롯 데이터 셋업
     /// </summary>
     /// <param name="info"></param>
-    public void SetUp(IdentityData info, bool isSelected)
+    public void SetUp(IdentityData info, (bool, int) result)
     {
-        if(isSelected)
-        {
-            isSelected = true;
-            selectTextSet.SetActive(true);
-        }
+        // 데이터 세팅
+        (bool selected, int order) = result;
+        isSelected = selected;
 
         // UI 셋팅
         characterImage.sprite = info.master.portrait;
@@ -38,6 +36,10 @@ public class CharacterSelectSlot : MonoBehaviour, IPointerClickHandler, IPointer
         border.sprite = borderSprite[info.sync >= 3 ? 1 : 0]; // 3동기화 이상일 경우 테두리 변경
         levelText.text = info.level.ToString();
         nameText.text = info.master.identityName;
+        if (isSelected)
+        {
+            selectTextSet.SetActive(true);
+        }
 
         foreach (GameObject icon in rankIcon)
         {
@@ -54,11 +56,15 @@ public class CharacterSelectSlot : MonoBehaviour, IPointerClickHandler, IPointer
     /// </summary>
     public void Select()
     {
-        if(identityInfo != null)
+        if (identityInfo != null)
         {
             isSelected = true;
-            selectTextSet.SetActive(true);
             CharacterRosterManager.instance.SetIdentity(identityInfo);
+
+            // UI 설정
+            (bool isSelect, int order) =
+                CharacterRosterManager.instance.GetIdentityOrderData(identityInfo.master.sinner);
+            selectTextSet.SetActive(true);
         }
         else
         {
@@ -71,10 +77,10 @@ public class CharacterSelectSlot : MonoBehaviour, IPointerClickHandler, IPointer
     /// </summary>
     public void Deselect()
     {
-        if(isSelected)
+        if (isSelected)
         {
             isSelected = false;
-            selectTextSet.SetActive(false);
+            selectTextSet.SetActive(true);
         }
     }
 

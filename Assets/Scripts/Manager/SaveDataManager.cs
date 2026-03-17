@@ -22,9 +22,9 @@ public class SaveData
     public bool playTutorial;
 
     [Header("---인격 & 에고 & 편성---")]
-    public List<OrganizationData> organizationDatas; // 인격 구성 데이터 (장착 인격 & 에고)
-    public List<CharacterId> organizationOrder; // 인격 편성 순서 데이터
     public List<OwnedSaveData> ownedCharacterData; // 보유 인격 & 에고 데이터
+    public List<OrganizationSaveData> organizationDatas; // 인격 구성 데이터 (장착 인격 & 에고)
+    public List<CharacterId> organizationOrder; // 인격 편성 순서 데이터
 
     [Header("---스테이지---")]
     public List<CantoData> cantoData;
@@ -62,6 +62,18 @@ public class OwnedSaveData
         public int curExp;
     }
 }
+
+[System.Serializable]
+/// <summary>
+/// 각 수감자의 인격 & 에고 편성 상태 세이브용 데이터
+/// </summary>
+public class OrganizationSaveData
+{
+    public CharacterId sinner;
+    public int identityId;
+    public List<int> egoId;
+}
+
 
 public class SaveDataManager : MonoBehaviour
 {
@@ -148,7 +160,7 @@ public class SaveDataManager : MonoBehaviour
             ownedCharacterData = CharacterRosterManager.instance.GetOwendData(),
 
             // 수감자 편성
-            organizationDatas = CharacterRosterManager.instance.GetOrganiztionData(),
+            organizationDatas = CharacterRosterManager.instance.GetSinnerOrganiztionData(),
             organizationOrder = CharacterRosterManager.instance.GetOrganizationOrderData(),
 
             // 스테이지
@@ -224,7 +236,18 @@ public class SaveDataManager : MonoBehaviour
     /// <returns></returns>
     public void NewData()
     {
-        // 데이터 생성
+        // 런타임 데이터 보장
+        // -> 지금은 awake에서 동작시킴
+
+        // 인격 & 에고 (기본 인격 지급 - 편성 데이터 생성 - 보유 데이터 생성)
+        CharacterRosterManager.instance.InitializeDefaultState();
+        var organizationData = CharacterRosterManager.instance.CreateSinnerOrganizationData();
+        var ownedData = CharacterRosterManager.instance.GetOwendData();
+
+        // 스테이지 
+        var canto = BattleContentManager.instance.CreateCantoData();
+
+        // 세이브 데이터 생성
         SaveData data = new SaveData
         {
             // 기본 데이터
@@ -232,12 +255,12 @@ public class SaveDataManager : MonoBehaviour
             playTutorial = false,
 
             // 수감자 세팅, 편성 순서, 인격 & 에고 보유 데이터
-            organizationDatas = CharacterRosterManager.instance.CreatOrganizationData(),
+            ownedCharacterData = ownedData,
+            organizationDatas = organizationData,
             organizationOrder = new List<CharacterId>(0),
-            ownedCharacterData = CharacterRosterManager.instance.CreatData(),
 
             // 스테이지 데이터
-            cantoData = BattleContentManager.instance.CreateCantoData(),
+            cantoData = canto,
 
             // 인벤토리 데이터
 
