@@ -2,6 +2,7 @@ using Game.Canto;
 using Game.Stage;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 
 public class BattleContentManager : MonoBehaviour
@@ -10,7 +11,7 @@ public class BattleContentManager : MonoBehaviour
 
     [Header("---Runtime Data---")]
     [SerializeField] private CantoDatabaseSO cantoDatabaseSO;
-    [SerializeField] private List<CantoData> cantoDataList;
+    [SerializeField] private List<CantoData> cantoRuntimeData;
 
     [Header("---UI---")]
     [SerializeField] private CantoSelectUI[] cantoSlot;
@@ -47,11 +48,11 @@ public class BattleContentManager : MonoBehaviour
     private void LoadCantoData()
     {
         // 런타임 칸토 데이터 생성
-        cantoDataList = new List<CantoData>(cantoDatabaseSO.CantoData.Count);
+        cantoRuntimeData = new List<CantoData>(cantoDatabaseSO.CantoData.Count);
         foreach(var canto in cantoDatabaseSO.CantoData)
         {
             CantoData cantoData = new CantoData(canto);
-            cantoDataList.Add(cantoData);
+            cantoRuntimeData.Add(cantoData);
         }
     }
     #endregion
@@ -65,22 +66,22 @@ public class BattleContentManager : MonoBehaviour
     public List<CantoData> CreateCantoData()
     {
         // 런타임 데이터 생성
-        cantoDataList = new List<CantoData>(cantoDatabaseSO.CantoData.Count);
+        cantoRuntimeData = new List<CantoData>(cantoDatabaseSO.CantoData.Count);
         for (int i = 0; i < cantoDatabaseSO.CantoData.Count; i++)
         {
             // 칸토 데이터 삽입
             CantoData cantoData = new CantoData(cantoDatabaseSO.CantoData[i]);
 
             // 런타임 데이터 리스트에 추가
-            cantoDataList.Add(cantoData);
+            cantoRuntimeData.Add(cantoData);
         }
 
         // 1장 - 1 스테이지 진입 가능하게 전환
-        cantoDataList[0].canEnter = true;
-        cantoDataList[0].stageData[0].canEnter = true;
+        cantoRuntimeData[0].canEnter = true;
+        cantoRuntimeData[0].stageData[0].canEnter = true;
 
         SetCantoUI();
-        return cantoDataList;
+        return cantoRuntimeData;
     }
 
     /// <summary>
@@ -89,8 +90,8 @@ public class BattleContentManager : MonoBehaviour
     /// <param name="data"></param>
     public void ApplyCantoData(SaveData data)
     {
-        // 런타임 데이터 생성
-        cantoDataList = data.cantoData;
+        // 런타임 데이터 생성 -> 여기 세이브 데이터 to RuntimeData로 전환 기능 필요
+        // cantoRuntimeData = data.cantoData;
         SetCantoUI();
     }
 
@@ -98,9 +99,30 @@ public class BattleContentManager : MonoBehaviour
     /// 세이브 용 칸토 데이터 전달
     /// </summary>
     /// <returns></returns>
-    public List<CantoData> GetCantoData()
+    public List<CantoSaveData> GetCantoData()
     {
-        return cantoDataList;
+        // 세이브용 데이터로 전환
+        List<CantoSaveData> save = new List<CantoSaveData>();
+        foreach(var runtime in cantoRuntimeData)
+        {
+            CantoSaveData saveData = new CantoSaveData
+            {
+                cantoId = runtime.cantoData.CantoId,
+                canEnter = runtime.canEnter,
+                stageData = runtime.stageData.Select(stage => stage.stageClearType).ToList(),
+                rewardData = runtime.rewardData.Select(re => 
+                new CantoSaveData.RewardSaveData
+                {
+                    rewardIndex = re.rewardIndex,
+                    getReward = re.getReward,
+                })
+                .ToList(),
+            };
+
+            save.Add(saveData);
+        }
+
+        return save;
     }
     #endregion
 
@@ -112,7 +134,7 @@ public class BattleContentManager : MonoBehaviour
     /// <param name="cantoIndex"></param>
     public void UpdataCantoData(int index, CantoData data)
     {
-        cantoDataList[index] = data;
+        cantoRuntimeData[index] = data;
     }
     #endregion
 
@@ -124,11 +146,11 @@ public class BattleContentManager : MonoBehaviour
     private void SetCantoUI()
     {
         // 슬롯 활성화
-        for (int i = 0; i < cantoDataList.Count; i++)
+        for (int i = 0; i < cantoRuntimeData.Count; i++)
         {
             // 데이터 & 진입가능 여부 주입
-            cantoSlot[i].SetUp(cantoDataList[i], cantoDataList[i].canEnter);
-            cantoManagers[i].SetUp(cantoDataList[i]);
+            cantoSlot[i].SetUp(cantoRuntimeData[i], cantoRuntimeData[i].canEnter);
+            cantoManagers[i].SetUp(cantoRuntimeData[i]);
         }
     }
 

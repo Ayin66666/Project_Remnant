@@ -1,7 +1,9 @@
+using Game.Canto;
+using Game.Character;
+using Game.Stage;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using Game.Character;
 
 
 [System.Serializable]
@@ -27,7 +29,7 @@ public class SaveData
     public List<CharacterId> organizationOrder; // 인격 편성 순서 데이터
 
     [Header("---스테이지---")]
-    public List<CantoData> cantoData;
+    public List<CantoSaveData> cantoData;
 
     // [Header("---인벤토리---")]
     // 아직 미구현
@@ -72,6 +74,48 @@ public class OrganizationSaveData
     public CharacterId sinner;
     public int identityId;
     public List<int> egoId;
+}
+
+[System.Serializable]
+/// <summary>
+/// 칸토 클리어 데이터
+/// </summary>
+public class CantoSaveData
+{
+    [Header("---Data---")]
+    /// <summary>
+    /// 칸토 id
+    /// </summary>
+    public int cantoId;
+    /// <summary>
+    /// 스테이지 진입 가능 여부
+    /// </summary>
+    public bool canEnter;
+    /// <summary>
+    /// 스테이지 진입 가능, 클리어, ex클리어 여부 리스트
+    /// </summary>
+    public List<StageClearType> stageData;
+    /// <summary>
+    /// 리워드 데이터
+    /// </summary>
+    public List<RewardSaveData> rewardData;
+
+
+    [System.Serializable]
+    /// <summary>
+    /// 보상 해금 & 획득 여부용 세이브 데이터
+    /// </summary>
+    public struct RewardSaveData
+    {
+        /// <summary>
+        /// 보상 해금 & 획득 여부
+        /// </summary>
+        public GetReward getReward;
+        /// <summary>
+        /// 리워드의 순서 - List가 보장하는데 필요한가?
+        /// </summary>
+        public int rewardIndex;
+    }
 }
 
 

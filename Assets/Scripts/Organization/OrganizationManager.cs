@@ -1,7 +1,7 @@
 using Game.Character;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using UnityEngine;
+
 
 public class OrganizationManager : MonoBehaviour
 {

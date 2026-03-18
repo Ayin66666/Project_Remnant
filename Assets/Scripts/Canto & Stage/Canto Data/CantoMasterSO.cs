@@ -10,6 +10,10 @@ namespace Game.Canto
     {
         [Header("---Canto Data---")]
         /// <summary>
+        /// Ä­Åä id
+        /// </summary>
+        [SerializeField] private int cantoId;
+        /// <summary>
         /// Ä­Åä ÀÌ¸§
         /// </summary>
         [SerializeField] private string cantoName;
@@ -32,12 +36,13 @@ namespace Game.Canto
         /// </summary>
         [SerializeField] private Sprite cantoSprte;
 
-
-        public string CantoName { get { return cantoName; } set { cantoName = value; } }
-        public int CantoOrder { get { return cantoOrder; } set { cantoOrder = value; } }
-        public List<StageMasterSO> StageData { get { return stageData; } set { stageData = value; } }
+        
+        public int CantoId { get { return cantoId; } }
+        public string CantoName { get { return cantoName; } private set { cantoName = value; } }
+        public int CantoOrder { get { return cantoOrder; } private set { cantoOrder = value; } }
+        public List<StageMasterSO> StageData { get { return stageData; } private set { stageData = value; } }
         public List<CantoRewardSO> RewardData { get { return rewardData; } private set { rewardData = value; } }
-        public Sprite CantoSprte { get { return cantoSprte; } set { cantoSprte = value; } }
+        public Sprite CantoSprte { get { return cantoSprte; } private set { cantoSprte = value; } }
     }
 
 

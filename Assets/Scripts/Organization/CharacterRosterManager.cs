@@ -165,7 +165,20 @@ public class CharacterRosterManager : MonoBehaviour
         }
 
         // 런타임용 데이터 생성 (딕셔너리)
+        organizationData = new Dictionary<CharacterId, OrganizationData>(list.Count);
+        foreach (var data in list)
+        {
+            // 데이터 생성
+            OrganizationData newData = new OrganizationData()
+            {
+                sinner = data.sinner,
+                identity = runtimeInfo[data.sinner].identityDic[data.identityId],
+                ego = new List<EgoData>()
+            };
 
+            // 딕셔너리에 추가
+            organizationData.Add(data.sinner, newData);
+        }
 
         // 데이터 반환
         return list;
@@ -190,7 +203,20 @@ public class CharacterRosterManager : MonoBehaviour
     public List<OrganizationSaveData> GetSinnerOrganiztionData()
     {
         // organizationData 를 list 형태로 가공해서 전달할 것!
-        return null;
+        List<OrganizationSaveData> save = new List<OrganizationSaveData>();
+        foreach(var runtime in organizationData.Values)
+        {
+            OrganizationSaveData data = new OrganizationSaveData()
+            {
+                sinner = runtime.sinner,
+                identityId = runtime.identity.master.identityId,
+                egoId = runtime.ego?.Select(id => id.master.egoId).ToList()
+            };
+
+            save.Add(data);
+        }
+
+        return save;
     }
 
     /// <summary>
