@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class CantoSelectUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("---Setting---")]
-    [SerializeField] private CantoData data;
+    [SerializeField] private CantoRuntimeData data;
 
     [Header("---UI---")]
     [SerializeField] private Image cantoImage;
@@ -22,7 +22,7 @@ public class CantoSelectUI : MonoBehaviour, IPointerClickHandler, IPointerEnterH
     /// </summary>
     /// <param name="data"></param>
     /// <param name="isOn"></param>
-    public void SetUp(CantoData data, bool isOn)
+    public void SetUp(CantoRuntimeData data, bool isOn)
     {
         this.data = data;
         cantoNameText.text = data.cantoData.CantoName;

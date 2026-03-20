@@ -5,7 +5,7 @@ using UnityEngine;
 public class CantoManager : MonoBehaviour
 {
     [Header("---Setting---")]
-    [SerializeField] private CantoData data;
+    [SerializeField] private CantoRuntimeData data;
     [SerializeField] private List<StageNode> stageNodes;
     [SerializeField] private int clearCount = 0;
     [SerializeField] private int exCount = 0;
@@ -23,7 +23,7 @@ public class CantoManager : MonoBehaviour
     /// 데이터 입력 & 스테이지 노드 세팅
     /// </summary>
     /// <param name="data"></param>
-    public void SetUp(CantoData data)
+    public void SetUp(CantoRuntimeData data)
     {
         this.data = data;
 

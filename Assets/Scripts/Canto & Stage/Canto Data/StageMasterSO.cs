@@ -9,6 +9,10 @@ namespace Game.Stage
     public class StageMasterSO : ScriptableObject
     {
         [Header("---Setting---")]
+        /// <summary> 
+        /// 스테이지 id
+        /// </summary>>
+        [SerializeField] private int stageId;
         /// <summary>
         /// 스테이지 이름
         /// </summary>
@@ -36,12 +40,13 @@ namespace Game.Stage
 
 
         #region 프로퍼티
-        public string StageName { get { return stageName; } }
-        public string StageOrder { get { return stageOrder; } }
-        public Sprite StageSprite { get { return stageImage; } }
-        public ExClearCondition ExClearCondition { get { return exClearCondition; } }
-        public List<StageLimitData> LimitData { get { return limitData; } }
-        public List<EnemyWaveData> EnemyWaveData { get { return enemyWaveData; } }
+        public int Stageid => stageId;
+        public string StageName => stageName;
+        public string StageOrder => stageOrder;
+        public Sprite StageSprite => stageImage;
+        public ExClearCondition ExClearCondition => exClearCondition;
+        public List<StageLimitData> LimitData => limitData;
+        public List<EnemyWaveData> EnemyWaveData => enemyWaveData;
         #endregion
     }
 

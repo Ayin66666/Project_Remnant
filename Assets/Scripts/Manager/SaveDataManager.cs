@@ -94,11 +94,22 @@ public class CantoSaveData
     /// <summary>
     /// 스테이지 진입 가능, 클리어, ex클리어 여부 리스트
     /// </summary>
-    public List<StageClearType> stageData;
+    public List<StageSaveData> stageData;
     /// <summary>
     /// 리워드 데이터
     /// </summary>
     public List<RewardSaveData> rewardData;
+
+    [System.Serializable]
+    /// <summary>
+    /// 스테이지 세이브 데이터
+    /// </summary>
+    public struct StageSaveData
+    {
+        public int stageId;
+        public bool canEnter;
+        public StageClearType stageClearType;
+    }
 
 
     [System.Serializable]
@@ -165,7 +176,7 @@ public class SaveDataManager : MonoBehaviour
                 BattleContentManager.instance.ApplyCantoData(data);
 
                 // 인벤토리
-
+                // InventoryManager.instacne.ApplyInventoryData(data);
             }
         }
         else

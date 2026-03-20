@@ -11,11 +11,16 @@ public class BattleContentManager : MonoBehaviour
 
     [Header("---Runtime Data---")]
     [SerializeField] private CantoDatabaseSO cantoDatabaseSO;
-    [SerializeField] private List<CantoData> cantoRuntimeData;
+    [SerializeField] private Dictionary<int, CantoRuntimeData> cantoRuntimeData;
 
     [Header("---UI---")]
     [SerializeField] private CantoSelectUI[] cantoSlot;
     [SerializeField] private CantoManager[] cantoManagers;
+
+
+    // 지금 생각이 꼬이는 이유
+    // 기존 로더 -> 런타임 로직에서 이건 바로 런타임임
+    // 기존 베이스 런타임 데이터 -> 데이터 덮어쓰기에서 이건 바로 생성 & 덮어쓰기임
 
 
     private void Awake()
@@ -29,30 +34,22 @@ public class BattleContentManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        SetUp();
+        CreateRuntimeData();
     }
 
 
     #region 시작 로직
     /// <summary>
-    /// 칸토 클리어 여부 데이터 가져오기
+    /// 베이스 런타임 데이터 생성하기
     /// </summary>
-    public void SetUp()
-    {
-        LoadCantoData();
-    }
-
-    /// <summary>
-    /// 파일에서 칸토 & 스테이지 so 읽어오기
-    /// </summary>
-    private void LoadCantoData()
+    private void CreateRuntimeData()
     {
         // 런타임 칸토 데이터 생성
-        cantoRuntimeData = new List<CantoData>(cantoDatabaseSO.CantoData.Count);
-        foreach(var canto in cantoDatabaseSO.CantoData)
+        cantoRuntimeData = new Dictionary<int, CantoRuntimeData>(cantoDatabaseSO.CantoData.Count);
+        foreach (var canto in cantoDatabaseSO.CantoData)
         {
-            CantoData cantoData = new CantoData(canto);
-            cantoRuntimeData.Add(cantoData);
+            CantoRuntimeData cantoData = new CantoRuntimeData(canto);
+            cantoRuntimeData.Add(cantoData.cantoData.CantoId, cantoData);
         }
     }
     #endregion
@@ -60,28 +57,21 @@ public class BattleContentManager : MonoBehaviour
 
     #region 세이브 & 로드 로직
     /// <summary>
-    /// 신규 칸토 데이터 생성
+    /// 신규 칸토 데이터 생성 & 세이브용 데이터 전달
     /// </summary>
     /// <returns></returns>
-    public List<CantoData> CreateCantoData()
+    public List<CantoSaveData> CreateCantoData()
     {
-        // 런타임 데이터 생성
-        cantoRuntimeData = new List<CantoData>(cantoDatabaseSO.CantoData.Count);
-        for (int i = 0; i < cantoDatabaseSO.CantoData.Count; i++)
-        {
-            // 칸토 데이터 삽입
-            CantoData cantoData = new CantoData(cantoDatabaseSO.CantoData[i]);
-
-            // 런타임 데이터 리스트에 추가
-            cantoRuntimeData.Add(cantoData);
-        }
-
         // 1장 - 1 스테이지 진입 가능하게 전환
-        cantoRuntimeData[0].canEnter = true;
-        cantoRuntimeData[0].stageData[0].canEnter = true;
+        int id = cantoDatabaseSO.CantoData[0].CantoId;
+        cantoRuntimeData[id].canEnter = true;
+        cantoRuntimeData[id].stageData[0].canEnter = true;
 
+        // UI 설정
         SetCantoUI();
-        return cantoRuntimeData;
+
+        // 세이브 데이터로 전환 후 반환
+        return GetCantoData();
     }
 
     /// <summary>
@@ -90,8 +80,20 @@ public class BattleContentManager : MonoBehaviour
     /// <param name="data"></param>
     public void ApplyCantoData(SaveData data)
     {
-        // 런타임 데이터 생성 -> 여기 세이브 데이터 to RuntimeData로 전환 기능 필요
-        // cantoRuntimeData = data.cantoData;
+        foreach (var save in data.cantoData)
+        {
+            foreach (var stage in save.stageData)
+            {
+                // 칸토 & 스테이지 Id 세팅
+                int cantoid = save.cantoId;
+                int stageid = stage.stageId;
+
+                // 세이브 데이터 주입
+                cantoRuntimeData[cantoid].stageData[stageid].canEnter = stage.canEnter;
+                cantoRuntimeData[cantoid].stageData[stageid].stageClearType = stage.stageClearType;
+            }
+        }
+
         SetCantoUI();
     }
 
@@ -103,14 +105,21 @@ public class BattleContentManager : MonoBehaviour
     {
         // 세이브용 데이터로 전환
         List<CantoSaveData> save = new List<CantoSaveData>();
-        foreach(var runtime in cantoRuntimeData)
+        foreach (var runtime in cantoRuntimeData.Values)
         {
             CantoSaveData saveData = new CantoSaveData
             {
                 cantoId = runtime.cantoData.CantoId,
                 canEnter = runtime.canEnter,
-                stageData = runtime.stageData.Select(stage => stage.stageClearType).ToList(),
-                rewardData = runtime.rewardData.Select(re => 
+                stageData = runtime.stageData
+                .Select(x => new CantoSaveData.StageSaveData 
+                { 
+                    stageId = x.stageSO.Stageid,
+                    canEnter = x.canEnter,
+                    stageClearType = x.stageClearType,
+                })
+                .ToList(),
+                rewardData = runtime.rewardData.Select(re =>
                 new CantoSaveData.RewardSaveData
                 {
                     rewardIndex = re.rewardIndex,
@@ -132,7 +141,7 @@ public class BattleContentManager : MonoBehaviour
     /// 칸토 데이터 업데이트
     /// </summary>
     /// <param name="cantoIndex"></param>
-    public void UpdataCantoData(int index, CantoData data)
+    public void UpdataCantoData(int index, CantoRuntimeData data)
     {
         cantoRuntimeData[index] = data;
     }
@@ -145,7 +154,7 @@ public class BattleContentManager : MonoBehaviour
     /// </summary>
     private void SetCantoUI()
     {
-        // 슬롯 활성화
+        // 슬롯 활성화 -> 딕셔너리로 바꾸면서 문제 발생 (for문 대신 id 기반 접근이 필요함!)
         for (int i = 0; i < cantoRuntimeData.Count; i++)
         {
             // 데이터 & 진입가능 여부 주입
@@ -175,13 +184,9 @@ public class BattleContentManager : MonoBehaviour
 /// <summary>
 /// 칸토 런타임 데이터
 /// </summary>
-public class CantoData
+public class CantoRuntimeData
 {
     [Header("---Data---")]
-    /// <summary>
-    /// 칸토 클리어 여부
-    /// </summary>
-    public bool isClear;
     /// <summary>
     /// 칸토 진입가능 여부
     /// </summary>
@@ -200,14 +205,12 @@ public class CantoData
     public List<RewardData> rewardData;
 
 
-
     /// <summary>
     /// 생성자 - 초기화 로직
     /// </summary>
     /// <param name="so"></param>
-    public CantoData(CantoMasterSO so)
+    public CantoRuntimeData(CantoMasterSO so)
     {
-        isClear = false;
         canEnter = false;
         cantoData = so;
 
