@@ -17,6 +17,7 @@ public class CharacterSlot : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private GameObject buttonSet;
+    [SerializeField] private GameObject selectSet;
     [SerializeField] private TextMeshProUGUI organizationCountText;
 
 
@@ -39,6 +40,9 @@ public class CharacterSlot : MonoBehaviour
         levelText.text = info.level.ToString();
         nameText.text = info.master.identityName;
 
+        int index = CharacterRosterManager.instance.GetIdentityOrder(SlotOnwer);
+        organizationCountText.text = $"{index}번";
+
         foreach (GameObject icon in rankIcon)
         {
             icon.SetActive(false);
@@ -59,6 +63,7 @@ public class CharacterSlot : MonoBehaviour
         levelText.text = "";
         nameText.text = "";
         organizationCountText.text = "";
+        selectSet.SetActive(false);
         foreach (GameObject icon in rankIcon)
         {
             icon.SetActive(false);
@@ -88,8 +93,11 @@ public class CharacterSlot : MonoBehaviour
 
         // UI
         (bool isSelected, int order) = CharacterRosterManager.instance.GetIdentityOrderData(slotOnwer);
-        organizationCountText.text = $"{order}번";
-        organizationCountText.gameObject.SetActive(true);
+        int index = CharacterRosterManager.instance.GetIdentityOrder(SlotOnwer);
+        organizationCountText.text = $"{index}번";
+
+        // isSelected = 선택 여부를 체크하는 값이라 반전 필요
+        selectSet.SetActive(!isSelected); 
     }
 
     /// <summary>

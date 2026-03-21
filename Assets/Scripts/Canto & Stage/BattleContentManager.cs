@@ -86,9 +86,10 @@ public class BattleContentManager : MonoBehaviour
             {
                 // 칸토 & 스테이지 Id 세팅
                 int cantoid = save.cantoId;
-                int stageid = stage.stageId;
+                int stageid = cantoRuntimeData[cantoid].stageData.FindIndex(x => x.stageSO.Stageid == stage.stageId);
 
                 // 세이브 데이터 주입
+
                 cantoRuntimeData[cantoid].stageData[stageid].canEnter = stage.canEnter;
                 cantoRuntimeData[cantoid].stageData[stageid].stageClearType = stage.stageClearType;
             }
@@ -112,8 +113,8 @@ public class BattleContentManager : MonoBehaviour
                 cantoId = runtime.cantoData.CantoId,
                 canEnter = runtime.canEnter,
                 stageData = runtime.stageData
-                .Select(x => new CantoSaveData.StageSaveData 
-                { 
+                .Select(x => new CantoSaveData.StageSaveData
+                {
                     stageId = x.stageSO.Stageid,
                     canEnter = x.canEnter,
                     stageClearType = x.stageClearType,
@@ -154,6 +155,15 @@ public class BattleContentManager : MonoBehaviour
     /// </summary>
     private void SetCantoUI()
     {
+        // 슬롯 활성화 -> 딕셔너리 버전
+        for (int i = 0; i < cantoDatabaseSO.CantoData.Count; i++)
+        {
+            // 데이터 & 진입가능 여부 주입
+            CantoRuntimeData data = cantoRuntimeData[cantoDatabaseSO.CantoData[i].CantoId];
+            cantoSlot[i].SetUp(data, data.canEnter);
+        }
+
+        /* 구버전
         // 슬롯 활성화 -> 딕셔너리로 바꾸면서 문제 발생 (for문 대신 id 기반 접근이 필요함!)
         for (int i = 0; i < cantoRuntimeData.Count; i++)
         {
@@ -161,6 +171,7 @@ public class BattleContentManager : MonoBehaviour
             cantoSlot[i].SetUp(cantoRuntimeData[i], cantoRuntimeData[i].canEnter);
             cantoManagers[i].SetUp(cantoRuntimeData[i]);
         }
+        */
     }
 
     /// <summary>

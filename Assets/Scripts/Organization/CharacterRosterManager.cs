@@ -1,19 +1,35 @@
 using Game.Character;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
+using static UnityEditorInternal.ReorderableList;
 
 
 public class CharacterRosterManager : MonoBehaviour
 {
     public static CharacterRosterManager instance;
 
-    [Header("---편성 데이터---")]
-    [SerializeField] private List<CharacterId> organizationOrderList;
-    [SerializeField] private Dictionary<CharacterId, OrganizationData> organizationData;
+    [Header("---런타임 데이터---")]
+    /// <summary>
+    /// 편성 순서 데이터
+    /// </summary>
+    [SerializeField] private List<CharacterId> organizationOrder;
+    public List<CharacterId> OrganizationOrder => organizationOrder;
 
-    [Header("---신규 런타임 데이터 (인격 & 에고 통합)---")]
+    /// <summary>
+    /// 편성 데이터
+    /// </summary>
+    [SerializeField] private Dictionary<CharacterId, OrganizationData> organizationData;
+    /// <summary>
+    /// 보유 데이터
+    /// </summary>
     [SerializeField] private Dictionary<CharacterId, SinnerRuntimeData> runtimeInfo;
+
+    [Header("---인스펙터 체크용---")]
+    [SerializeField] private List<SinnerRuntimeData> runtimeinfoCheck;
+    [SerializeField] private List<OrganizationData> organizationDataCheck;
 
 
     private void Awake()
@@ -30,16 +46,35 @@ public class CharacterRosterManager : MonoBehaviour
 
     private void Start()
     {
-        // 데이터 로드
-        CreateIdentityRuntimeData();
+        // 런타임 데이터 생성
+        CreateRuntimeData();
     }
 
 
     #region 런타임 데이터 생성
     /// <summary>
-    /// 로더에서 데이터 획득 후 런타임 베이스 데이터 생성
+    /// 런타임 데이터 생성
     /// </summary>
-    public void CreateIdentityRuntimeData()
+    public void CreateRuntimeData()
+    {
+        // 인격 & 에고 보유 데이터
+        CreateIdentityRuntimeData();
+
+        // 편성
+        CreateOrganizationRuntimeData();
+
+        // 편성 순서
+        CreateOrganizationOrderData();
+
+        // 데이터 체크용 리스트
+        runtimeinfoCheck = runtimeInfo.Values.ToList();
+        organizationDataCheck = organizationData.Values.ToList();
+    }
+
+    /// <summary>
+    /// 인격 & 에고 런타임 베이스 데이터 생성
+    /// </summary>
+    private void CreateIdentityRuntimeData()
     {
         // 데이터 로드
         IdentityDatabaseSO identityData = DataLoader.instance.IdentityDatabaseSO;
@@ -79,6 +114,34 @@ public class CharacterRosterManager : MonoBehaviour
             runtimeInfo.Add(data.Sinner, runtimeData);
         }
     }
+
+    /// <summary>
+    /// 편성 런타임 베이스 데이터 생성
+    /// </summary>
+    private void CreateOrganizationRuntimeData()
+    {
+        // 기본 편성은 기본 인격들만 배치되어 있는 상태로
+        organizationData = new Dictionary<CharacterId, OrganizationData>();
+        foreach(var container in DataLoader.instance.IdentityDatabaseSO.SOContainers)
+        {
+            OrganizationData data = new OrganizationData()
+            {
+                sinner = container.Sinner,
+                identity = runtimeInfo[container.Sinner].identityDic[container.defaultIdentityId],
+                ego = new List<EgoData>(5),
+            };
+
+            organizationData.Add(container.Sinner, data);
+        }
+    }
+
+    /// <summary>
+    /// 편성 순서 런타임 베이스 데이터 생성
+    /// </summary>
+    private void CreateOrganizationOrderData()
+    {
+        organizationOrder = new List<CharacterId>();
+    }
     #endregion
 
 
@@ -89,8 +152,7 @@ public class CharacterRosterManager : MonoBehaviour
     /// <param name="saveData"></param>
     public void ApplySaveData(SaveData saveData)
     {
-        Debug.Log($"호출!{saveData.ownedCharacterData.Count}");
-
+        // 인격 & 에고 보유 데이터
         foreach (var owned in saveData.ownedCharacterData)
         {
             if (!runtimeInfo.TryGetValue(owned.sinner, out var runtime))
@@ -120,6 +182,27 @@ public class CharacterRosterManager : MonoBehaviour
                 }
             }
         }
+
+        // 편성 인격 & 에고 데이터
+        foreach (var orData in saveData.organizationDatas)
+        {
+            Debug.Log($"orgData null? {organizationData == null}");
+            Debug.Log($"key 존재? {organizationData.ContainsKey(orData.sinner)}");
+            Debug.Log($"value null? {organizationData[orData.sinner] == null}");
+
+            organizationData[orData.sinner].identity =
+                runtimeInfo[orData.sinner].identityDic[orData.identityId];
+
+            // 에고 데이터
+            foreach (var id in orData.egoId)
+            {
+                EgoData ego = runtimeInfo[orData.sinner].egoDic[id];
+                organizationData[orData.sinner].ego.Add(ego);
+            }
+        }
+
+        // 편성 순서 데이터
+        organizationOrder = saveData.organizationOrder;
     }
 
     /// <summary>
@@ -193,7 +276,7 @@ public class CharacterRosterManager : MonoBehaviour
     /// <returns></returns>
     public List<CharacterId> GetOrganizationOrderData()
     {
-        return organizationOrderList;
+        return organizationOrder;
     }
 
     /// <summary>
@@ -204,7 +287,7 @@ public class CharacterRosterManager : MonoBehaviour
     {
         // organizationData 를 list 형태로 가공해서 전달할 것!
         List<OrganizationSaveData> save = new List<OrganizationSaveData>();
-        foreach(var runtime in organizationData.Values)
+        foreach (var runtime in organizationData.Values)
         {
             OrganizationSaveData data = new OrganizationSaveData()
             {
@@ -365,6 +448,7 @@ public class CharacterRosterManager : MonoBehaviour
         return runtimeInfo[sinner];
     }
 
+    // 이거 bool만 반환해도 될듯?
     /// <summary>
     /// 해당 수감자가 편성된 상태인지 (1~12번) 여부 데이터 전달
     /// </summary>
@@ -372,9 +456,21 @@ public class CharacterRosterManager : MonoBehaviour
     /// <returns></returns>
     public (bool, int) GetIdentityOrderData(CharacterId sinner)
     {
-        int index = organizationOrderList.IndexOf(sinner);
+        int index = organizationOrder.IndexOf(sinner);
         if (index != -1) return (true, index);
         else return (false, -1);
+    }
+
+    /// <summary>
+    /// 수감자의 편성 순서 가져오기
+    /// </summary>
+    /// <param name="sinner"></param>
+    /// <returns></returns>
+    public int GetIdentityOrder(CharacterId sinner)
+    {
+        int value = organizationOrder.FindIndex(x => x == sinner);
+        Debug.Log(value == -1 ? "데이터 없음" : $"데이터 확인 {value}");
+        return value;
     }
     #endregion
 
@@ -383,17 +479,22 @@ public class CharacterRosterManager : MonoBehaviour
     public void OrganizationOrderSetting(CharacterId sinner)
     {
         // 1. 편성 여부 체크
-        int index = organizationOrderList.FindIndex(x => x == sinner);
+        int index = organizationOrder.FindIndex(x => x == sinner);
+        Debug.Log($"Before: {string.Join(",", organizationOrder)}");
         if (index != -1)
         {
             // 편성중이라면 - 편성 해제
-            organizationOrderList.Remove(sinner);
+            Debug.Log("REMOVE");
+            organizationOrder.Remove(sinner);
         }
         else
         {
             // 미편성이라면 - 편성
-            organizationOrderList.Add(sinner);
+            Debug.Log("ADD");
+            organizationOrder.Add(sinner);
         }
+
+        Debug.Log($"After: {string.Join(",", organizationOrder)}");
     }
 
     /// <summary>
@@ -401,7 +502,7 @@ public class CharacterRosterManager : MonoBehaviour
     /// </summary>
     public void ClearOrganizationOrder()
     {
-        organizationOrderList.Clear();
+        organizationOrder.Clear();
     }
     #endregion
 }

@@ -34,14 +34,16 @@ public class OrganizationManager : MonoBehaviour
     }
 
 
-    private void Update()
+    /// <summary>
+    /// 신규 - 세이브 데이터 적용 (슬롯 최신화)
+    /// </summary>
+    public void ApplySaveData()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            SetUpOrganization();
-        }
+
     }
 
+
+    // 이거 필요한가?
     /// <summary>
     /// 게임 시작 시 편성 데이터 로드 & 초기값 설정
     /// </summary>
