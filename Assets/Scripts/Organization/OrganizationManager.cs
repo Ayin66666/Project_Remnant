@@ -1,5 +1,6 @@
 using Game.Character;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -10,8 +11,22 @@ public class OrganizationManager : MonoBehaviour
 
     [Header("---현제 편성중인 캐릭터의 데이터---")]
     [SerializeField] private CharacterId curSinner;
-    [SerializeField] private List<CharacterSlot> characterSlot;
-    [SerializeField] private List<EgoEquipSlot> egoSlot;
+    /// <summary>
+    /// 외부 할당용
+    /// </summary>
+    [SerializeField] private List<CharacterSlot> sinnerSlots;
+    /// <summary>
+    /// 실제 로직 동작용
+    /// </summary>
+    [SerializeField] private Dictionary<CharacterId, CharacterSlot> sinnerSlotDic;
+    /// <summary>
+    /// 외부 할당용
+    /// </summary>
+    [SerializeField] private List<EgoEquipSlot> egoSlots;
+    /// <summary>
+    /// 실제 로직 동작용
+    /// </summary>
+    [SerializeField] private Dictionary<Rank, EgoEquipSlot> egoSlotDic;
 
     [Header("---UI---")]
     [SerializeField] private GameObject selectUI;
@@ -31,44 +46,34 @@ public class OrganizationManager : MonoBehaviour
             Destroy(gameObject);
 
         Application.targetFrameRate = 30;
+
+        // 딕셔너리에 데이터 할당
+        sinnerSlotDic = sinnerSlots.ToDictionary(x => x.SlotOnwer);
+        egoSlotDic = egoSlots.ToDictionary(x => x.SlotRank);
     }
 
-
-    /// <summary>
-    /// 신규 - 세이브 데이터 적용 (슬롯 최신화)
-    /// </summary>
-    public void ApplySaveData()
+    public void ApplySaveData(SaveData saveData)
     {
-
-    }
-
-
-    // 이거 필요한가?
-    /// <summary>
-    /// 게임 시작 시 편성 데이터 로드 & 초기값 설정
-    /// </summary>
-    public void SetUpOrganization()
-    {
-        // 데이터가 있다면 - 로드
-        if (false)
+        foreach(var data in saveData.organizationDatas)
         {
-            // OrganizationDatabase.instance.LoadData();
-        }
-        else
-        {
-            // 데이터가 없다면 - 현재는 무조건 초기값 세팅
-            for (int i = 0; i < characterSlot.Count; i++)
+            // 데이터 삽입
+            IdentityData idenitty = 
+                CharacterRosterManager.instance
+                .GetIdentityData(data.sinner)
+                .identityDic[data.identityId];
+
+            int index = sinnerSlots.FindIndex(x => x.SlotOnwer == idenitty.master.sinner);
+            if(index != -1)
             {
-                OrganizationData data = CharacterRosterManager.instance.GetOrganizationData((CharacterId)i);
-                if (data != null)
-                {
-                    Debug.Log($"데이터 셋팅 / 캐릭터 : {(CharacterId)(i)}");
-                    characterSlot[i].SetUp(data.identity);
-                }
-                else
-                {
-                    Debug.Log($"데이터 없음 / 캐릭터 : {(CharacterId)(i)}");
-                }
+                // 슬롯 설정
+                sinnerSlots[index].SetUp(idenitty);
+
+                // 순서 UI 업데이트
+                sinnerSlotDic[data.sinner].OrderSetting();
+            }
+            else
+            {
+                Debug.Log("슬롯을 찾지 못함");
             }
         }
     }
@@ -109,22 +114,22 @@ public class OrganizationManager : MonoBehaviour
 
         // 런타임 데이터 받아오기
         SinnerRuntimeData data = CharacterRosterManager.instance.GetIdentityData(id);
-        if(data == null)
+        if (data == null)
         {
             Debug.LogError($"에러 발생 {id} 인격 데이터가 없음!");
             return;
         }
 
         // 데이터 세팅
-        foreach(var iden in data.identityDic.Values)
+        foreach (var iden in data.identityDic.Values)
         {
-            if(iden.isUnlocked)
+            if (iden.isUnlocked)
             {
                 // 풀링에서 슬롯 받아오기
                 CharacterSelectSlot slot = pooling.GetIdentitySlot();
 
                 // 슬롯 데이터 할당 (인격 정보 & 편성 여부)
-                (bool, int) result = CharacterRosterManager.instance.GetIdentityOrderData(iden.master.sinner);
+                bool result = CharacterRosterManager.instance.GetIdentityOrderData(iden.master.sinner);
                 slot.SetUp(iden, result);
                 slot.gameObject.SetActive(true);
             }
@@ -152,17 +157,23 @@ public class OrganizationManager : MonoBehaviour
     /// <summary>
     /// 인격 선택 후 슬롯 데이터 업데이트
     /// </summary>
-    public void CharacterSlotUpdata(IdentityData data)
+    public void UpdataSinnerSlot(IdentityData data)
     {
         // 해당 캐릭터의 슬롯 찾기
-        CharacterSlot slot = characterSlot.Find(x => x.SlotOnwer == data.master.sinner);
-        if (slot != null)
-        {
-            slot.SetUp(data);
-        }
+        if (sinnerSlotDic.ContainsKey(data.master.sinner))
+            sinnerSlotDic[data.master.sinner].SetUp(data);
         else
-        {
             Debug.Log("해당 캐릭터의 슬롯이 존재하지 않습니다.");
+    }
+
+    /// <summary>
+    /// 슬롯 UI 업데이트
+    /// </summary>
+    public void UpdataSlotUI()
+    {
+        foreach (var slot in sinnerSlotDic.Values)
+        {
+            slot.OrderSetting();
         }
     }
     #endregion

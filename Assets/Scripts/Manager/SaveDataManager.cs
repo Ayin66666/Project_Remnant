@@ -169,8 +169,11 @@ public class SaveDataManager : MonoBehaviour
             {
                 Debug.Log($"데이터 로드 / {data}");
 
-                // 인격 & 에고 데이터 전달
+                // 인격 & 에고 보유 데이터
                 CharacterRosterManager.instance.ApplySaveData(data);
+
+                // 편성 데이터 (UI)
+                // OrganizationManager.instance.ApplySaveData(data);
 
                 // 스테이지
                 BattleContentManager.instance.ApplyCantoData(data);

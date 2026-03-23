@@ -24,11 +24,10 @@ public class CharacterSelectSlot : MonoBehaviour, IPointerClickHandler, IPointer
     /// 슬롯 데이터 셋업
     /// </summary>
     /// <param name="info"></param>
-    public void SetUp(IdentityData info, (bool, int) result)
+    public void SetUp(IdentityData info, bool result)
     {
         // 데이터 세팅
-        (bool selected, int order) = result;
-        isSelected = selected;
+        isSelected = result;
 
         // UI 셋팅
         characterImage.sprite = info.master.portrait;
@@ -62,8 +61,6 @@ public class CharacterSelectSlot : MonoBehaviour, IPointerClickHandler, IPointer
             CharacterRosterManager.instance.SetIdentity(identityInfo);
 
             // UI 설정
-            (bool isSelect, int order) =
-                CharacterRosterManager.instance.GetIdentityOrderData(identityInfo.master.sinner);
             selectTextSet.SetActive(true);
         }
         else

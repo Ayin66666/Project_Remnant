@@ -1,10 +1,7 @@
 using Game.Character;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
-using static UnityEditorInternal.ReorderableList;
 
 
 public class CharacterRosterManager : MonoBehaviour
@@ -122,7 +119,7 @@ public class CharacterRosterManager : MonoBehaviour
     {
         // 기본 편성은 기본 인격들만 배치되어 있는 상태로
         organizationData = new Dictionary<CharacterId, OrganizationData>();
-        foreach(var container in DataLoader.instance.IdentityDatabaseSO.SOContainers)
+        foreach (var container in DataLoader.instance.IdentityDatabaseSO.SOContainers)
         {
             OrganizationData data = new OrganizationData()
             {
@@ -361,6 +358,7 @@ public class CharacterRosterManager : MonoBehaviour
     /// </summary>
     public void SetIdentity(IdentityData data)
     {
+        #region 에러 테스트용 디버그 코드
         Debug.Log($"{data} / {data.master.sinner}");
         if (organizationData == null)
         {
@@ -375,7 +373,7 @@ public class CharacterRosterManager : MonoBehaviour
         }
 
         Debug.Log(orgData == null ? "value null" : "정상");
-
+        #endregion
 
         // 혹시 모를 인격 미편성 체크
         bool haveData = organizationData.ContainsKey(data.master.sinner);
@@ -385,14 +383,12 @@ public class CharacterRosterManager : MonoBehaviour
             organizationData[data.master.sinner].identity = data;
 
             // 편성창 슬롯 업데이트
-            OrganizationManager.instance.CharacterSlotUpdata(data);
-
-            // 로그
+            OrganizationManager.instance.UpdataSinnerSlot(data);
             Debug.Log($"인격 편성 완료 / {organizationData[data.master.sinner].identity}");
         }
         else
         {
-            // 모종의 이유로 수감자의 데이터가 제대로 설정되지 않았을 경우
+            // 수감자의 데이터가 제대로 설정되지 않았을 경우
             Debug.Log($"에러 발생 / 인격 데이터 설정 오류 / {data.master.sinner}");
         }
     }
@@ -448,29 +444,27 @@ public class CharacterRosterManager : MonoBehaviour
         return runtimeInfo[sinner];
     }
 
-    // 이거 bool만 반환해도 될듯?
     /// <summary>
-    /// 해당 수감자가 편성된 상태인지 (1~12번) 여부 데이터 전달
+    /// 해당 수감자가 편성 여부 데이터 (bool)
     /// </summary>
     /// <param name="sinner"></param>
     /// <returns></returns>
-    public (bool, int) GetIdentityOrderData(CharacterId sinner)
+    public bool GetIdentityOrderData(CharacterId sinner)
     {
-        int index = organizationOrder.IndexOf(sinner);
-        if (index != -1) return (true, index);
-        else return (false, -1);
+        int index = organizationOrder.FindIndex(x => x == sinner);
+        if (index != -1) return true;
+        else return false;
     }
 
     /// <summary>
-    /// 수감자의 편성 순서 가져오기
+    /// 편성 순서 데이터 (int)
     /// </summary>
     /// <param name="sinner"></param>
     /// <returns></returns>
     public int GetIdentityOrder(CharacterId sinner)
     {
-        int value = organizationOrder.FindIndex(x => x == sinner);
-        Debug.Log(value == -1 ? "데이터 없음" : $"데이터 확인 {value}");
-        return value;
+        int index = organizationOrder.FindIndex(x => x == sinner);
+        return index;
     }
     #endregion
 
@@ -480,7 +474,6 @@ public class CharacterRosterManager : MonoBehaviour
     {
         // 1. 편성 여부 체크
         int index = organizationOrder.FindIndex(x => x == sinner);
-        Debug.Log($"Before: {string.Join(",", organizationOrder)}");
         if (index != -1)
         {
             // 편성중이라면 - 편성 해제
@@ -493,8 +486,6 @@ public class CharacterRosterManager : MonoBehaviour
             Debug.Log("ADD");
             organizationOrder.Add(sinner);
         }
-
-        Debug.Log($"After: {string.Join(",", organizationOrder)}");
     }
 
     /// <summary>

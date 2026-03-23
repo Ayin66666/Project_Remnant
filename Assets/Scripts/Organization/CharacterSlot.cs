@@ -1,7 +1,7 @@
+using Game.Character;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Game.Character;
 
 
 public class CharacterSlot : MonoBehaviour
@@ -27,21 +27,17 @@ public class CharacterSlot : MonoBehaviour
 
     #region 데이터 설정
     /// <summary>
-    /// 캐릭터 슬롯 데이터 설정
+    /// 슬롯 데이터 삽입
     /// </summary>
     /// <param name="info"></param>
     public void SetUp(IdentityData info)
     {
-        Debug.Log($"슬롯 업데이트 {info}");
         slotOnwer = info.master.sinner;
         characterImage.sprite = info.master.portrait;
         identityInfo = info;
         border.sprite = borderSprite[info.sync >= 3 ? 1 : 0]; // 3동기화 이상일 경우 테두리 변경
         levelText.text = info.level.ToString();
         nameText.text = info.master.identityName;
-
-        int index = CharacterRosterManager.instance.GetIdentityOrder(SlotOnwer);
-        organizationCountText.text = $"{index}번";
 
         foreach (GameObject icon in rankIcon)
         {
@@ -92,12 +88,15 @@ public class CharacterSlot : MonoBehaviour
         CharacterRosterManager.instance.OrganizationOrderSetting(slotOnwer);
 
         // UI
-        (bool isSelected, int order) = CharacterRosterManager.instance.GetIdentityOrderData(slotOnwer);
-        int index = CharacterRosterManager.instance.GetIdentityOrder(SlotOnwer);
-        organizationCountText.text = $"{index}번";
+        bool isSelected = CharacterRosterManager.instance.GetIdentityOrderData(slotOnwer);
+        if (isSelected)
+        {
+            // 편성 UI 활성화
+            int order = CharacterRosterManager.instance.GetIdentityOrder(slotOnwer);
+            organizationCountText.text = $"{order + 1}번";
+        }
 
-        // isSelected = 선택 여부를 체크하는 값이라 반전 필요
-        selectSet.SetActive(!isSelected); 
+        selectSet.SetActive(isSelected);
     }
 
     /// <summary>
@@ -105,7 +104,7 @@ public class CharacterSlot : MonoBehaviour
     /// </summary>
     public void ShowIdentityUI()
     {
-        if(identityInfo == null) return;
+        if (identityInfo == null) return;
 
         OrganizationData data = CharacterRosterManager.instance.GetOrganizationData(slotOnwer);
         if (data != null)

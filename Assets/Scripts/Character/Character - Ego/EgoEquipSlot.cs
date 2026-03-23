@@ -13,6 +13,7 @@ public class EgoEquipSlot : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     [Header("---Setting---")]
     [SerializeField] private Rank slotRank;
     [SerializeField] private EgoData equipEgoData;
+    public Rank SlotRank => slotRank;
 
     // Press Setting
     private float timer;
