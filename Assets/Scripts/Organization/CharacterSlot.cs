@@ -80,14 +80,23 @@ public class CharacterSlot : MonoBehaviour
     /// <summary>
     /// 편성하기 (순서)
     /// </summary>
-    public void OrderSetting()
+    public void OrderUI()
     {
-        if (identityInfo == null) return;
+        if (identityInfo == null)
+        {
+            Debug.Log("편성 불가! / 데이터 없음");
+            return;
+        }
 
         // 편성
         CharacterRosterManager.instance.OrganizationOrderSetting(slotOnwer);
+    }
 
-        // UI
+    /// <summary>
+    /// 편성 숫자 UI 업데이트
+    /// </summary>
+    public void UpdataOrderUI()
+    {
         bool isSelected = CharacterRosterManager.instance.GetIdentityOrderData(slotOnwer);
         if (isSelected)
         {

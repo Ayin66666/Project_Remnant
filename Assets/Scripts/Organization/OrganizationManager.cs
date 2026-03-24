@@ -45,36 +45,21 @@ public class OrganizationManager : MonoBehaviour
         else
             Destroy(gameObject);
 
-        Application.targetFrameRate = 30;
-
         // 딕셔너리에 데이터 할당
         sinnerSlotDic = sinnerSlots.ToDictionary(x => x.SlotOnwer);
         egoSlotDic = egoSlots.ToDictionary(x => x.SlotRank);
     }
 
-    public void ApplySaveData(SaveData saveData)
+    /// <summary>
+    /// 수감자 슬롯의 편성 순서 UI 업데이트
+    /// </summary>
+    public void UpdataSinnerSlotUI()
     {
-        foreach(var data in saveData.organizationDatas)
+        Debug.Log("호출");
+        foreach (var slot in sinnerSlots)
         {
-            // 데이터 삽입
-            IdentityData idenitty = 
-                CharacterRosterManager.instance
-                .GetIdentityData(data.sinner)
-                .identityDic[data.identityId];
-
-            int index = sinnerSlots.FindIndex(x => x.SlotOnwer == idenitty.master.sinner);
-            if(index != -1)
-            {
-                // 슬롯 설정
-                sinnerSlots[index].SetUp(idenitty);
-
-                // 순서 UI 업데이트
-                sinnerSlotDic[data.sinner].OrderSetting();
-            }
-            else
-            {
-                Debug.Log("슬롯을 찾지 못함");
-            }
+            slot.UpdataOrderUI();
+            Debug.Log("슬롯 설정");
         }
     }
     #endregion
@@ -173,7 +158,7 @@ public class OrganizationManager : MonoBehaviour
     {
         foreach (var slot in sinnerSlotDic.Values)
         {
-            slot.OrderSetting();
+            slot.OrderUI();
         }
     }
     #endregion
@@ -214,7 +199,7 @@ public class OrganizationManager : MonoBehaviour
     #endregion
 
 
-    #region 편성 -> 이쪽 데이터베이스가 이동한다 치면 필요없을듯?
+    #region 편성 -> 이쪽 데이터베이스가 이동한다 치면 필요없을듯? / 이거 사용되는거 맞나?
     /// <summary>
     /// 편성 인격 변경하기
     /// </summary>

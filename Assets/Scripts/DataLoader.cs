@@ -70,7 +70,7 @@ public class DataLoader : MonoBehaviour
             return;
         }
 
-        Debug.Log("인격 SO 로드 종료 / 성공");
+        // Debug.Log("인격 SO 로드 종료 / 성공");
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public class DataLoader : MonoBehaviour
             return;
         }
 
-        Debug.Log("에고 SO 로드 종료 / 성공");
+        // Debug.Log("에고 SO 로드 종료 / 성공");
     }
 
     /// <summary>
@@ -100,7 +100,7 @@ public class DataLoader : MonoBehaviour
             return;
         }
 
-        Debug.Log("칸토 SO 로드 종료 / 성공");
+        // Debug.Log("칸토 SO 로드 종료 / 성공");
     }
     #endregion
 }

@@ -81,7 +81,7 @@ public class ChatacterSlotButton : MonoBehaviour,
         else
         {
             // 순서 편성
-            slot.OrderSetting();
+            slot.OrderUI();
         }
     }
 }

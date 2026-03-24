@@ -20,5 +20,6 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);
+        Application.targetFrameRate = 24;
     }
 }

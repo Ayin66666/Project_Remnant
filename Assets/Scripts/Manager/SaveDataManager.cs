@@ -172,8 +172,8 @@ public class SaveDataManager : MonoBehaviour
                 // 인격 & 에고 보유 데이터
                 CharacterRosterManager.instance.ApplySaveData(data);
 
-                // 편성 데이터 (UI)
-                // OrganizationManager.instance.ApplySaveData(data);
+                // 편성 (UI)
+                OrganizationManager.instance.UpdataSinnerSlotUI();
 
                 // 스테이지
                 BattleContentManager.instance.ApplyCantoData(data);

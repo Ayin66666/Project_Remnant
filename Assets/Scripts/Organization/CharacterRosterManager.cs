@@ -183,10 +183,11 @@ public class CharacterRosterManager : MonoBehaviour
         // 편성 인격 & 에고 데이터
         foreach (var orData in saveData.organizationDatas)
         {
+            /*
             Debug.Log($"orgData null? {organizationData == null}");
             Debug.Log($"key 존재? {organizationData.ContainsKey(orData.sinner)}");
             Debug.Log($"value null? {organizationData[orData.sinner] == null}");
-
+            */
             organizationData[orData.sinner].identity =
                 runtimeInfo[orData.sinner].identityDic[orData.identityId];
 
@@ -486,6 +487,8 @@ public class CharacterRosterManager : MonoBehaviour
             Debug.Log("ADD");
             organizationOrder.Add(sinner);
         }
+
+        OrganizationManager.instance.UpdataSinnerSlotUI();
     }
 
     /// <summary>
