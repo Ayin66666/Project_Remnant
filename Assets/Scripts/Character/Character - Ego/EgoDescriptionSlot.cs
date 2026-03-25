@@ -9,6 +9,8 @@ public class EgoDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointerE
 {
     [Header("---Setting---")]
     [SerializeField] private Rank slotRank;
+    public Rank SlotRank => slotRank;
+
     [SerializeField] private EgoData data;
 
     [Header("---UI---")]

@@ -20,6 +20,20 @@ public class EgoUI : MonoBehaviour
     {
         Clear();
 
+        foreach(var ego in data.ego.Values)
+        {
+            GameObject obj = Instantiate(egoContainerUIPrefab, containerRect);
+            EgoContainerUI container = obj.GetComponent<EgoContainerUI>();
+            container.SetUp(data.identity, ego);
+
+            // Zayin 등급이면 활성화 / 아니면 비활성화
+            // 이거 근데 왜 있는지 몰?루
+            obj.SetActive(ego.master.egoRank == Rank.ZAYIN ? true : false);
+
+            egoContainerList.Add(container);
+        }
+
+        /* 구형 코드 (ego List 사용)
         for (int i = 0; i < data.ego.Count; i++)
         {
             GameObject obj = Instantiate(egoContainerUIPrefab, containerRect);
@@ -33,6 +47,7 @@ public class EgoUI : MonoBehaviour
 
             egoContainerList.Add(container);
         }
+        */
     }
 
     /// <summary>

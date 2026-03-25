@@ -125,7 +125,7 @@ public class CharacterRosterManager : MonoBehaviour
             {
                 sinner = container.Sinner,
                 identity = runtimeInfo[container.Sinner].identityDic[container.defaultIdentityId],
-                ego = new List<EgoData>(5),
+                ego = new Dictionary<Rank, EgoData>()
             };
 
             organizationData.Add(container.Sinner, data);
@@ -195,7 +195,7 @@ public class CharacterRosterManager : MonoBehaviour
             foreach (var id in orData.egoId)
             {
                 EgoData ego = runtimeInfo[orData.sinner].egoDic[id];
-                organizationData[orData.sinner].ego.Add(ego);
+                organizationData[orData.sinner].ego.Add(ego.master.egoRank, ego);
             }
         }
 
@@ -213,14 +213,16 @@ public class CharacterRosterManager : MonoBehaviour
         IdentityDatabaseSO idSO = DataLoader.instance.IdentityDatabaseSO;
         foreach (var frist in idSO.SOContainers)
         {
-            runtimeInfo[frist.Sinner].identityDic[frist.so[0].identityId].isUnlocked = true;
+            if (runtimeInfo[frist.Sinner].identityDic.ContainsKey(frist.defaultIdentityId))
+                runtimeInfo[frist.Sinner].identityDic[frist.defaultIdentityId].isUnlocked = true;
         }
 
         // 1번 에고 언락
         EgoDatabaseSO egSO = DataLoader.instance.EgoDatabaseSO;
         foreach (var frist in egSO.SOContainers)
         {
-            runtimeInfo[frist.Sinner].egoDic[frist.so[0].egoId].isUnlocked = true;
+            if (runtimeInfo[frist.Sinner].egoDic.ContainsKey(frist.defaultEgoId))
+                runtimeInfo[frist.Sinner].egoDic[frist.defaultEgoId].isUnlocked = true;
         }
     }
 
@@ -254,7 +256,7 @@ public class CharacterRosterManager : MonoBehaviour
             {
                 sinner = data.sinner,
                 identity = runtimeInfo[data.sinner].identityDic[data.identityId],
-                ego = new List<EgoData>()
+                ego = new Dictionary<Rank, EgoData>()
             };
 
             // 딕셔너리에 추가
@@ -291,7 +293,7 @@ public class CharacterRosterManager : MonoBehaviour
             {
                 sinner = runtime.sinner,
                 identityId = runtime.identity.master.identityId,
-                egoId = runtime.ego?.Select(id => id.master.egoId).ToList()
+                egoId = runtime.ego?.Values.Select(x=> x.master.egoId).ToList() ?? new List<int>(),
             };
 
             save.Add(data);
@@ -400,6 +402,27 @@ public class CharacterRosterManager : MonoBehaviour
     /// <param name="data"></param>
     public void SetEgo(EgoData data)
     {
+        // 데이터 할당
+        CharacterId id = data.master.sinner;
+        Rank rank = data.master.egoRank;
+
+        // 이미 장착된 동일 등급의 에고가 있다면
+        if(organizationData[id].ego.ContainsKey(rank))
+        {
+            Debug.Log($"에고 교체 / {data.master.egoName}");
+            organizationData[id].ego[rank] = data;
+        }
+        else
+        {
+            Debug.Log($"에고 장착 / {data.master.egoName}");
+            organizationData[id].ego.Add(rank, data);
+        }
+
+        // UI 업데이트
+        
+
+        // 여기 로직에 이슈 있음 -> 새롭게 변경 필요할듯
+        /*
         bool haveData = organizationData.ContainsKey(data.master.sinner);
         if (haveData)
         {
@@ -411,6 +434,7 @@ public class CharacterRosterManager : MonoBehaviour
             // 모종의 이유로 수감자의 데이터가 제대로 편성되지 않았을 경우
             Debug.Log($"에러 발생 / 인격 데이터 설정 오류 / {data.master.sinner}");
         }
+        */
     }
     #endregion
 
@@ -510,7 +534,9 @@ public class OrganizationData
 {
     public CharacterId sinner;
     public IdentityData identity;
-    public List<EgoData> ego;
+    public Dictionary<Rank, EgoData> ego;
+
+    // public List<EgoData> ego; // -> 이거 탐색하려면 딕셔너리화 필요할듯
 }
 
 

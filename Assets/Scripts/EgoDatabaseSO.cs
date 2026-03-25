@@ -20,6 +20,7 @@ namespace Game.Character
     public class EgoSOContainer
     {
         public CharacterId Sinner;
+        public int defaultEgoId;
         public List<EgoMasterSO> so;
     }
 }

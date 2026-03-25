@@ -28,10 +28,21 @@ public class CharacterSummation : MonoBehaviour
     {
         Clear();
 
-        // 에고 데이터 설정
+        /* 구형 코드 (ego List 사용 방식)
         for (int i = 0; i < data.ego.Count; i++)
         {
-            egoSlots[i].SetUp(data.ego[i]);
+            egoSlots[i].SetUp(data.ego[]);
+        }
+        */
+
+        // 에고 데이터 설정
+        foreach (var ego in data.ego.Values)
+        {
+            int index = egoSlots.FindIndex(x => x.SlotRank == ego.master.egoRank);
+            if (index != -1)
+            {
+                egoSlots[index].SetUp(ego);
+            }
         }
 
         // 스킬 데이터 설정 - IdentityMasterSO 에 스킬 데이터 추가 필요!
@@ -55,7 +66,7 @@ public class CharacterSummation : MonoBehaviour
             slot.Clear();
         }
 
-        foreach(var obj in skillSlots)
+        foreach (var obj in skillSlots)
         {
             Destroy(obj);
         }

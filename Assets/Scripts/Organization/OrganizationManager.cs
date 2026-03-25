@@ -50,18 +50,7 @@ public class OrganizationManager : MonoBehaviour
         egoSlotDic = egoSlots.ToDictionary(x => x.SlotRank);
     }
 
-    /// <summary>
-    /// 수감자 슬롯의 편성 순서 UI 업데이트
-    /// </summary>
-    public void UpdataSinnerSlotUI()
-    {
-        Debug.Log("호출");
-        foreach (var slot in sinnerSlots)
-        {
-            slot.UpdataOrderUI();
-            Debug.Log("슬롯 설정");
-        }
-    }
+
     #endregion
 
 
@@ -152,13 +141,15 @@ public class OrganizationManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 슬롯 UI 업데이트
+    /// 수감자 슬롯의 편성 순서 UI 업데이트
     /// </summary>
-    public void UpdataSlotUI()
+    public void UpdataSinnerSlotUI()
     {
-        foreach (var slot in sinnerSlotDic.Values)
+        Debug.Log("호출");
+        foreach (var slot in sinnerSlots)
         {
-            slot.OrderUI();
+            slot.UpdataOrderUI();
+            Debug.Log("슬롯 설정");
         }
     }
     #endregion
@@ -169,32 +160,35 @@ public class OrganizationManager : MonoBehaviour
     /// 에고 클릭 -> 에고 리스트 오픈
     /// </summary>
     /// <param name="id"></param>
-    public void OpenEgoList(Rank rank)
+    public void OpenEgoList(Rank? egoRank)
     {
         // 리스트 클리어
         pooling.ClearEgoSlot();
-        /*
-        // 데이터 세팅 - ego
-        EgoInfo info2 = egoInfo.Find(x => x.sinner == curSinner);
-        Debug.Log(info2);
-        Debug.Log(info2.info.Count);
 
-        for (int i = 0; i < info2.info.Count; i++)
+        // 데이터 받아오기
+        SinnerRuntimeData EgoData = CharacterRosterManager.instance.GetIdentityData(curSinner);
+        foreach(var data in EgoData.egoDic.Values)
         {
-            // 에고 해금 여부 & 에고 티어가 동일한지 체크
-            if (info2.info[i].isUnlocked && info2.info[i].master.egoRank == rank)
-            {
-                // 에고 추가
-                EgoListSlot slot = pooling.GetEgoSlot();
-                slot.SetUp(info2.info[i]);
-                slot.gameObject.SetActive(true);
-            }
+            Debug.Log($"{ data.master.egoName} / {data.master.egoRank} / {data.isUnlocked}");
+
+            // 해금 여부 체크
+            if (!data.isUnlocked)
+                continue;
+
+            // 랭크 필터
+            if (egoRank != null && data.master.egoRank != egoRank)
+                continue;
+
+            // 슬롯 세팅
+            EgoListSlot slot = pooling.GetEgoSlot();
+            slot.SetUp(data);
+            slot.gameObject.SetActive(true);
         }
 
+        // UI
         egoListUI.SetActive(true);
         selectUI.SetActive(true);
         identityListUI.SetActive(false);
-        */
     }
     #endregion
 

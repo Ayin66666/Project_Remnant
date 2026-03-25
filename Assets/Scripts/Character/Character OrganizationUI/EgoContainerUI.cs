@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 namespace Game.Character
 {
+    /// <summary>
+    /// 에고 상세설명 UI
+    /// </summary>
     public class EgoContainerUI : MonoBehaviour
     {
         [Header("---Setting---")]
