@@ -117,7 +117,7 @@ public class CharacterSlot : MonoBehaviour
 
         OrganizationData data = CharacterRosterManager.instance.GetOrganizationData(slotOnwer);
         if (data != null)
-            CharacterDescription.instance.SetUp(data);
+            GameManager.instance.characterDescription.SetUp(data);
         else
             Debug.Log("오류발생 / 인격 편성 체크필요");
     }

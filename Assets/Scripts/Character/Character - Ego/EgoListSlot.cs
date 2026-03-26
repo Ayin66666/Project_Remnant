@@ -82,7 +82,7 @@ public class EgoListSlot : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         else
         {
             // ¿¡°í ÀåÂø
-            OrganizationManager.instance.OrganizingEgo(egoData);
+            CharacterRosterManager.instance.SetEgo(egoData);
         }
     }
     #endregion

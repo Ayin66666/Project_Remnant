@@ -11,6 +11,8 @@ public class OrganizationManager : MonoBehaviour
 
     [Header("---현제 편성중인 캐릭터의 데이터---")]
     [SerializeField] private CharacterId curSinner;
+    public CharacterId CurSinner => curSinner;
+
     /// <summary>
     /// 외부 할당용
     /// </summary>
@@ -49,8 +51,6 @@ public class OrganizationManager : MonoBehaviour
         sinnerSlotDic = sinnerSlots.ToDictionary(x => x.SlotOnwer);
         egoSlotDic = egoSlots.ToDictionary(x => x.SlotRank);
     }
-
-
     #endregion
 
 
@@ -61,30 +61,12 @@ public class OrganizationManager : MonoBehaviour
     /// <param name="id"></param>
     public void OpenCharacterList(CharacterId id)
     {
+        // UI 슬롯 초기화
+        pooling.ClearIdentitySlot();
+        pooling.ClearEgoSlot();
+
+        // 리스트를 연 인격 저장
         curSinner = id;
-
-        /* 구버전
-        // 데이터 세팅 - 인격
-        IdentityInfo info1 = CharacterRosterManager.instance.GetIdentityInfo(id);
-        if (info1 == null)
-        {
-            Debug.Log("인격 정보 없음");
-            return;
-        }
-
-        // 슬롯에 데이터 전달
-        for (int i = 0; i < info1.info.Count; i++)
-        {
-            if (info1.info[i].isUnlocked)
-            {
-                CharacterSelectSlot slot = pooling.GetIdentitySlot();
-
-                // 여기 일단은 false로 넣긴 하는데, 원래는 편성 여부 체크해서 넣어야 함!
-                slot.SetUp(info1.info[i], false);
-                slot.gameObject.SetActive(true);
-            }
-        }
-        */
 
         // 런타임 데이터 받아오기
         SinnerRuntimeData data = CharacterRosterManager.instance.GetIdentityData(id);
@@ -94,7 +76,7 @@ public class OrganizationManager : MonoBehaviour
             return;
         }
 
-        // 데이터 세팅
+        // 인격 데이터 세팅
         foreach (var iden in data.identityDic.Values)
         {
             if (iden.isUnlocked)
@@ -107,6 +89,21 @@ public class OrganizationManager : MonoBehaviour
                 slot.SetUp(iden, result);
                 slot.gameObject.SetActive(true);
             }
+        }
+
+
+        // 에고 슬롯 초기화
+        foreach (var slot in egoSlots)
+        {
+            slot.Clear();
+        }
+
+        // 장착중인 에고 세팅
+        OrganizationData egoData = CharacterRosterManager.instance.GetOrganizationData(id);
+        foreach (var ego in egoData.ego.Values)
+        {
+            var slot = egoSlots.FirstOrDefault(x => x.SlotRank == ego.master.egoRank);
+            slot?.LoadEquipEgo(ego);
         }
 
         // UI 오픈
@@ -167,9 +164,9 @@ public class OrganizationManager : MonoBehaviour
 
         // 데이터 받아오기
         SinnerRuntimeData EgoData = CharacterRosterManager.instance.GetIdentityData(curSinner);
-        foreach(var data in EgoData.egoDic.Values)
+        foreach (var data in EgoData.egoDic.Values)
         {
-            Debug.Log($"{ data.master.egoName} / {data.master.egoRank} / {data.isUnlocked}");
+            Debug.Log($"{data.master.egoName} / {data.master.egoRank} / {data.isUnlocked}");
 
             // 해금 여부 체크
             if (!data.isUnlocked)
@@ -190,28 +187,19 @@ public class OrganizationManager : MonoBehaviour
         selectUI.SetActive(true);
         identityListUI.SetActive(false);
     }
-    #endregion
 
-
-    #region 편성 -> 이쪽 데이터베이스가 이동한다 치면 필요없을듯? / 이거 사용되는거 맞나?
-    /// <summary>
-    /// 편성 인격 변경하기
-    /// </summary>
-    /// <param name="info"></param>
-    public void OrganizingIdentity(IdentityData info)
+    public void UpdataEgoSlot()
     {
-        // 데이터베이스로 전달
-        CharacterRosterManager.instance.SetIdentity(info);
-    }
-
-    /// <summary>
-    /// 편성 ego 변경
-    /// </summary>
-    /// <param name="info"></param>
-    public void OrganizingEgo(EgoData info)
-    {
-        // 데이터베이스로 전달
-        CharacterRosterManager.instance.SetEgo(info);
+        Debug.Log("호출");
+        OrganizationData data = CharacterRosterManager.instance.GetOrganizationData(curSinner);
+        foreach (var slot in egoSlots)
+        {
+            if (data.ego.ContainsKey(slot.SlotRank))
+            {
+                slot.ChangeEquipEgo(data.ego[slot.SlotRank]);
+                Debug.Log($"슬롯 설정 {slot.SlotRank}");
+            }
+        }
     }
     #endregion
 }

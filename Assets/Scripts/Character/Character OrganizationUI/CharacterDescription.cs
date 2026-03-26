@@ -7,11 +7,6 @@ using Game.Character;
 
 public class CharacterDescription : MonoBehaviour
 {
-    public static CharacterDescription instance;
-
-    [Header("---Test---")]
-    [SerializeField] private OrganizationData tdata;
-
     [Header("---Component---")]
     [SerializeField] private DescriptionUI descriptionUI;
     [SerializeField] private CharacterSummation summation;
@@ -20,6 +15,7 @@ public class CharacterDescription : MonoBehaviour
     [SerializeField] private MentalityUI mentality;
 
     [Header("---UI---")]
+    [SerializeField] private GameObject canvas;
     [SerializeField] private GameObject[] uiSet;
 
     [Header("---Left Status UI---")]
@@ -44,27 +40,13 @@ public class CharacterDescription : MonoBehaviour
     [SerializeField] private GameObject skillSlotPrefab;
 
 
-    private void Awake()
-    {
-        instance = this;
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            SetUp(tdata);
-        }
-    }
-
-
-    #region 최초 & 종료 시 실행 
+    #region 동작 로직 
     public void SetUp(OrganizationData data)
     {
         // 캐릭터의 편성 데이터를 받아와서 UI에 전달
 
         // 데이터 초기화
-        Clear();
+        ClearData();
 
         // 캐릭터 능력치 (1번 = hp / 2번 = 속도 / 3번 = 공격 & 방어 포인트)
         StatusL(data);
@@ -89,6 +71,8 @@ public class CharacterDescription : MonoBehaviour
         {
             obj.SetActive(false);
         }
+
+        canvas.SetActive(true);
         uiSet[0].SetActive(true);
     }
 
@@ -154,9 +138,9 @@ public class CharacterDescription : MonoBehaviour
     }
 
     /// <summary>
-    /// 캐릭터 설명 UI Off
+    /// 내부 데이터 초기화
     /// </summary>
-    public void Clear()
+    public void ClearData()
     {
         // 우상단 능력치
         for (int i = 0; i < rankIcon.Count; i++)
@@ -176,6 +160,7 @@ public class CharacterDescription : MonoBehaviour
         // 스킬 UI
 
         // 패시브
+
     }
     #endregion
 
@@ -212,6 +197,14 @@ public class CharacterDescription : MonoBehaviour
     public void SyncUp()
     {
 
+    }
+
+    /// <summary>
+    /// 설명 UI 나가기
+    /// </summary>
+    public void Exit()
+    {
+        canvas.SetActive(false);
     }
     #endregion
 

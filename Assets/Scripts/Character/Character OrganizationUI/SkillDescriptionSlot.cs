@@ -62,12 +62,12 @@ public class SkillDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointe
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (data != null)
-            CharacterDescription.instance.ShowSkillSlotDescription(true, data);
+            GameManager.instance.characterDescription.ShowSkillSlotDescription(true, data);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        CharacterDescription.instance.ShowSkillSlotDescription(false, null);
+        GameManager.instance.characterDescription.ShowSkillSlotDescription(false, null);
     }
     #endregion
 }

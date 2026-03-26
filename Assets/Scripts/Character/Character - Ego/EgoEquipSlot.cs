@@ -34,15 +34,13 @@ public class EgoEquipSlot : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     [SerializeField] private Sprite[] rankSprites;
     [SerializeField] private Sprite[] syncSprites;
 
-
+    #region 기능
     /// <summary>
     /// 캐릭터 리스트 창 오픈 시 호출되는 로직 - 편성 데이터가 있다면 info 입력, 아니면 null로 입력할 것!
     /// </summary>
     /// <param name="info"></param>
-    public void LoadEquipEgo(Rank slotRank, EgoData info)
+    public void LoadEquipEgo(EgoData info)
     {
-        this.slotRank = slotRank;
-
         // 로드 데이터가 있다면
         if (info != null)
         {
@@ -81,6 +79,7 @@ public class EgoEquipSlot : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         rankIcon.sprite = rankSprites[0];
         syncIcon.sprite = syncSprites[0];
     }
+    #endregion
 
 
     #region MouseOver Event

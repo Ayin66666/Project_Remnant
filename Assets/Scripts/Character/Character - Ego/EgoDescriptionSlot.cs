@@ -55,13 +55,13 @@ public class EgoDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointerE
     {
         // UI 표시
         if (data != null)
-            CharacterDescription.instance.ShowEgoSlotDescription(true, data);
+            GameManager.instance.characterDescription.ShowEgoSlotDescription(true, data);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         // UI 종료
-            CharacterDescription.instance.ShowEgoSlotDescription(false, data);
+        GameManager.instance.characterDescription.ShowEgoSlotDescription(false, data);
     }
     #endregion
 }

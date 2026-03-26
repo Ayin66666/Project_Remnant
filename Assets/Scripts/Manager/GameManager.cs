@@ -11,6 +11,9 @@ public class GameManager : MonoBehaviour
     public OptionManager optionManager;
     public ExpManager expManager;
 
+    [Header("---UI---")]
+    public CharacterDescription characterDescription;
+
 
     private void Awake()
     {

@@ -355,7 +355,7 @@ public class CharacterRosterManager : MonoBehaviour
     #endregion
 
 
-    #region 편성
+    #region 인격 & 에고 편성
     /// <summary>
     /// 선택한 인격 편성
     /// </summary>
@@ -419,7 +419,7 @@ public class CharacterRosterManager : MonoBehaviour
         }
 
         // UI 업데이트
-        
+        OrganizationManager.instance.UpdataEgoSlot();
 
         // 여기 로직에 이슈 있음 -> 새롭게 변경 필요할듯
         /*
@@ -438,6 +438,39 @@ public class CharacterRosterManager : MonoBehaviour
     }
     #endregion
 
+    #region 출격 순서
+    /// <summary>
+    /// 출격 순서 설정
+    /// </summary>
+    /// <param name="sinner"></param>
+    public void OrganizationOrderSetting(CharacterId sinner)
+    {
+        // 1. 편성 여부 체크
+        int index = organizationOrder.FindIndex(x => x == sinner);
+        if (index != -1)
+        {
+            // 편성중이라면 - 편성 해제
+            Debug.Log("REMOVE");
+            organizationOrder.Remove(sinner);
+        }
+        else
+        {
+            // 미편성이라면 - 편성
+            Debug.Log("ADD");
+            organizationOrder.Add(sinner);
+        }
+
+        OrganizationManager.instance.UpdataSinnerSlotUI();
+    }
+
+    /// <summary>
+    /// 편성 데이터 초기화
+    /// </summary>
+    public void ClearOrganizationOrder()
+    {
+        organizationOrder.Clear();
+    }
+    #endregion
 
     #region 데이터 체크 & 전달
     /// <summary>
@@ -492,37 +525,6 @@ public class CharacterRosterManager : MonoBehaviour
         return index;
     }
     #endregion
-
-
-    #region 편성 순서 로직
-    public void OrganizationOrderSetting(CharacterId sinner)
-    {
-        // 1. 편성 여부 체크
-        int index = organizationOrder.FindIndex(x => x == sinner);
-        if (index != -1)
-        {
-            // 편성중이라면 - 편성 해제
-            Debug.Log("REMOVE");
-            organizationOrder.Remove(sinner);
-        }
-        else
-        {
-            // 미편성이라면 - 편성
-            Debug.Log("ADD");
-            organizationOrder.Add(sinner);
-        }
-
-        OrganizationManager.instance.UpdataSinnerSlotUI();
-    }
-
-    /// <summary>
-    /// 편성 데이터 초기화
-    /// </summary>
-    public void ClearOrganizationOrder()
-    {
-        organizationOrder.Clear();
-    }
-    #endregion
 }
 
 
@@ -538,7 +540,6 @@ public class OrganizationData
 
     // public List<EgoData> ego; // -> 이거 탐색하려면 딕셔너리화 필요할듯
 }
-
 
 /// <summary>
 /// 신규 런타임 인격 보유 데이터
