@@ -472,6 +472,7 @@ public class CharacterRosterManager : MonoBehaviour
     }
     #endregion
 
+
     #region 데이터 체크 & 전달
     /// <summary>
     /// 편성된 인격 & 에고 데이터 전달

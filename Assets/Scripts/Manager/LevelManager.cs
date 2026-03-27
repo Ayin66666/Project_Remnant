@@ -2,16 +2,27 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class ExpManager : MonoBehaviour
+public class LevelManager : MonoBehaviour
 {
-    [Header("---Setting---")]
+    [Header("---Identity Level Setting---")]
     [SerializeField] private int maxLevel = 90;
     [SerializeField] private int startExp = 500;
     [SerializeField] private int expIncrease = 108;
-
-
-    [Header("---Data---")]
     [SerializeField] private List<int> expData;
+
+    [Header("---Ego Level Setting---")]
+    /// <summary>
+    /// 동기화에 필요한 끈 & 파편 데이터
+    /// </summary>
+    [SerializeField] private List<EgoExp> egoExpList;
+
+    [System.Serializable]
+    public struct EgoExp
+    {
+        [SerializeField] private string name;
+        public int fragment;
+        public int cord;
+    }
 
 
     private void Awake()
@@ -20,6 +31,7 @@ public class ExpManager : MonoBehaviour
     }
 
 
+    #region Identity Level
     /// <summary>
     /// 각 레벨별 필요한 경험치 데이터 세팅
     /// </summary>
@@ -40,8 +52,22 @@ public class ExpManager : MonoBehaviour
     public int GetNeedExp(int level)
     {
         if (level >= maxLevel) 
-            return 0;
+            return -1;
         else 
             return expData[level - 1];
     }
+    #endregion
+
+
+    #region Ego Level
+    /// <summary>
+    /// 에고 강화에 필요한 재료 전달
+    /// </summary>
+    /// <param name="sync"></param>
+    /// <returns></returns>
+    public EgoExp GetEgoExp(int sync)
+    {
+        return egoExpList[sync];
+    }
+    #endregion
 }
