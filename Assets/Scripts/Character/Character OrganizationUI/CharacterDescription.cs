@@ -215,11 +215,11 @@ public class CharacterDescription : MonoBehaviour
     /// </summary>
     /// <param name="isOn"></param>
     /// <param name="skill"></param>
-    public void ShowSkillSlotDescription(bool isOn, SkillSO skill)
+    public void ShowSkillSlotDescription(bool isOn, IdentityData identity, SkillSO skill)
     {
         // 받은 정보를 기반으로 데이터 표시
         descriptionUI.gameObject.SetActive(isOn);
-        if (isOn) descriptionUI.SetUp(skill);
+        if (isOn) descriptionUI.SetUp(identity, skill);
     }
 
     /// <summary>

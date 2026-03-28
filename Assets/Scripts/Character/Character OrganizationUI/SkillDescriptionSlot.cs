@@ -1,3 +1,4 @@
+using Game.Character;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,7 +9,8 @@ using UnityEngine.UI;
 public class SkillDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("---Setting---")]
-    [SerializeField] private SkillSO data;
+    [SerializeField] private IdentityData identityData;
+    [SerializeField] private SkillSO skillData;
 
 
     [Header("---UI---")]
@@ -22,8 +24,8 @@ public class SkillDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointe
     /// <summary>
     /// 데이터를 받아와서 슬롯에 설정
     /// </summary>
-    /// <param name="data"></param>
-    public void SetUp(SkillSO data)
+    /// <param name="skillSO"></param>
+    public void SetUp(IdentityData identity, SkillSO skillSO)
     {
         // 보더 컬러는 어떻게? - 이거 속성에 따라서 변경 예정
         // 분노 = 빨강
@@ -37,11 +39,15 @@ public class SkillDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointe
         // 초기화
         Clear();
 
+        // 데이터 입력
+        identityData = identity;
+        skillData = skillSO;
+        Debug.Log(skillSO);
+
         // UI 배치
-        this.data = data;
-        icon.sprite = data.ui.icon;
-        coinPowerText.text = $"+ {data.coinPower}";
-        for (int i = 0; i < data.coins.Count; i++)
+        icon.sprite = skillSO.icon;
+        coinPowerText.text = $"+ {skillSO.Skill[identity.sync].coinPower}";
+        for (int i = 0; i < skillSO.Skill[identity.sync].coins.Count; i++)
         {
             GameObject obj = Instantiate(coinPrefab, coinRect);
         }
@@ -52,7 +58,7 @@ public class SkillDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointe
     /// </summary>
     public void Clear()
     {
-        data = null;
+        skillData = null;
         icon.sprite = null;
         coinPowerText.text = "";
     }
@@ -61,13 +67,13 @@ public class SkillDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointe
     #region Mouse Event
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (data != null)
-            GameManager.instance.characterDescription.ShowSkillSlotDescription(true, data);
+        if (skillData != null)
+            GameManager.instance.characterDescription.ShowSkillSlotDescription(true, identityData, skillData);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        GameManager.instance.characterDescription.ShowSkillSlotDescription(false, null);
+        GameManager.instance.characterDescription.ShowSkillSlotDescription(false, identityData, null);
     }
     #endregion
 }

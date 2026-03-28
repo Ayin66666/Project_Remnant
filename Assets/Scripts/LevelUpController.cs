@@ -13,6 +13,10 @@ public class LevelUpController : MonoBehaviour
     [Header("---Setting---")]
     [SerializeField] private SinnerRuntimeData sinnerData;
 
+    [Header("---UI---")]
+    [SerializeField] private GameObject identityLevelUpUI;
+    [SerializeField] private GameObject identitySyncUpUI;
+
 
     #region 기본 호출 로직
     /// <summary>
@@ -35,6 +39,20 @@ public class LevelUpController : MonoBehaviour
 
 
     #region UI
+
+    // UI 가 붙어있는 설명 UI는 어디까지나 DontDestoryOnLoad 에 붙어있기 때문에
+    // 직접 할당은 불가능함 -> 이거 Description UI에 접근해서 받아오는 식으로 해야할듯?
+    // 지금은 일단 테스트용이라 바로 붙임
+    public void IdentityLevelUpUI(bool isOn)
+    {
+        identityLevelUpUI.SetActive(isOn);
+    }
+
+    public void IdentitySyncUpUI(bool isOn)
+    {
+        identitySyncUpUI.SetActive(isOn);
+    }
+
     /// <summary>
     /// 레벨업 후 UI 업데이트
     /// </summary>

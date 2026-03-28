@@ -25,13 +25,15 @@ public class LevelManager : MonoBehaviour
     }
 
 
+
+
     private void Awake()
     {
         SetUp();
     }
 
 
-    #region Identity Level
+    #region (Identity & Ego) Level & Sync Up
     /// <summary>
     /// 각 레벨별 필요한 경험치 데이터 세팅
     /// </summary>
@@ -56,10 +58,7 @@ public class LevelManager : MonoBehaviour
         else 
             return expData[level - 1];
     }
-    #endregion
 
-
-    #region Ego Level
     /// <summary>
     /// 에고 강화에 필요한 재료 전달
     /// </summary>

@@ -48,10 +48,14 @@ public class CharacterSummation : MonoBehaviour
         // 스킬 데이터 설정 - IdentityMasterSO 에 스킬 데이터 추가 필요!
         for (int i = 0; i < data.identity.master.skillData.Count; i++)
         {
+            // 슬롯 생성
             GameObject obj = Instantiate(skillSlot_Prefab, skillRect);
             SkillDescriptionSlot slot = obj.GetComponent<SkillDescriptionSlot>();
+
+            // 데이터 세팅
+            Debug.Log($"{data} / {data.identity}");
             SkillSO skill = data.identity.master.skillData[i];
-            slot.SetUp(skill);
+            slot.SetUp(data.identity, skill);
             skillSlots.Add(slot);
         }
     }

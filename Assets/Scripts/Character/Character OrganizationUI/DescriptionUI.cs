@@ -32,36 +32,37 @@ public class DescriptionUI : MonoBehaviour
     /// <summary>
     /// 스킬 셋업 - SkillSO
     /// </summary>
-    /// <param name="skill"></param>
-    public void SetUp(SkillSO skill)
+    /// <param name="skillSO"></param>
+    public void SetUp(IdentityData identity, SkillSO skillSO)
     {
         Clear();
 
         // UI 세팅
-        icon.sprite = skill.ui.icon;
-        nameText.text = skill.ui.skillName;
-        descriptionText.text = skill.ui.skillDescription;
+        icon.sprite = skillSO.icon;
+        nameText.text = skillSO.skillName;
+        descriptionText.text = skillSO.Skill[identity.sync].ui.skillDescription;
 
         // 코인 개수
-        StringBuilder sb = new StringBuilder(skill.coins.Count);
-        for (int i = 0; i < skill.coins.Count; i++)
+        StringBuilder sb = new StringBuilder(skillSO.Skill[identity.sync].coins.Count);
+        for (int i = 0; i < skillSO.Skill[identity.sync].coins.Count; i++)
         {
             sb.Append("<sprite=0>");
         }
         coinText.text = sb.ToString();
 
         // 위력
-        sb = new StringBuilder(skill.coins.Count * 6);
-        for(int i = 0; i < skill.coins.Count; i++)
+        sb = new StringBuilder(skillSO.Skill[identity.sync].coins.Count * 6);
+        for(int i = 0; i < skillSO.Skill[identity.sync].coins.Count; i++)
         {
-            sb.Append(skill.coins[i].value.ToString("0.0"));
-            if(i < skill.coins.Count-1) sb.Append(" / ");
+            Vector2 value = skillSO.Skill[identity.sync].coins[i].value;
+            sb.Append(value.ToString("0.0"));
+            if(i < skillSO.Skill[identity.sync].coins.Count-1) sb.Append(" / ");
         }
         valueText.text = sb.ToString();
 
         // 가중치
-        sb = new StringBuilder(skill.targetCount);
-        for (int i = 0; i < skill.targetCount; i++)
+        sb = new StringBuilder(skillSO.Skill[identity.sync].targetCount);
+        for (int i = 0; i < skillSO.Skill[identity.sync].targetCount; i++)
         {
             sb.Append("<sprite=0>");
         }

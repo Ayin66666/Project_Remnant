@@ -10,32 +10,12 @@ public class SkillSO : ScriptableObject
     public SkillVariantType skillVariantType;
     public enum SkillVariantType { Base = 0, Enhanced = 1 }
 
-
     [Header("---Skill Data---")]
-    /// <summary>
-    /// 참관타
-    /// </summary>
-    public AttackType attackType;
-    /// <summary>
-    /// 죄악 타입
-    /// </summary>
-    public Crime crimeType;
-    /// <summary>
-    /// 1코인 당 추가되는 위력 수치
-    /// </summary>
-    public int coinPower;
-    /// <summary>
-    /// 공격 가중치 (1 ~ 9)
-    /// </summary>
-    public int targetCount;
-    /// <summary>
-    /// 코인 데이터 (벨류, 타격 횟수)
-    /// </summary>
-    public List<CoinInfo> coins;
-    /// <summary>
-    /// UI 데이터
-    /// </summary>
-    public SkillUI ui;
+    [SerializeField] private List<SkillInfo> skillinfo;
+    public Sprite icon;
+    public string skillName;
+    public List<SkillInfo> Skill => skillinfo;
+
 
     [Header("---Action---")]
     /// <summary>
@@ -45,12 +25,43 @@ public class SkillSO : ScriptableObject
 
 
     [System.Serializable]
+    public struct SkillInfo
+    {
+        [Header("---Skill Data---")]
+        /// <summary>
+        /// 참관타
+        /// </summary>
+        public AttackType attackType;
+        /// <summary>
+        /// 죄악 타입
+        /// </summary>
+        public Crime crimeType;
+        /// <summary>
+        /// 1코인 당 추가되는 위력 수치
+        /// </summary>
+        public int coinPower;
+        /// <summary>
+        /// 공격 가중치 (1 ~ 9)
+        /// </summary>
+        public int targetCount;
+        /// <summary>
+        /// 코인 데이터 (벨류, 타격 횟수)
+        /// </summary>
+        public List<CoinInfo> coins;
+
+        /// <summary>
+        /// UI 데이터
+        /// </summary>
+        public SkillUI ui;
+    }
+
+    [System.Serializable]
     public struct CoinInfo
     {
         /// <summary>
-        /// 스킬 배율
+        /// 스킬 배율 (앞면 = X / 뒷면 = Y)
         /// </summary>
-        public float value;
+        public Vector2 value;
         /// <summary>
         /// 타격 횟수 (데미지 / hitCount)
         /// </summary>
@@ -60,8 +71,7 @@ public class SkillSO : ScriptableObject
     [System.Serializable]
     public struct SkillUI
     {
-        public Sprite icon;
-        public string skillName;
+        [SerializeField] private string sync;
         [TextArea] public string skillDescription;
     }
 }

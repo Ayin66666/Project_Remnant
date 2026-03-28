@@ -8,42 +8,26 @@ public class SkillSOEditor : Editor
     SerializedProperty skillType;
     SerializedProperty skillVariantType;
 
-    // --- Skill Data ---
-    SerializedProperty attackType;
-    SerializedProperty crimeType;
-    SerializedProperty coinPower;
-    SerializedProperty targetCount;
-    SerializedProperty coins;
-
-    // --- UI ---
-    SerializedProperty ui;
+    // --- Root UI ---
     SerializedProperty icon;
     SerializedProperty skillName;
-    SerializedProperty skillDescription;
+
+    // --- Skill Info List ---
+    SerializedProperty skillInfos;
 
     // --- Action ---
     SerializedProperty skill;
 
     void OnEnable()
     {
-        // Type
         skillType = serializedObject.FindProperty("skillType");
         skillVariantType = serializedObject.FindProperty("skillVariantType");
 
-        // Skill Data
-        attackType = serializedObject.FindProperty("attackType");
-        crimeType = serializedObject.FindProperty("crimeType");
-        coinPower = serializedObject.FindProperty("coinPower");
-        targetCount = serializedObject.FindProperty("targetCount");
-        coins = serializedObject.FindProperty("coins");
+        icon = serializedObject.FindProperty("icon");
+        skillName = serializedObject.FindProperty("skillName");
 
-        // UI
-        ui = serializedObject.FindProperty("ui");
-        icon = ui.FindPropertyRelative("icon");
-        skillName = ui.FindPropertyRelative("skillName");
-        skillDescription = ui.FindPropertyRelative("skillDescription");
+        skillInfos = serializedObject.FindProperty("skillinfo");
 
-        // Action
         skill = serializedObject.FindProperty("skill");
     }
 
@@ -58,21 +42,40 @@ public class SkillSOEditor : Editor
 
         EditorGUILayout.Space(10);
 
-        // ===== Skill Data =====
-        EditorGUILayout.LabelField("Skill Data", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(attackType);
-        EditorGUILayout.PropertyField(crimeType);
-        EditorGUILayout.PropertyField(coinPower);
-        EditorGUILayout.PropertyField(targetCount);
-        EditorGUILayout.PropertyField(coins);
+        // ===== Skill UI =====
+        EditorGUILayout.LabelField("Skill UI", EditorStyles.boldLabel);
+
+        DrawIconPreview();
+        EditorGUILayout.PropertyField(skillName);
 
         EditorGUILayout.Space(10);
 
-        // ===== Skill UI =====
-        EditorGUILayout.LabelField("Skill UI", EditorStyles.boldLabel);
-        DrawIconPreview();
-        EditorGUILayout.PropertyField(skillName);
-        DrawLargeTextArea(skillDescription, 6);
+        // ===== Skill Data =====
+        EditorGUILayout.LabelField("Skill Data", EditorStyles.boldLabel);
+
+        for (int i = 0; i < skillInfos.arraySize; i++)
+        {
+            SerializedProperty info = skillInfos.GetArrayElementAtIndex(i);
+
+            EditorGUILayout.BeginVertical("box");
+            EditorGUILayout.LabelField($"Skill Info {i}", EditorStyles.boldLabel);
+
+            DrawSkillInfo(info);
+
+            if (GUILayout.Button("Remove Skill Info"))
+            {
+                skillInfos.DeleteArrayElementAtIndex(i);
+                break;
+            }
+
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.Space(5);
+        }
+
+        if (GUILayout.Button("Add Skill Info"))
+        {
+            skillInfos.InsertArrayElementAtIndex(skillInfos.arraySize);
+        }
 
         EditorGUILayout.Space(10);
 
@@ -81,6 +84,69 @@ public class SkillSOEditor : Editor
         EditorGUILayout.PropertyField(skill);
 
         serializedObject.ApplyModifiedProperties();
+    }
+
+    void DrawSkillInfo(SerializedProperty info)
+    {
+        SerializedProperty attackType = info.FindPropertyRelative("attackType");
+        SerializedProperty crimeType = info.FindPropertyRelative("crimeType");
+        SerializedProperty coinPower = info.FindPropertyRelative("coinPower");
+        SerializedProperty targetCount = info.FindPropertyRelative("targetCount");
+        SerializedProperty coins = info.FindPropertyRelative("coins");
+        SerializedProperty ui = info.FindPropertyRelative("ui");
+
+        EditorGUILayout.PropertyField(attackType);
+        EditorGUILayout.PropertyField(crimeType);
+        EditorGUILayout.PropertyField(coinPower);
+        EditorGUILayout.PropertyField(targetCount);
+
+        EditorGUILayout.Space(5);
+
+        DrawCoins(coins);
+
+        EditorGUILayout.Space(5);
+
+        DrawSkillUI(ui);
+    }
+
+    void DrawCoins(SerializedProperty coins)
+    {
+        EditorGUILayout.LabelField("Coins", EditorStyles.boldLabel);
+
+        for (int i = 0; i < coins.arraySize; i++)
+        {
+            SerializedProperty coin = coins.GetArrayElementAtIndex(i);
+
+            SerializedProperty value = coin.FindPropertyRelative("value");
+            SerializedProperty hitCount = coin.FindPropertyRelative("hitCount");
+
+            EditorGUILayout.BeginVertical("box");
+
+            EditorGUILayout.PropertyField(value, new GUIContent("Value (Front / Back)"));
+            EditorGUILayout.PropertyField(hitCount);
+
+            if (GUILayout.Button("Remove Coin"))
+            {
+                coins.DeleteArrayElementAtIndex(i);
+                break;
+            }
+
+            EditorGUILayout.EndVertical();
+        }
+
+        if (GUILayout.Button("Add Coin"))
+        {
+            coins.InsertArrayElementAtIndex(coins.arraySize);
+        }
+    }
+
+    void DrawSkillUI(SerializedProperty ui)
+    {
+        SerializedProperty skillDescription = ui.FindPropertyRelative("skillDescription");
+
+        EditorGUILayout.LabelField("Description", EditorStyles.boldLabel);
+
+        DrawLargeTextArea(skillDescription, 5);
     }
 
     void DrawIconPreview()
@@ -99,8 +165,6 @@ public class SkillSOEditor : Editor
 
     void DrawLargeTextArea(SerializedProperty property, int heightMultiplier)
     {
-        EditorGUILayout.LabelField(property.displayName);
-
         GUIStyle style = new GUIStyle(EditorStyles.textArea)
         {
             wordWrap = true
