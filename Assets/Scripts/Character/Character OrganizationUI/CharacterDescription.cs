@@ -14,27 +14,33 @@ public class CharacterDescription : MonoBehaviour
     [SerializeField] private EgoUI ego;
     [SerializeField] private MentalityUI mentality;
 
-    [Header("---UI---")]
+
+    [Header("---Base UI---")]
     [SerializeField] private GameObject canvas;
     [SerializeField] private GameObject[] uiSet;
+
 
     [Header("---Left Status UI---")]
     [SerializeField] private TextMeshProUGUI statusText;
     [SerializeField] private TextMeshProUGUI[] resistText;
 
+
     [Header("---Right Status UI---")]
     [SerializeField] private List<GameObject> rankIcon;
     [SerializeField] private Image characterIcon;
     [SerializeField] private Sprite[] characterSprite;
-
     [SerializeField] private Image syncIcon;
     [SerializeField] private Sprite[] syncSprite;
-
     [SerializeField] private TextMeshProUGUI identityNameText;
 
+
+    [Header("---Level & Sync Up---")]
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI expText;
     [SerializeField] private Slider expSlider;
+    [SerializeField] private GameObject identityLevelUpUI;
+    [SerializeField] private GameObject identitySyncUpUI;
+
 
     [Header("---Prefab---")]
     [SerializeField] private GameObject skillSlotPrefab;
@@ -165,6 +171,14 @@ public class CharacterDescription : MonoBehaviour
     #endregion
 
 
+    #region Level & Sync Up
+    public void AddLevel()
+    {
+
+    }
+    #endregion
+
+
     #region 버튼 이벤트
     /// <summary>
     /// 0 : Summation
@@ -186,17 +200,17 @@ public class CharacterDescription : MonoBehaviour
     /// <summary>
     /// 레벨업 - 레벨업 UI
     /// </summary>
-    public void LevelUp()
+    public void IdentityLevelUpUI(bool isOn)
     {
-
+        identityLevelUpUI.SetActive(isOn);
     }
 
     /// <summary>
     /// 동기화 - 동기화업 UI
     /// </summary>
-    public void SyncUp()
+    public void SyncUpUI(bool isOn)
     {
-
+        identitySyncUpUI.SetActive(isOn);
     }
 
     /// <summary>

@@ -25,8 +25,6 @@ public class LevelManager : MonoBehaviour
     }
 
 
-
-
     private void Awake()
     {
         SetUp();
