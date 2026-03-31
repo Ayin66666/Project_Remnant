@@ -13,7 +13,7 @@ public class CharacterDescription : MonoBehaviour
     [SerializeField] private SkillUI skill;
     [SerializeField] private EgoUI ego;
     [SerializeField] private MentalityUI mentality;
-
+    [SerializeField] private LevelUpUI levelUpUI;
 
     [Header("---Base UI---")]
     [SerializeField] private GameObject canvas;
@@ -72,8 +72,11 @@ public class CharacterDescription : MonoBehaviour
         // 정신력
         mentality.SetUp(data.identity);
 
+        // 인격 & 에고 레벨 & 동기화 업 UI
+        levelUpUI.SetUp(data);
+
         // UI OnOff
-        foreach(GameObject obj in uiSet)
+        foreach (GameObject obj in uiSet)
         {
             obj.SetActive(false);
         }
@@ -137,7 +140,7 @@ public class CharacterDescription : MonoBehaviour
 
         // 레벨 & 경험치 바
         levelText.text = $"Lv {data.identity.level}";
-        int exp = GameManager.instance.expManager.GetNeedExp(data.identity.level);
+        int exp = GameManager.instance.levelManager.GetNeedExp(data.identity.level);
         expText.text = $"{data.identity.curExp} / {exp}";
         expSlider.maxValue = exp;
         expSlider.value = data.identity.curExp;

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -9,12 +10,14 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private int startExp = 500;
     [SerializeField] private int expIncrease = 108;
     [SerializeField] private List<int> expData;
+    public int MaxLevel => maxLevel;
 
     [Header("---Ego Level Setting---")]
     /// <summary>
     /// 동기화에 필요한 끈 & 파편 데이터
     /// </summary>
     [SerializeField] private List<EgoExp> egoExpList;
+
 
     [System.Serializable]
     public struct EgoExp

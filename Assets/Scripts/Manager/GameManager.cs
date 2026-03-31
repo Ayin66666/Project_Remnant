@@ -9,7 +9,8 @@ public class GameManager : MonoBehaviour
     [Header("---Manager---")]
     public SaveDataManager saveDataManager;
     public OptionManager optionManager;
-    public LevelManager expManager;
+    public LevelManager levelManager;
+    public InventoryManager inventory;
 
     [Header("---UI---")]
     public CharacterDescription characterDescription;

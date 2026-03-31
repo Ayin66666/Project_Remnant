@@ -179,7 +179,7 @@ public class SaveDataManager : MonoBehaviour
                 BattleContentManager.instance.ApplyCantoData(data);
 
                 // 인벤토리
-                // InventoryManager.instacne.ApplyInventoryData(data);
+                InventoryManager.instance.ApplyInventoryData(data);
             }
         }
         else
