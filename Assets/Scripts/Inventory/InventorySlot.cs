@@ -14,6 +14,7 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler, IPointerEnterH
     [Header("---UI---")]
     [SerializeField] private Image icon;
     [SerializeField] private TextMeshProUGUI countText;
+    [SerializeField] private GameObject borderEffect;
 
 
     #region Setting
@@ -50,17 +51,18 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler, IPointerEnterH
     #region Click Event
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // 설명 UI On
+        borderEffect.SetActive(true);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        // 설명 UI Off
+        borderEffect.SetActive(false);
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // 아이템 사용 (소모품이라면)
+        // 아이템 상세설명 UI
+        GameManager.instance.inventory.DescriptionUI(item, true);
     }
     #endregion
 }

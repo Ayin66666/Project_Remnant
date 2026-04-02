@@ -31,8 +31,8 @@ public class SaveData
     [Header("---스테이지---")]
     public List<CantoSaveData> cantoData;
 
-    // [Header("---인벤토리---")]
-    // 아직 미구현
+    [Header("---인벤토리---")]
+    public List<IventorySaveData> inventoryData;
 }
 
 [System.Serializable]
@@ -129,6 +129,13 @@ public class CantoSaveData
     }
 }
 
+[System.Serializable]
+public class IventorySaveData
+{
+    public int itemId;
+    public int count;
+}
+
 
 public class SaveDataManager : MonoBehaviour
 {
@@ -151,7 +158,6 @@ public class SaveDataManager : MonoBehaviour
     {
         SetUp();
     }
-
 
     public void SetUp()
     {
