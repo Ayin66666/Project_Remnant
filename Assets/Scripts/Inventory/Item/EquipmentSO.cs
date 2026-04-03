@@ -1,11 +1,12 @@
 using Game.Character;
+using Item;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 
 [CreateAssetMenu(fileName = "Equip", menuName = "Item/Equip", order = int.MaxValue)]
-public class EquipmentSO : MonoBehaviour
+public class EquipmentSO : ItemSO
 {
     [Header("---Equip Setting---")]
     [SerializeField] private CharacterId sinner;

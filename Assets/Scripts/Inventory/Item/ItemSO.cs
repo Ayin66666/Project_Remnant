@@ -49,7 +49,7 @@ namespace Item
     public enum ItemType 
     { 
         Equip, 
-        Useable, 
+        Useable,
         Material, 
         Other 
     }

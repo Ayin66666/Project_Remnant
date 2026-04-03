@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 
 
 public class InventoryManager : MonoBehaviour
@@ -18,14 +19,17 @@ public class InventoryManager : MonoBehaviour
     public static InventoryManager instance;
 
     [Header("---Setting---")]
-    [SerializeField] private Dictionary<int, ItemStack> itemDic = new Dictionary<int, ItemStack>();
     [SerializeField] private List<InventorySlot> slots;
+    [SerializeField] private Dictionary<int, ItemStack> itemDic;
 
     [Header("---Prefab---")]
     [SerializeField] private GameObject slot;
 
     [Header("---UI---")]
+    [SerializeField] private RectTransform slotRect;
     [SerializeField] private GameObject descriptionUI;
+
+    [Header("---Description UI---")]
     [SerializeField] private Image desIcon;
     [SerializeField] private TextMeshProUGUI desNameText;
     [SerializeField] private TextMeshProUGUI countText;
@@ -45,6 +49,31 @@ public class InventoryManager : MonoBehaviour
     /// 세이브 데이터 받아오기
     /// </summary>
     public void ApplyInventoryData(SaveData saveData)
+    {
+        // 세이브 데이터를 읽은 후 세팅
+        foreach(var itemSave in saveData.inventoryData)
+        {
+            // 데이터 생성
+            ItemSO so = DataLoader.instance.ItemDic[itemSave.itemId];
+            ItemStack stack = new ItemStack(so, itemSave.count);
+
+            // 런타임 데이터 딕셔너리에 데이터 저장
+            itemDic.Add(so.ItemID, stack);
+
+            // 슬롯 생성
+            GameObject slot = Instantiate(this.slot, slotRect.transform);
+            InventorySlot invenSlot = slot.GetComponent<InventorySlot>();
+
+            // 슬롯 데이터 세팅
+            invenSlot.SetUp(so, stack.count);
+            slots.Add(invenSlot);
+        }
+    }
+
+    /// <summary>
+    /// 신규 데이터 생성
+    /// </summary>
+    public void CreateInventoryData()
     {
 
     }

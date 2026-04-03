@@ -1,4 +1,6 @@
 using Game.Character;
+using Item;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -18,10 +20,11 @@ public class DataLoader : MonoBehaviour
     [SerializeField] private CantoDatabaseSO cantoSO;
     public CantoDatabaseSO CantoDatabaseSO => cantoSO;
 
-    /*
-    [Header("---Inventory---")]
-    [SerializeField] private GameObject obj;
-    */
+    [Header("---Item---")]
+    [SerializeField] private ItemSOContainer itemSOcontainer;
+    private Dictionary<int, ItemSO> itemDic;
+    public Dictionary<int, ItemSO> ItemDic => itemDic;
+
 
     private void Awake()
     {
@@ -52,7 +55,8 @@ public class DataLoader : MonoBehaviour
         // 스테이지
         LoadStageData();
 
-        // 인벤토리
+        // 아이템
+        LoadIventoryData();
     }
 
 
@@ -101,6 +105,32 @@ public class DataLoader : MonoBehaviour
         }
 
         // Debug.Log("칸토 SO 로드 종료 / 성공");
+    }
+
+    /// <summary>
+    /// 아이템 so 로드 & so 딕셔너리화
+    /// </summary>
+    private void LoadIventoryData()
+    {
+        itemSOcontainer = Resources.Load<ItemSOContainer>("Item/ItemSOContainer");
+        if (itemSOcontainer == null)
+        {
+            Debug.LogError("아이템 SO 로드 실패!");
+            return;
+        }
+
+        itemDic = new Dictionary<int, ItemSO>();
+        foreach (var itemList in itemSOcontainer.AllItems)
+        {
+            foreach (var item in itemList)
+            {
+                if (itemDic.ContainsKey(item.ItemID))
+                    Debug.LogError($"아이템 ID 중복 발견! ID: {item.ItemID}, 이름: {item.ItemName}");
+
+                else
+                    itemDic.Add(item.ItemID, item);
+            }
+        }
     }
     #endregion
 }
