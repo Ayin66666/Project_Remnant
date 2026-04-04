@@ -9,13 +9,13 @@ public class LevelUpUI : MonoBehaviour
 {
     [Header("---Setting---")]
     [SerializeField] private OrganizationData sinnerData;
-    private Dictionary<ExpTicketType, int> addExpData = new Dictionary<ExpTicketType, int>();
-    private Dictionary<ExpTicketType, int> ticketData = new Dictionary<ExpTicketType, int>()
+    private Dictionary<int, int> addExpData = new Dictionary<int, int>();
+    private Dictionary<int, int> ticketData = new Dictionary<int, int>()
     {
-        { ExpTicketType.ExpTicket_100, 100 },
-        { ExpTicketType.ExpTicket_500, 500 },
-        { ExpTicketType.ExpTicket_1000, 1000 },
-        { ExpTicketType.ExpTicket_5000, 5000 },
+        { 90100, 100 },
+        { 90500, 500 },
+        { 91000, 1000 },
+        { 95000, 5000 },
     };
 
 
@@ -117,10 +117,10 @@ public class LevelUpUI : MonoBehaviour
     /// </summary>
     /// <param name="type">티켓 타입</param>
     /// <returns></returns>
-    public int GetUsedTicketCount(ExpTicketType type)
+    public int GetUsedTicketCount(int id)
     {
-        if(addExpData.ContainsKey(type))
-            return addExpData[type];
+        if(addExpData.ContainsKey(id))
+            return addExpData[id];
         else
             return 0;
     }
@@ -128,14 +128,14 @@ public class LevelUpUI : MonoBehaviour
     /// <summary>
     /// 투입 예정인 경험치 티켓 데이터 세팅
     /// </summary>
-    /// <param name="type">티켓 종류</param>
+    /// <param name="id">티켓 종류</param>
     /// <param name="count">투입 개수</param>
-    public void SetAddExp(ExpTicketType type, int count)
+    public void SetAddExp(int id, int count)
     {
-        if (addExpData.ContainsKey(type))
-            addExpData[type] += count;
+        if (addExpData.ContainsKey(id))
+            addExpData[id] += count;
         else
-            addExpData.Add(type, count);
+            addExpData.Add(id, count);
     }
 
     /// <summary>

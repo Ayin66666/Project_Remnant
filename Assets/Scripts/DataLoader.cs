@@ -131,6 +131,8 @@ public class DataLoader : MonoBehaviour
                     itemDic.Add(item.ItemID, item);
             }
         }
+
+        Debug.Log($"아이템 SO 로드 종료 / 성공 {itemDic.Count}");
     }
     #endregion
 }

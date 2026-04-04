@@ -7,7 +7,7 @@ public class LevelUpInputField : MonoBehaviour
 {
     [Header("---Setting---")]
     // 지금은 enum 타입인데 이거 id 기반으로 교체해야하나?
-    [SerializeField] private ExpTicketType ticketType; 
+    [SerializeField] private int ticketType; 
 
     [Header("---UI---")]
     [SerializeField] private TMP_InputField inputField;

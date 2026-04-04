@@ -37,12 +37,31 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private GameObject useButton;
 
 
+    #region 시작 로직
     private void Awake()
     {
         if (instance == null)
             instance = this;
         else
             Destroy(gameObject);
+
+        itemDic = new Dictionary<int, ItemStack>();
+    }
+
+    /// <summary>
+    /// 기본 런타임 데이터 생성 - 경험치 티켓(500) 1개, 끈 50개 제공
+    /// </summary>
+    public void SetUp()
+    {
+        itemDic = new Dictionary<int, ItemStack>();
+
+        // 경험치 티켓(500) 1개
+        ItemStack stack = new ItemStack(DataLoader.instance.ItemDic[90500], 1);
+        itemDic.Add(stack.item.ItemID, stack);
+
+        // 끈 50개
+        stack = new ItemStack(DataLoader.instance.ItemDic[90000], 50);
+        itemDic.Add(stack.item.ItemID, stack);
     }
 
     /// <summary>
@@ -51,7 +70,7 @@ public class InventoryManager : MonoBehaviour
     public void ApplyInventoryData(SaveData saveData)
     {
         // 세이브 데이터를 읽은 후 세팅
-        foreach(var itemSave in saveData.inventoryData)
+        foreach (var itemSave in saveData.inventoryData)
         {
             // 데이터 생성
             ItemSO so = DataLoader.instance.ItemDic[itemSave.itemId];
@@ -69,23 +88,23 @@ public class InventoryManager : MonoBehaviour
             slots.Add(invenSlot);
         }
     }
-
-    /// <summary>
-    /// 신규 데이터 생성
-    /// </summary>
-    public void CreateInventoryData()
-    {
-
-    }
+    #endregion
 
     /// <summary>
     /// 경험치 티켓 보유량 반환
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public int GetExpTicketCount(ExpTicketType type)
+    public int GetExpTicketCount(int id)
     {
-        return 0;
+        if (itemDic.ContainsKey(id))
+        {
+            return itemDic[id].count;
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     /// <summary>

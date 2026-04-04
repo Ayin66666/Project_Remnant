@@ -51,7 +51,6 @@ namespace Item
         Equip, 
         Useable,
         Material, 
-        Other 
     }
 
     /// <summary>
