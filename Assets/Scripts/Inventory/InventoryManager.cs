@@ -3,19 +3,10 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 
 public class InventoryManager : MonoBehaviour
 {
-    /*
-    역할 : 인벤토리 관리
-        - 인격 전용 장비
-        - 경험치 티켓
-        - 끈 & 파편
-        - 기타 소장 아이템
-    */
-
     public static InventoryManager instance;
 
     [Header("---Setting---")]
@@ -45,7 +36,7 @@ public class InventoryManager : MonoBehaviour
         else
             Destroy(gameObject);
 
-        itemDic = new Dictionary<int, ItemStack>();
+        SetUp();
     }
 
     /// <summary>
@@ -55,6 +46,7 @@ public class InventoryManager : MonoBehaviour
     {
         itemDic = new Dictionary<int, ItemStack>();
 
+        /*
         // 경험치 티켓(500) 1개
         ItemStack stack = new ItemStack(DataLoader.instance.ItemDic[90500], 1);
         itemDic.Add(stack.item.ItemID, stack);
@@ -62,6 +54,7 @@ public class InventoryManager : MonoBehaviour
         // 끈 50개
         stack = new ItemStack(DataLoader.instance.ItemDic[90000], 50);
         itemDic.Add(stack.item.ItemID, stack);
+        */
     }
 
     /// <summary>
@@ -90,12 +83,74 @@ public class InventoryManager : MonoBehaviour
     }
     #endregion
 
+
+    #region 데이터 로직
     /// <summary>
-    /// 경험치 티켓 보유량 반환
+    /// 아이템 추가
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="count"></param>
+    public void AddItem(int id, int count)
+    {
+        if(itemDic.ContainsKey(id))
+        {
+            // 개수 추가
+            itemDic[id].count = itemDic[id].count + count;
+        }
+        else
+        {
+            // 아이템 추가
+            ItemStack stack = new ItemStack(DataLoader.instance.ItemDic[id], count);
+            itemDic.Add(id, stack);
+        }
+
+        // UI 업데이트
+        UpdataSlot(id);
+    }
+
+    /// <summary>
+    /// 아이템 사용
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="count"></param>
+    public void UseItem(int id, int count)
+    {
+        if(itemDic.ContainsKey(id))
+        {
+            // 개수 차감
+            itemDic[id].count = itemDic[id].count - count;
+
+            // 개수가 0이하라면 -> 아이템 제거
+            if (itemDic[id].count <= 0)
+            {
+                UpdataSlot(id);
+                itemDic.Remove(id);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 슬롯의 데이터 업데이트
+    /// </summary>
+    public void UpdataSlot(int id)
+    {
+        InventorySlot slot = slots.Find(x => x.Item.ItemID == id);
+        if (itemDic[id].count > 0)
+        {
+            slot.SetUp(DataLoader.instance.ItemDic[id], itemDic[id].count);
+        }
+        else
+        {
+            slot.Clear();
+        }
+    }
+
+    /// <summary>
+    ///  아이템 보유량 반환
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public int GetExpTicketCount(int id)
+    public int GetitemCount(int id)
     {
         if (itemDic.ContainsKey(id))
         {
@@ -127,6 +182,7 @@ public class InventoryManager : MonoBehaviour
 
         descriptionUI.SetActive(isOn);
     }
+    #endregion
 }
 
 

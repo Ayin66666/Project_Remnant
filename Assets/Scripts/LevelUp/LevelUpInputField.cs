@@ -25,7 +25,7 @@ public class LevelUpInputField : MonoBehaviour
         this.levelUpUI = levelUpUI;
 
         // UI 업데이트
-        int count = GameManager.instance.inventory.GetExpTicketCount(ticketType);
+        int count = GameManager.instance.inventory.GetitemCount(ticketType);
         countText.text = $"(보유 : {count})";
     }
 
@@ -41,7 +41,7 @@ public class LevelUpInputField : MonoBehaviour
         if (!change) return -1;
 
         // 보유 티켓 값 보다 더 많은 수치가 입력되었는지 체크
-        int ticket = GameManager.instance.inventory.GetExpTicketCount(ticketType);
+        int ticket = GameManager.instance.inventory.GetitemCount(ticketType);
         if (ticket < inputValue)
         {
             inputValue = ticket;
@@ -68,7 +68,7 @@ public class LevelUpInputField : MonoBehaviour
         }
 
         // 보유 티켓 수 확인
-        int ticket = GameManager.instance.inventory.GetExpTicketCount(ticketType);
+        int ticket = GameManager.instance.inventory.GetitemCount(ticketType);
         if (ticket > levelUpUI.GetUsedTicketCount(ticketType))
         {
             // 보유 티켓보다 입력 값이 작다면 1 증가
