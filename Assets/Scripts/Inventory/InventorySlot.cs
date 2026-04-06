@@ -29,6 +29,7 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler, IPointerEnterH
         this.item = item;
 
         // UI
+        Debug.Log($"{item} / {item.ItemIcon}");
         icon.sprite = item.ItemIcon;
         countText.text = count.ToString();
     }
@@ -62,7 +63,9 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler, IPointerEnterH
     public void OnPointerClick(PointerEventData eventData)
     {
         // 아이템 상세설명 UI
-        GameManager.instance.inventory.DescriptionUI(item, true);
+        GameManager.instance.inventory.DescriptionUIDataSetting(item);
+        GameManager.instance.inventory.DescriptionUI(true);
+
     }
     #endregion
 }

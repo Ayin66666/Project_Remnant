@@ -1,6 +1,7 @@
 using Item;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,11 +11,11 @@ public class InventoryManager : MonoBehaviour
     public static InventoryManager instance;
 
     [Header("---Setting---")]
-    [SerializeField] private List<InventorySlot> slots;
+    [SerializeField] private Dictionary<int, InventorySlot> slotDic;
     [SerializeField] private Dictionary<int, ItemStack> itemDic;
 
     [Header("---Prefab---")]
-    [SerializeField] private GameObject slot;
+    [SerializeField] private GameObject slotPrefab;
 
     [Header("---UI---")]
     [SerializeField] private RectTransform slotRect;
@@ -27,6 +28,19 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private GameObject useButton;
 
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            AddItem(90500, 1);
+        }
+
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            UseItem(90500, 1);
+        }
+    }
 
     #region 시작 로직
     private void Awake()
@@ -45,8 +59,9 @@ public class InventoryManager : MonoBehaviour
     public void SetUp()
     {
         itemDic = new Dictionary<int, ItemStack>();
+        slotDic = new Dictionary<int, InventorySlot>();
 
-        /*
+        /* 기본 아이템 지급 로직 -> 필요한가?
         // 경험치 티켓(500) 1개
         ItemStack stack = new ItemStack(DataLoader.instance.ItemDic[90500], 1);
         itemDic.Add(stack.item.ItemID, stack);
@@ -73,12 +88,12 @@ public class InventoryManager : MonoBehaviour
             itemDic.Add(so.ItemID, stack);
 
             // 슬롯 생성
-            GameObject slot = Instantiate(this.slot, slotRect.transform);
+            GameObject slot = Instantiate(this.slotPrefab, slotRect.transform);
             InventorySlot invenSlot = slot.GetComponent<InventorySlot>();
 
             // 슬롯 데이터 세팅
             invenSlot.SetUp(so, stack.count);
-            slots.Add(invenSlot);
+            slotDic.Add(so.ItemID, invenSlot);
         }
     }
     #endregion
@@ -92,20 +107,24 @@ public class InventoryManager : MonoBehaviour
     /// <param name="count"></param>
     public void AddItem(int id, int count)
     {
-        if(itemDic.ContainsKey(id))
+        if (itemDic.ContainsKey(id))
         {
-            // 개수 추가
+            // 기존 데이터 & 슬롯에 데이터 업데이트
             itemDic[id].count = itemDic[id].count + count;
+            slotDic[id].SetUp(itemDic[id].item, itemDic[id].count);
         }
         else
         {
             // 아이템 추가
             ItemStack stack = new ItemStack(DataLoader.instance.ItemDic[id], count);
             itemDic.Add(id, stack);
-        }
 
-        // UI 업데이트
-        UpdataSlot(id);
+            // 슬롯 추가 & 데이터 할당
+            GameObject slot = Instantiate(slotPrefab, slotRect);
+            InventorySlot invenSlot = slot.GetComponent<InventorySlot>();
+            invenSlot.SetUp(stack.item, stack.count);
+            slotDic.Add(id, invenSlot);
+        }
     }
 
     /// <summary>
@@ -115,33 +134,17 @@ public class InventoryManager : MonoBehaviour
     /// <param name="count"></param>
     public void UseItem(int id, int count)
     {
-        if(itemDic.ContainsKey(id))
+        if (itemDic.ContainsKey(id))
         {
             // 개수 차감
             itemDic[id].count = itemDic[id].count - count;
-
-            // 개수가 0이하라면 -> 아이템 제거
             if (itemDic[id].count <= 0)
             {
-                UpdataSlot(id);
+                GameObject obj = slotDic[id].gameObject;
+                slotDic.Remove(id);
                 itemDic.Remove(id);
+                Destroy(obj);
             }
-        }
-    }
-
-    /// <summary>
-    /// 슬롯의 데이터 업데이트
-    /// </summary>
-    public void UpdataSlot(int id)
-    {
-        InventorySlot slot = slots.Find(x => x.Item.ItemID == id);
-        if (itemDic[id].count > 0)
-        {
-            slot.SetUp(DataLoader.instance.ItemDic[id], itemDic[id].count);
-        }
-        else
-        {
-            slot.Clear();
         }
     }
 
@@ -150,7 +153,7 @@ public class InventoryManager : MonoBehaviour
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public int GetitemCount(int id)
+    public int GetItemCount(int id)
     {
         if (itemDic.ContainsKey(id))
         {
@@ -163,23 +166,26 @@ public class InventoryManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 설명 UI 데이터 세팅
+    /// </summary>
+    /// <param name="so"></param>
+    public void DescriptionUIDataSetting(ItemSO so)
+    {
+        // 데이터 세팅
+        desNameText.text = so.ItemName;
+        desIcon.sprite = so.ItemIcon;
+        countText.text = $"소지 수 : <size=50>{itemDic[so.ItemID].count}</size>";
+        descriptionText.text = so.ItemDescription;
+
+        // 사용 가능한 아이템이라면 -> 사용 버튼 활성화
+        useButton.SetActive(so.ItemType == ItemType.Useable ? true : false);
+    }
+
+    /// <summary>
     /// 아이템 설명 UI On/Off
     /// </summary>
-    public void DescriptionUI(ItemSO so, bool isOn)
+    public void DescriptionUI(bool isOn)
     {
-        if (isOn)
-        {
-            // 데이터 세팅
-            desNameText.text = so.ItemName;
-            desIcon.sprite = so.ItemIcon;
-            countText.text = $"소지 수 : <size=50>{itemDic[so.ItemID].count}</size>";
-            descriptionText.text = so.ItemDescription;
-
-            // 사용 가능한 아이템이라면 -> 사용 버튼 활성화
-            if (so.ItemType == ItemType.Useable)
-                useButton.SetActive(true);
-        }
-
         descriptionUI.SetActive(isOn);
     }
     #endregion
