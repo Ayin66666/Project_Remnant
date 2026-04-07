@@ -13,9 +13,11 @@ public class InventoryManager : MonoBehaviour
     [Header("---Setting---")]
     [SerializeField] private Dictionary<int, InventorySlot> slotDic;
     [SerializeField] private Dictionary<int, ItemStack> itemDic;
+    [SerializeField] private int selectedItemId;
 
     [Header("---Prefab---")]
     [SerializeField] private GameObject slotPrefab;
+    [SerializeField] private GameObject resultIconPrefab;
 
     [Header("---UI---")]
     [SerializeField] private RectTransform slotRect;
@@ -26,7 +28,9 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI desNameText;
     [SerializeField] private TextMeshProUGUI countText;
     [SerializeField] private TextMeshProUGUI descriptionText;
+    [SerializeField] private TMP_InputField inputField;
     [SerializeField] private GameObject useButton;
+    [SerializeField] private GameObject inputfield;
 
 
     private void Update()
@@ -172,13 +176,15 @@ public class InventoryManager : MonoBehaviour
     public void DescriptionUIDataSetting(ItemSO so)
     {
         // 데이터 세팅
+        selectedItemId = so.ItemID;
         desNameText.text = so.ItemName;
         desIcon.sprite = so.ItemIcon;
         countText.text = $"소지 수 : <size=50>{itemDic[so.ItemID].count}</size>";
         descriptionText.text = so.ItemDescription;
 
-        // 사용 가능한 아이템이라면 -> 사용 버튼 활성화
+        // 사용 가능한 아이템이라면 -> 사용 버튼 & 인풋필드 활성화
         useButton.SetActive(so.ItemType == ItemType.Useable ? true : false);
+        inputfield.SetActive(so.ItemType == ItemType.Useable ? true : false);
     }
 
     /// <summary>
@@ -188,7 +194,34 @@ public class InventoryManager : MonoBehaviour
     {
         descriptionUI.SetActive(isOn);
     }
+
+    /// <summary>
+    /// 아이템 사용 후 결과 표시
+    /// </summary>
+    /// <param name="so"></param>
+    /// <param name="count"></param>
+    public void ResultUI(ItemSO so, int count)
+    {
+        
+    }
     #endregion
+
+    /// <summary>
+    /// 아이템 사용 - id 기반 아이템 검색
+    /// </summary>
+    public void ClickUseButton()
+    {
+        // 인풋 필드의 데이터 받아오기
+        int value = int.Parse(inputField.text);
+
+        // 아이템 사용
+        UseItem(selectedItemId, value);
+
+        // UI 종료
+        DescriptionUI(false);
+
+        // 결과 UI 표시
+    }
 }
 
 
