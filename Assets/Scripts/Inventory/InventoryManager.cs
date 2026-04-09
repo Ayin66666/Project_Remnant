@@ -1,7 +1,7 @@
 using Item;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,6 +32,11 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private GameObject useButton;
     [SerializeField] private GameObject inputfield;
 
+    [Header("---Result UI---")]
+    [SerializeField] private GameObject resultUI;
+    [SerializeField] private RectTransform resultRect;
+    [SerializeField] private List<GameObject> resultIconList;
+
 
     private void Update()
     {
@@ -45,6 +50,7 @@ public class InventoryManager : MonoBehaviour
             UseItem(90500, 1);
         }
     }
+
 
     #region 시작 로직
     private void Awake()
@@ -141,7 +147,16 @@ public class InventoryManager : MonoBehaviour
         if (itemDic.ContainsKey(id))
         {
             // 개수 차감
-            itemDic[id].count = itemDic[id].count - count;
+            itemDic[id].count -= count;
+
+            // 아이템 추가? -> 이거 어떻게 구현해야?
+            // itemDic[id].Use();
+
+            // 결과 UI 표시
+            AddResultIcon(itemDic[id].item, count);
+            ResultUI(true);
+
+            // 전부 소모했다면 데이터 제거
             if (itemDic[id].count <= 0)
             {
                 GameObject obj = slotDic[id].gameObject;
@@ -168,7 +183,10 @@ public class InventoryManager : MonoBehaviour
             return 0;
         }
     }
+    #endregion
 
+
+    #region UI
     /// <summary>
     /// 설명 UI 데이터 세팅
     /// </summary>
@@ -196,16 +214,40 @@ public class InventoryManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 아이템 사용 후 결과 표시
+    /// 아이템 사용 후 결과 아이콘을 결과창에 추가
     /// </summary>
     /// <param name="so"></param>
     /// <param name="count"></param>
-    public void ResultUI(ItemSO so, int count)
+    public void AddResultIcon(ItemSO so, int count)
     {
-        
+        Debug.Log($"획득 데이터 전달 : {so} / {count}");
+
+        // 획득한 아이템을 아이콘에 데이터 전달
+        GameObject obj = Instantiate(resultIconPrefab, resultRect);
+        ResultIcon icon = obj.GetComponent<ResultIcon>();
+        icon.SetUp(so, count);
+        resultIconList.Add(obj);
+    }
+
+    /// <summary>
+    /// 아이템 획득 결과창 UI On/Off
+    /// </summary>
+    public void ResultUI(bool isOn)
+    {
+        if(!isOn)
+        {
+            // 리스트 및 데이터 정리
+            resultIconList.ForEach(Destroy);
+            resultIconList.Clear();
+        }
+
+        // UI 종료
+        resultUI.SetActive(isOn);
     }
     #endregion
 
+
+    #region Button
     /// <summary>
     /// 아이템 사용 - id 기반 아이템 검색
     /// </summary>
@@ -219,9 +261,8 @@ public class InventoryManager : MonoBehaviour
 
         // UI 종료
         DescriptionUI(false);
-
-        // 결과 UI 표시
     }
+    #endregion
 }
 
 
