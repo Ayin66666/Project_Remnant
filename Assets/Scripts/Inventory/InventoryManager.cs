@@ -14,6 +14,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private Dictionary<int, InventorySlot> slotDic;
     [SerializeField] private Dictionary<int, ItemStack> itemDic;
     [SerializeField] private int selectedItemId;
+    private Dictionary<int, int> addDic;
 
     [Header("---Prefab---")]
     [SerializeField] private GameObject slotPrefab;
@@ -28,9 +29,9 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI desNameText;
     [SerializeField] private TextMeshProUGUI countText;
     [SerializeField] private TextMeshProUGUI descriptionText;
-    [SerializeField] private TMP_InputField inputField;
+    [SerializeField] private TMP_InputField inputfield;
     [SerializeField] private GameObject useButton;
-    [SerializeField] private GameObject inputfield;
+    [SerializeField] private GameObject inputfieldObj;
 
     [Header("---Result UI---")]
     [SerializeField] private GameObject resultUI;
@@ -42,12 +43,7 @@ public class InventoryManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.I))
         {
-            AddItem(90500, 1);
-        }
-
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            UseItem(90500, 1);
+            AddItem(200002, 1);
         }
     }
 
@@ -149,11 +145,10 @@ public class InventoryManager : MonoBehaviour
             // 개수 차감
             itemDic[id].count -= count;
 
-            // 아이템 추가? -> 이거 어떻게 구현해야?
-            // itemDic[id].Use();
+            // 아이템 사용 효과 호출
+            itemDic[id].item.Use();
 
             // 결과 UI 표시
-            AddResultIcon(itemDic[id].item, count);
             ResultUI(true);
 
             // 전부 소모했다면 데이터 제거
@@ -183,6 +178,24 @@ public class InventoryManager : MonoBehaviour
             return 0;
         }
     }
+
+
+    /// <summary>
+    /// 아이템 사용 결과 표시를 위한 데이터 취합 함수
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="count"></param>
+    public void AddUseData(int id, int count)
+    {
+        if (itemDic.ContainsKey(id))
+        {
+            itemDic[id].count += count;
+        }
+        else
+        {
+            addDic.Add(id, count);
+        }
+    } // 이거 추가 구현 및 체크 필요 / 결과창 UI와 연계 필요
     #endregion
 
 
@@ -202,7 +215,7 @@ public class InventoryManager : MonoBehaviour
 
         // 사용 가능한 아이템이라면 -> 사용 버튼 & 인풋필드 활성화
         useButton.SetActive(so.ItemType == ItemType.Useable ? true : false);
-        inputfield.SetActive(so.ItemType == ItemType.Useable ? true : false);
+        inputfieldObj.SetActive(so.ItemType == ItemType.Useable ? true : false);
     }
 
     /// <summary>
@@ -210,6 +223,7 @@ public class InventoryManager : MonoBehaviour
     /// </summary>
     public void DescriptionUI(bool isOn)
     {
+        inputfield.text = string.Empty;
         descriptionUI.SetActive(isOn);
     }
 
@@ -234,7 +248,7 @@ public class InventoryManager : MonoBehaviour
     /// </summary>
     public void ResultUI(bool isOn)
     {
-        if(!isOn)
+        if (!isOn)
         {
             // 리스트 및 데이터 정리
             resultIconList.ForEach(Destroy);
@@ -254,13 +268,101 @@ public class InventoryManager : MonoBehaviour
     public void ClickUseButton()
     {
         // 인풋 필드의 데이터 받아오기
-        int value = int.Parse(inputField.text);
+        if (int.TryParse(inputfield.text, out int value))
+        {
+            // 아이템 사용
+            Debug.Log($"입력된 값 : {value}");
+            UseItem(selectedItemId, value);
 
-        // 아이템 사용
-        UseItem(selectedItemId, value);
+            // UI 종료
+            DescriptionUI(false);
+        }
+        else
+        {
+            // 모종의 이유로 인풋필드 값 전환 실패 시
+            Debug.LogError("모종의 오류로 인풋 필드 값 전환 실패!");
+        }
+    }
 
-        // UI 종료
-        DescriptionUI(false);
+    // 이 아래 코드는 인풋 필드 코드
+    /// <summary>
+    /// 가지고 있는 재화를 모두 사용 버튼
+    /// </summary>
+    public void ClickMaxButton()
+    {
+        // 잘못된 id인지 체크
+        if (!itemDic.ContainsKey(selectedItemId))
+            return;
+
+        int inputValue = itemDic[selectedItemId].count;
+        inputfield.text = inputValue.ToString();
+    }
+
+    /// <summary>
+    /// 입력값 0으로 초기화 버튼
+    /// </summary>
+    public void ClickMinButton()
+    {
+        Debug.Log("제거호출");
+        // 잘못된 id인지 체크
+        if (!itemDic.ContainsKey(selectedItemId))
+            return;
+
+        int inputValue = 0;
+        Debug.Log($"제거호출2 {inputValue}");
+        inputfield.text = inputValue.ToString();
+    }
+
+    /// <summary>
+    /// 증가 버튼 클릭
+    /// </summary>
+    public void ClickPlus()
+    {
+        // 잘못된 id인지 체크
+        if (!itemDic.ContainsKey(selectedItemId))
+            return;
+
+        // 입력값 전환 성공 여부 체크
+        if (!int.TryParse(inputfield.text, out int value))
+            value = 0;
+
+        value = Mathf.Clamp(value + 1, 0, itemDic[selectedItemId].count);
+        inputfield.SetTextWithoutNotify(value.ToString());
+    }
+
+    /// <summary>
+    /// 감소 버튼 클릭
+    /// </summary>
+    public void ClickMinus()
+    {
+        // 잘못된 id인지 체크
+        if (!itemDic.ContainsKey(selectedItemId))
+            return;
+
+        // 입력값 전환 성공 여부 체크
+        if (!int.TryParse(inputfield.text, out int value))
+            value = 0;
+
+        value = Mathf.Clamp(value - 1, 0, itemDic[selectedItemId].count);
+        inputfield.SetTextWithoutNotify(value.ToString());
+    }
+
+    /// <summary>
+    /// 인풋 필드의 입력값을 체크하고 가진 아이템 이상을 입력했을 경우 최대치로 자동전환
+    /// </summary>
+    public void InputField()
+    {
+        // 잘못된 id인지 체크
+        if (!itemDic.ContainsKey(selectedItemId))
+            return;
+
+        // 입력값 전환 성공 여부 체크
+        if (!int.TryParse(inputfield.text, out int inputValue))
+            return;
+
+        // 값 전환
+        inputValue = Mathf.Clamp(inputValue, 0, itemDic[selectedItemId].count);
+        inputfield.SetTextWithoutNotify(inputValue.ToString());
     }
     #endregion
 }

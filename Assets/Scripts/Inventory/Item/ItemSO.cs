@@ -40,6 +40,13 @@ namespace Item
         public string ItemName => itemName;
         public string ItemDescription => itemDescription;
         public Sprite ItemIcon => itemIcon;
+
+
+
+        public virtual void Use()
+        {
+            Debug.Log($"사용 가능한 아이템이 아님! / {ItemName}");
+        }
     }
 
 

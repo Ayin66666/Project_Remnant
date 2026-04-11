@@ -21,7 +21,7 @@ public class ItemSOContainer : ScriptableObject
     public List<ItemSO>[] AllItems => new List<ItemSO>[]
     {
         equipList,
-        equipList,
+        useableList,
         materialList,
         expTicketList,
         fragmentList
