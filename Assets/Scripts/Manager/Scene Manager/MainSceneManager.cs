@@ -34,6 +34,17 @@ public class MainSceneManager : MonoBehaviour
 
         mainUI[uiNum].SetActive(true);
     }
+
+    /// <summary>
+    /// 인벤토리 버튼 이벤트
+    /// </summary>
+    public void ClickInventory()
+    {
+        // 인벤토리는 데이터 저장을 위해 게임 매니저 하위에 들어가있는 DontDestroyOnLoad 오브젝트이므로,
+        // MainSceneManager는 instance가 없어서 GameManager.instance.inventory로 접근해야 함
+
+        GameManager.instance.inventory.InventoryUI(true);
+    }
 }
 
 

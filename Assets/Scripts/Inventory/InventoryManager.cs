@@ -1,6 +1,5 @@
 using Item;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,8 +20,14 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private GameObject resultIconPrefab;
 
     [Header("---UI---")]
+    [SerializeField] private GameObject inventoryUI;
     [SerializeField] private RectTransform slotRect;
-    [SerializeField] private GameObject descriptionUI;
+    [SerializeField] private GameObject descriptionLUI;
+    [SerializeField] private RectTransform summaryUI;
+
+    [Header("---Summary UI---")]
+    [SerializeField] private TextMeshProUGUI summaryNameText;
+    [SerializeField] private TextMeshProUGUI summaryText;
 
     [Header("---Description UI---")]
     [SerializeField] private Image desIcon;
@@ -39,6 +44,9 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private List<GameObject> resultIconList;
 
 
+    /// <summary>
+    /// 아이템 추가 테스트용 코드 - 추후 제거 예정
+    /// </summary>
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.I))
@@ -60,22 +68,13 @@ public class InventoryManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 기본 런타임 데이터 생성 - 경험치 티켓(500) 1개, 끈 50개 제공
+    /// 기본 런타임 데이터 생성
     /// </summary>
     public void SetUp()
     {
         itemDic = new Dictionary<int, ItemStack>();
         slotDic = new Dictionary<int, InventorySlot>();
-
-        /* 기본 아이템 지급 로직 -> 필요한가?
-        // 경험치 티켓(500) 1개
-        ItemStack stack = new ItemStack(DataLoader.instance.ItemDic[90500], 1);
-        itemDic.Add(stack.item.ItemID, stack);
-
-        // 끈 50개
-        stack = new ItemStack(DataLoader.instance.ItemDic[90000], 50);
-        itemDic.Add(stack.item.ItemID, stack);
-        */
+        addDic = new Dictionary<int, int>();
     }
 
     /// <summary>
@@ -146,7 +145,10 @@ public class InventoryManager : MonoBehaviour
             itemDic[id].count -= count;
 
             // 아이템 사용 효과 호출
-            itemDic[id].item.Use();
+            for(int i = 0; i < count; i++)
+            {
+                itemDic[id].item.Use();
+            }
 
             // 결과 UI 표시
             ResultUI(true);
@@ -179,27 +181,41 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-
     /// <summary>
     /// 아이템 사용 결과 표시를 위한 데이터 취합 함수
     /// </summary>
     /// <param name="id"></param>
     /// <param name="count"></param>
-    public void AddUseData(int id, int count)
+    public void AddResultData(ItemSO item, int count)
     {
-        if (itemDic.ContainsKey(id))
+        // 이미 동일한 아이템을 추가한 적 있는지 체크
+        if (addDic.ContainsKey(item.ItemID))
         {
-            itemDic[id].count += count;
+            // 있다면 -> 기존 데이터에 개수 추가
+            addDic[item.ItemID] += count;
         }
         else
         {
-            addDic.Add(id, count);
+            // 없다면 -> 새로 데이터 추가
+            addDic.Add(item.ItemID, count);
         }
-    } // 이거 추가 구현 및 체크 필요 / 결과창 UI와 연계 필요
+
+        // 아이템 추가
+        AddItem(item.ItemID, count);
+    }
     #endregion
 
 
     #region UI
+    /// <summary>
+    /// 인벤토리 UI On/Off
+    /// </summary>
+    /// <param name="isOn"></param>
+    public void InventoryUI(bool isOn)
+    {
+        inventoryUI.SetActive(isOn);
+    }
+
     /// <summary>
     /// 설명 UI 데이터 세팅
     /// </summary>
@@ -219,12 +235,35 @@ public class InventoryManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 아이템 설명 UI On/Off
+    /// 아이템 상세 설명 UI On/Off
     /// </summary>
     public void DescriptionUI(bool isOn)
     {
         inputfield.text = string.Empty;
-        descriptionUI.SetActive(isOn);
+        descriptionLUI.SetActive(isOn);
+    }
+
+    /// <summary>
+    /// 아이템 요약 설명 UI
+    /// </summary>
+    /// <param name="so"></param>
+    /// <param name="isOn"></param>
+    public void SummaryUI(ItemSO so, bool isOn)
+    {
+        if(isOn)
+        {
+            summaryNameText.text = $"{so.ItemName} <size=20>(보유 수 : {itemDic[so.ItemID].count})</size>";
+            summaryText.text = so.ItemDescription; 
+            Vector2 pos = Input.mousePosition + new Vector3(325, 0, 0);
+            summaryUI.position = pos;
+        }
+        else
+        {
+            summaryNameText.text = string.Empty;
+            summaryText.text = string.Empty;
+        }
+
+        summaryUI.gameObject.SetActive(isOn);
     }
 
     /// <summary>
@@ -253,9 +292,19 @@ public class InventoryManager : MonoBehaviour
             // 리스트 및 데이터 정리
             resultIconList.ForEach(Destroy);
             resultIconList.Clear();
+            addDic.Clear();
+        }
+        else
+        {
+            // 결과 UI 아이콘 추가
+            foreach(var data in addDic)
+            {
+                ItemSO so = DataLoader.instance.ItemDic[data.Key];
+                AddResultIcon(so, data.Value);
+            }
         }
 
-        // UI 종료
+        // UI On/Off
         resultUI.SetActive(isOn);
     }
     #endregion

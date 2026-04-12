@@ -1,7 +1,6 @@
 using Item;
 using System.Collections.Generic;
 using UnityEngine;
-using static UseableSO;
 
 
 [CreateAssetMenu(fileName = "Useable", menuName = "Item/Useable/UseableSO", order = int.MaxValue)]
@@ -10,17 +9,17 @@ public class UseableSO : ItemSO
     [Header("---Useable Setting---")]
     [SerializeField] private AddType addType;
     [SerializeField] private List<Effect> effectList;
-    private enum AddType { Count, GiveAll }
+    private enum AddType { JustOne, GiveAll }
 
 
     [System.Serializable]
     public struct Effect
     {
         public AddType addType;
-        public int count;
-        public Vector2Int random;
         public ItemSO item;
-        public enum AddType { count, random }
+        public int value;
+        public Vector2Int random;
+        public enum AddType { Value, Random }
     }
 
 
@@ -28,30 +27,24 @@ public class UseableSO : ItemSO
     {
         switch (addType)
         {
-            case AddType.Count:
+            case AddType.JustOne:
                 int ran = Random.Range(0, effectList.Count);
-                int add = effectList[ran].addType == Effect.AddType.count ?
-                    effectList[ran].count : Random.Range(effectList[ran].random.x, effectList[ran].random.y);
+                int add = effectList[ran].addType == Effect.AddType.Value ?
+                    effectList[ran].value : Random.Range(effectList[ran].random.x, effectList[ran].random.y);
                 
                 // 아이템 추가
-                GameManager.instance.inventory.AddItem(effectList[ran].item.ItemID, add);
-
-                // 결과창 UI에 데이터 추가
-                GameManager.instance.inventory.AddResultIcon(effectList[ran].item, add);
+                GameManager.instance.inventory.AddResultData(effectList[ran].item, add);
                 break;
 
             case AddType.GiveAll:
                 foreach (Effect effect in effectList)
                 {
                     // 타입 별 획득 개수 설정
-                    add = effect.addType == Effect.AddType.count ?
-                        effect.count : Random.Range(effect.random.x, effect.random.y);
+                    add = effect.addType == Effect.AddType.Value ?
+                        effect.value : Random.Range(effect.random.x, effect.random.y);
 
                     // 아이템 추가
-                    GameManager.instance.inventory.AddItem(effect.item.ItemID, add);
-
-                    // 결과창 UI에 데이터 추가
-                    GameManager.instance.inventory.AddResultIcon(effect.item, add);
+                    GameManager.instance.inventory.AddResultData(effect.item, add);
                 }
                 break;
         }

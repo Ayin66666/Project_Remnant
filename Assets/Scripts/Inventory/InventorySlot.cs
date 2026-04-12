@@ -65,7 +65,6 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler, IPointerEnterH
         // 아이템 상세설명 UI
         GameManager.instance.inventory.DescriptionUIDataSetting(item);
         GameManager.instance.inventory.DescriptionUI(true);
-
     }
     #endregion
 }
