@@ -6,6 +6,8 @@ public class BattleManager : MonoBehaviour
 {
     public static BattleManager instance;
 
+    // [Header("---Setting---")]
+    // [SerializeField] private List<PhaseData> phaseData;
 
     private void Awake()
     {

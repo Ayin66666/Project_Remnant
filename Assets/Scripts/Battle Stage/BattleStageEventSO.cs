@@ -1,11 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "BattleStageEventSO", menuName = "Canto/Stage/BattleStageEventSO", order = int.MaxValue)]
-public class BattleStageEventSO : ScriptableObject
+public abstract class BattleStageEventSO : ScriptableObject
 {
-    [Header("---Setting---")]
+    [Header("---Description---")]
     [SerializeField] private string eventName;
-    [SerializeField] private int id;
+    [SerializeField, TextArea] private string eventDescription;
+
+    [Header("---Base Setting---")]
+    [SerializeField] private string eventTitle;
+    public enum TriggerTiming { WaveStart, WaveEnd, TurnReached, HpBelow }
+
+
+    public abstract void Execute();
 }
