@@ -1,7 +1,7 @@
+using Game.Character;
 using System.Collections.Generic;
 using UnityEngine;
-using static BattleStageSO;
-
+using UnityEngine.Rendering;
 
 [CreateAssetMenu(fileName = "BattleStageSO", menuName = "Canto/Stage/BattleStageSO", order = int.MaxValue)]
 public class BattleStageSO : ScriptableObject
@@ -31,7 +31,10 @@ public class BattleStageSO : ScriptableObject
         public List<BattleStageEventSO> eventList;
 
         [Header("---Enemy Data---")]
-        public List<GameObject> enemies;
+        public List<SpawnData> enemies;
+
+        [Header("---Post Processing---")]
+        public VolumeProfile postProcessingProfile;
 
         [Header("---Background Data---")]
         public Sprite floor;
@@ -42,6 +45,22 @@ public class BattleStageSO : ScriptableObject
 
     public StageType Type => stageType;
     public List<PhaseData> PhaseDataList => phaseData;
+}
+
+[System.Serializable]
+public class SpawnData
+{
+    public enum SpawnType
+    {
+        Random,
+        Fixed
+    }
+
+    [Header("---Enemy Data---")]
+    public SpawnType spawnType;
+    public int spawnNum;
+    public int level;
+    public IdentityMasterSO enemy;
 }
 
 
