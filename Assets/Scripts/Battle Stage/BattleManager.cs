@@ -10,7 +10,6 @@ public class BattleManager : MonoBehaviour
 
     [Header("---Stage Setting---")]
     [SerializeField] private BattleStageSO stageSO;
-    [SerializeField] private List<GameObject> enemies;
     [SerializeField] private List<Transform> spawnPoints;
 
     [Header("---Background---")]
@@ -53,7 +52,7 @@ public class BattleManager : MonoBehaviour
         // 몬스터 세팅
 
         // 전투 시작 UI
-        if(true)
+        if (true)
         {
             // 1. 특수연출이라면
         }
@@ -114,7 +113,10 @@ public class BattleManager : MonoBehaviour
     /// <param name="phase"></param>
     public void Spawn(int phase)
     {
-        foreach(SpawnData data in stageSO.PhaseDataList[phase].enemies)
+        // 몬스터 소환 후 남은 몬스터가 얼마인지, 웨이브(페이즈)가 넘어가야 하는지 체크해야함
+        // 근데 이걸 체크할거면 단순 List가 아니라 관리를 위한 데이터 클래스가 필요할듯
+        // 그럼 몬스터 배치도가 들어가있는 SpawnData 를 받아온 뒤 이걸 Wave 데이터클래스로 만들어줘야하나?
+        foreach (SpawnData data in stageSO.PhaseDataList[phase].enemies)
         {
             // 몬스터 소환
             GameObject obj = Instantiate(data.enemy.prefab, spawnPoints[data.spawnNum].position, Quaternion.identity);
@@ -125,7 +127,7 @@ public class BattleManager : MonoBehaviour
     /// 이벤트 체크
     /// </summary>
     public void EventCheck()
-    { 
+    {
 
     }
 
@@ -138,5 +140,31 @@ public class BattleManager : MonoBehaviour
         // 1. 모든 적 처치
         // 2. N턴 버티기
         // 3. 조건 몬스터의 체력 N 이하
+    }
+
+    [System.Serializable]
+    public class WaveRuntimeData
+    {
+        public int totalCount;
+        public int currentCount;
+        public List<GameObject> enemyList;
+
+        public WaveRuntimeData(BattleStageSO.PhaseData so)
+        {
+            // 몬스터 수 세팅
+            totalCount = so.enemies.Count;
+            currentCount = 0;
+
+            // 몬스터 소환 후 리스트 채우기
+            for(int i = 0; i < so.enemies.Count; i++)
+            {
+                for(int j = 0; j < so.enemies[i].spawnNum; j++)
+                {
+                    GameObject obj = Instantiate(so.enemies[i].enemy.prefab);
+                    obj.SetActive(false);
+                    enemyList.Add(obj);
+                }
+            }
+        }
     }
 }
