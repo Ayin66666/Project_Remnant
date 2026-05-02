@@ -37,6 +37,7 @@ public class BattleStageSO : ScriptableObject
         public VolumeProfile postProcessingProfile;
 
         [Header("---Background Data---")]
+        public bool haveChageableBackground;
         public Sprite floor;
         public Sprite wall;
         public List<Sprite> background;
@@ -50,14 +51,16 @@ public class BattleStageSO : ScriptableObject
 [System.Serializable]
 public class SpawnData
 {
+    /* 일단 제거
     public enum SpawnType
     {
         Random,
         Fixed
     }
+    public SpawnType spawnType;
+    */
 
     [Header("---Enemy Data---")]
-    public SpawnType spawnType;
     public int spawnNum;
     public int level;
     public IdentityMasterSO enemy;

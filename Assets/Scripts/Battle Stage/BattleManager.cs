@@ -1,7 +1,7 @@
-using Game.Character;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using static BattleManager;
 
 
 public class BattleManager : MonoBehaviour
@@ -9,8 +9,10 @@ public class BattleManager : MonoBehaviour
     public static BattleManager instance;
 
     [Header("---Stage Setting---")]
+    [SerializeField] private int curPhase;
     [SerializeField] private BattleStageSO stageSO;
-    [SerializeField] private List<Transform> spawnPoints;
+    [SerializeField] private List<WaveRuntimeData> spawnDatas;
+    [SerializeField] private List<SpwanPoint> spawnPoints;
 
     [Header("---Background---")]
     [SerializeField] private GameObject wallPrefab;
@@ -25,6 +27,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
 
 
+    #region 시작 로직
     private void Awake()
     {
         if (instance == null)
@@ -46,10 +49,16 @@ public class BattleManager : MonoBehaviour
         stageSO = so;
 
         // 맵 세팅
-        StageSetting(so, 0);
+        StageSetting(0);
         BGMSetting(0);
 
-        // 몬스터 세팅
+        // so 데이터 기반 런타임 데이터 생성
+        for(int i = 0; i < stageSO.PhaseDataList.Count; i++)
+        {
+            // 데이터 생성
+            WaveRuntimeData runtimeData = new WaveRuntimeData(stageSO.PhaseDataList[i]);
+            spawnDatas.Add(runtimeData);
+        }
 
         // 전투 시작 UI
         if (true)
@@ -61,32 +70,37 @@ public class BattleManager : MonoBehaviour
             // 2. 일반전이라면
         }
     }
+    #endregion
 
+    #region 진행 로직
     /// <summary>
     /// 맵 배치 & 포스트 프로세싱 세팅
     /// </summary>
     /// <param name="so"></param>
     /// <param name="phase"></param>
-    public void StageSetting(BattleStageSO so, int phase)
+    public void StageSetting(int phase)
     {
         // 초기화
         floor.sprite = null;
         wall.Clear();
 
         // UI 배치
-        floor.sprite = so.PhaseDataList[phase].floor;
-        for (int i = 0; i < wall.Count; i++)
+        if(stageSO.PhaseDataList[phase].haveChageableBackground)
         {
-            GameObject wallObj = Instantiate(wallPrefab, wallRect.transform);
-            SpriteRenderer renderer = wallObj.GetComponent<SpriteRenderer>();
-            renderer.sprite = so.PhaseDataList[phase].wall;
-            wall.Add(wallObj);
+            floor.sprite = stageSO.PhaseDataList[phase].floor;
+            for (int i = 0; i < wall.Count; i++)
+            {
+                GameObject wallObj = Instantiate(wallPrefab, wallRect.transform);
+                SpriteRenderer renderer = wallObj.GetComponent<SpriteRenderer>();
+                renderer.sprite = stageSO.PhaseDataList[phase].wall;
+                wall.Add(wallObj);
+            }
         }
 
         // 포스트 프로세싱 세팅
-        if (so.PhaseDataList[phase].postProcessingProfile != null)
+        if (stageSO.PhaseDataList[phase].postProcessingProfile != null)
         {
-            postprocessing.profile = so.PhaseDataList[phase].postProcessingProfile;
+            postprocessing.profile = stageSO.PhaseDataList[phase].postProcessingProfile;
         }
     }
 
@@ -111,15 +125,36 @@ public class BattleManager : MonoBehaviour
     /// 소환 로직 구현 중
     /// </summary>
     /// <param name="phase"></param>
-    public void Spawn(int phase)
+    public void Spawn()
     {
-        // 몬스터 소환 후 남은 몬스터가 얼마인지, 웨이브(페이즈)가 넘어가야 하는지 체크해야함
-        // 근데 이걸 체크할거면 단순 List가 아니라 관리를 위한 데이터 클래스가 필요할듯
-        // 그럼 몬스터 배치도가 들어가있는 SpawnData 를 받아온 뒤 이걸 Wave 데이터클래스로 만들어줘야하나?
-        foreach (SpawnData data in stageSO.PhaseDataList[phase].enemies)
+        // 페이즈 phase 번의 몬스터 소환
+        // -> 만약 남은 몬스터가 없다면 다음 페이즈로 전환
+
+        if(spawnDatas[curPhase].currentCount < spawnDatas[curPhase].totalCount)
         {
             // 몬스터 소환
-            GameObject obj = Instantiate(data.enemy.prefab, spawnPoints[data.spawnNum].position, Quaternion.identity);
+            spawnDatas[curPhase].currentCount++;
+            GameObject enemy = spawnDatas[curPhase].enemyList[spawnDatas[curPhase].currentCount];
+
+            // 소환 위치 찾기
+            foreach (SpwanPoint point in spawnPoints)
+            {
+                if(point.character == null)
+                {
+                    point.character = enemy.GetComponent<CharacterBase>();
+                    enemy.transform.position = point.spawnPos.position;
+                    enemy.SetActive(true);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            // 다음 페이즈로 전환
+            curPhase++;
+
+            StageSetting(curPhase);
+            BGMSetting(curPhase);
         }
     }
 
@@ -141,7 +176,14 @@ public class BattleManager : MonoBehaviour
         // 2. N턴 버티기
         // 3. 조건 몬스터의 체력 N 이하
     }
+    #endregion
 
+
+    #region UI 로직
+    #endregion
+
+
+    #region 데이터 클래스
     [System.Serializable]
     public class WaveRuntimeData
     {
@@ -167,4 +209,13 @@ public class BattleManager : MonoBehaviour
             }
         }
     }
+
+
+    [System.Serializable]
+    public class  SpwanPoint
+    {
+        public CharacterBase character;
+        public Transform spawnPos;
+    }
+    #endregion
 }
