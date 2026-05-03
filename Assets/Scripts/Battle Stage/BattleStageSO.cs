@@ -63,7 +63,7 @@ public class SpawnData
     [Header("---Enemy Data---")]
     public int spawnNum;
     public int level;
-    public IdentityMasterSO enemy;
+    public EnemyMasterSO enemy;
 }
 
 

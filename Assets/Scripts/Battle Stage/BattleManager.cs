@@ -1,7 +1,9 @@
+using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using static BattleManager;
+using Game.Character;
 
 
 public class BattleManager : MonoBehaviour
@@ -12,7 +14,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private int curPhase;
     [SerializeField] private BattleStageSO stageSO;
     [SerializeField] private List<WaveRuntimeData> spawnDatas;
-    [SerializeField] private List<SpwanPoint> spawnPoints;
+    [SerializeField] private List<SpawnPoint> spawnPoints;
 
     [Header("---Background---")]
     [SerializeField] private GameObject wallPrefab;
@@ -25,6 +27,12 @@ public class BattleManager : MonoBehaviour
 
     [Header("---Audio---")]
     [SerializeField] private AudioSource audioSource;
+
+    [Header("---UI---")]
+    [SerializeField] private bool isUIEvent;
+    [SerializeField] private List<CanvasGroup> startUI;
+    [SerializeField] private List<GameObject> clearUI;
+    [SerializeField] private CanvasGroup fadeUI;
 
 
     #region 시작 로직
@@ -53,7 +61,7 @@ public class BattleManager : MonoBehaviour
         BGMSetting(0);
 
         // so 데이터 기반 런타임 데이터 생성
-        for(int i = 0; i < stageSO.PhaseDataList.Count; i++)
+        for (int i = 0; i < stageSO.PhaseDataList.Count; i++)
         {
             // 데이터 생성
             WaveRuntimeData runtimeData = new WaveRuntimeData(stageSO.PhaseDataList[i]);
@@ -72,7 +80,8 @@ public class BattleManager : MonoBehaviour
     }
     #endregion
 
-    #region 진행 로직
+
+    #region 스테이지 설정 로직
     /// <summary>
     /// 맵 배치 & 포스트 프로세싱 세팅
     /// </summary>
@@ -85,7 +94,7 @@ public class BattleManager : MonoBehaviour
         wall.Clear();
 
         // UI 배치
-        if(stageSO.PhaseDataList[phase].haveChageableBackground)
+        if (stageSO.PhaseDataList[phase].haveChageableBackground)
         {
             floor.sprite = stageSO.PhaseDataList[phase].floor;
             for (int i = 0; i < wall.Count; i++)
@@ -122,64 +131,154 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 소환 로직 구현 중
+    /// 소환 로직 구현 중 -> 일단 기본적인건 만들었고 페이즈 체크 기능 필요!
     /// </summary>
     /// <param name="phase"></param>
-    public void Spawn()
+    public void EnemySpawn()
     {
-        // 페이즈 phase 번의 몬스터 소환
+        // 해당 페이즈의 몬스터 소환
         // -> 만약 남은 몬스터가 없다면 다음 페이즈로 전환
 
-        if(spawnDatas[curPhase].currentCount < spawnDatas[curPhase].totalCount)
+        if (spawnDatas[curPhase].currentCount < spawnDatas[curPhase].totalCount)
         {
-            // 몬스터 소환
-            spawnDatas[curPhase].currentCount++;
-            GameObject enemy = spawnDatas[curPhase].enemyList[spawnDatas[curPhase].currentCount];
-
-            // 소환 위치 찾기
-            foreach (SpwanPoint point in spawnPoints)
+            // 소환해야 하는 몬스터 수 체크
+            int spawnCount = 0;
+            foreach (SpawnPoint point in spawnPoints)
             {
-                if(point.character == null)
-                {
-                    point.character = enemy.GetComponent<CharacterBase>();
-                    enemy.transform.position = point.spawnPos.position;
-                    enemy.SetActive(true);
-                    break;
-                }
+                if (point.character == null)
+                    spawnCount++;
+            }
+
+            // 몬스터 소환
+            for (int i = 0; i < spawnCount; i++)
+            {
+                // 소환 위치 설정
+                SpawnPoint spawn = spawnPoints.FirstOrDefault(x => x.character == null);
+
+                // 몬스터 배치 -> IdentityMasterSO에서 EnemyMasterSO로 변경했음으로 새로 구현 필요
+                /*
+                CharacterBase enemy = spawnDatas[curPhase].enemyList[spawnDatas[curPhase].currentCount];
+                spawn.character = enemy;
+                enemy.transform.position = spawn.spawnPos.position;
+                enemy.SetUp();
+                enemy.gameObject.SetActive(true);
+                */
+                // 소환된 몬스터 수 업데이트
+                spawnDatas[curPhase].currentCount++;
             }
         }
         else
         {
-            // 다음 페이즈로 전환
-            curPhase++;
+            // 다음 페이즈가 있는지 체크
+            if (curPhase + 1 >= stageSO.PhaseDataList.Count)
+            {
+                // 스테이지 클리어
+                // 일단은 디버그만 찍지만, 실제로는 UI 표시 후 이벤트 체크, 스테이지에서 나가는 로직 필요
+                Debug.Log("스테이지 클리어!");
+            }
+            else
+            {
+                // 다음 페이즈로 전환
+                curPhase++;
 
-            StageSetting(curPhase);
-            BGMSetting(curPhase);
+                StageSetting(curPhase);
+                BGMSetting(curPhase);
+            }
+
         }
     }
 
     /// <summary>
-    /// 이벤트 체크
+    /// 스테이지 클리어 시 호출 (승리 UI, 스테이지 로딩)
+    /// -> 이후 이벤트에 따른 대화나 연출같은 기능 추가 필요
     /// </summary>
-    public void EventCheck()
+    /// <returns></returns>
+    private IEnumerator StageClear()
     {
+        // 종료 UI 및 UI 이벤트 체크
+        StartCoroutine(ClearUI((int)stageSO.Type));
+        yield return new WaitWhile(() => isUIEvent);
 
-    }
-
-    /// <summary>
-    /// 스테이지 상태 체크 (클리어 조건, 플레이어 패배 등등)
-    /// </summary>
-    public void ClearCheck()
-    {
-        // 클리어 조건은 크게 다음과 같이 나뉨
-        // 1. 모든 적 처치
-        // 2. N턴 버티기
-        // 3. 조건 몬스터의 체력 N 이하
+        // 씬 전환
+        SceneLoadManager.LoadScene("Main_Scene", "거점 기지");
     }
     #endregion
 
 
+    #region 전투 시스템 로직
+    #endregion
+
+
     #region UI 로직
+    /// <summary>
+    /// 시작 타입에 따른 UI 연출 변경
+    /// </summary>
+    /// <param name="startType"></param>
+    /// <returns></returns>
+    public IEnumerator StartUI(int startType)
+    {
+        isUIEvent = true;
+
+        // 페이드
+        fadeUI.gameObject.SetActive(true);
+        fadeUI.alpha = 1f;
+
+        // 대기
+        yield return new WaitForSeconds(0.5f);
+
+        // 페이드 종료
+        float timer = 0f;
+        while (timer < 1)
+        {
+            timer += Time.deltaTime;
+            fadeUI.alpha = Mathf.Lerp(1f, 0f, timer);
+            yield return null;
+        }
+        fadeUI.alpha = 1;
+
+        // 시작 UI
+        startUI[startType].gameObject.SetActive(true);
+
+        // 시작 UI 종료
+        while(timer < 1f)
+        {
+            timer += Time.deltaTime;
+            startUI[startType].alpha = Mathf.Lerp(1f, 0f, timer);
+            yield return null;
+        }
+        fadeUI.alpha = 0;
+        startUI[startType].gameObject.SetActive(false);
+
+        isUIEvent = false;
+    }
+
+    /// <summary>
+    /// 클리어 타입에 따른 UI 연출 변경
+    /// </summary>
+    /// <param name="clearType">
+    /// 0 = 일반  
+    /// 1 = 보스 
+    /// </param>
+    /// <returns></returns>
+    private IEnumerator ClearUI(int clearType)
+    {
+        isUIEvent = true;
+
+        clearUI[clearType].SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+
+        fadeUI.gameObject.SetActive(true);
+        float timer = 0f;
+        while (timer < 1f)
+        {
+            timer += Time.deltaTime;
+            fadeUI.alpha = Mathf.Lerp(0f, 1f, timer);
+            yield return null;
+        }
+        fadeUI.alpha = 1f;
+
+        isUIEvent = false;
+    }
     #endregion
 
 
@@ -187,10 +286,23 @@ public class BattleManager : MonoBehaviour
     [System.Serializable]
     public class WaveRuntimeData
     {
+        /// <summary>
+        /// 총 몬스터 수
+        /// </summary>
         public int totalCount;
+        /// <summary>
+        /// 소환된 몬스터의 인덱스
+        /// </summary>
         public int currentCount;
-        public List<GameObject> enemyList;
+        /// <summary>
+        /// 몬스터 오브젝트 리스트
+        /// </summary>
+        public List<EnemyMasterSO> enemyList;
 
+        /// <summary>
+        /// 생성자
+        /// </summary>
+        /// <param name="so"></param>
         public WaveRuntimeData(BattleStageSO.PhaseData so)
         {
             // 몬스터 수 세팅
@@ -198,21 +310,19 @@ public class BattleManager : MonoBehaviour
             currentCount = 0;
 
             // 몬스터 소환 후 리스트 채우기
-            for(int i = 0; i < so.enemies.Count; i++)
+            enemyList = new List<EnemyMasterSO>();
+            for (int i = 0; i < so.enemies.Count; i++)
             {
-                for(int j = 0; j < so.enemies[i].spawnNum; j++)
+                for (int j = 0; j < so.enemies[i].spawnNum; j++)
                 {
-                    GameObject obj = Instantiate(so.enemies[i].enemy.prefab);
-                    obj.SetActive(false);
-                    enemyList.Add(obj);
+                    // 새로 구현 필요
                 }
             }
         }
     }
 
-
     [System.Serializable]
-    public class  SpwanPoint
+    public class SpawnPoint
     {
         public CharacterBase character;
         public Transform spawnPos;
