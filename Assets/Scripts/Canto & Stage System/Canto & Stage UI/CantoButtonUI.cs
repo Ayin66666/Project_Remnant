@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 
 
-public class CantoSelectUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class CantoButtonUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("---Setting---")]
     [SerializeField] private CantoRuntimeData data;

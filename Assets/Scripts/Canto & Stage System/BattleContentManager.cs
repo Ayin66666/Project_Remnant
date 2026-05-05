@@ -1,8 +1,8 @@
 using Game.Canto;
 using Game.Stage;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
 
 public class BattleContentManager : MonoBehaviour
@@ -14,9 +14,9 @@ public class BattleContentManager : MonoBehaviour
     [SerializeField] private Dictionary<int, CantoRuntimeData> cantoRuntimeData;
 
     [Header("---UI---")]
-    [SerializeField] private CantoSelectUI[] cantoSlot;
+    [SerializeField] private CantoButtonUI[] cantoSlot;
     [SerializeField] private CantoManager[] cantoManagers;
-
+    [SerializeField] private GameObject stageDescriptionUI;
 
     // 지금 생각이 꼬이는 이유
     // 기존 로더 -> 런타임 로직에서 이건 바로 런타임임
@@ -187,6 +187,18 @@ public class BattleContentManager : MonoBehaviour
 
         if (isOn) cantoManagers[index].gameObject.SetActive(isOn);
     }
+
+    /// <summary>
+    /// 스테이지 노드 클릭 시 동작 - 스테이지 설명 UI 표기
+    /// </summary>
+    /// <param name="stageSO"></param>
+    public void ShowStageDataUI(StageData data)
+    {
+        // 데이터 세팅
+
+
+        // UI 활성화
+    }
     #endregion
 }
 
@@ -231,6 +243,9 @@ public class CantoRuntimeData
 }
 
 [System.Serializable]
+/// <summary>
+/// 스테이지 런타임 데이터
+/// </summary>
 public class StageData
 {
     [Header("---Data---")]

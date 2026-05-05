@@ -11,31 +11,30 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     // 4. 인게임 UI (체력바, 이름, 버프 & 디버프 표시)
 
     [Header("---Status---")]
-    [SerializeField] private int level;
-    [SerializeField] private int sync;
-    [SerializeField] private int maxHp;
-    [SerializeField] private int curHp;
-    [SerializeField] private List<int> groggy;
-    [SerializeField] private int attack;
-    [SerializeField] private int defence;
-    [SerializeField] private Vector2Int speed;
+    [SerializeField] protected int level;
+    [SerializeField] protected int sync;
+    [SerializeField] protected int maxHp;
+    [SerializeField] protected int curHp;
+    [SerializeField] protected List<int> groggy;
+    [SerializeField] protected int attack;
+    [SerializeField] protected int defence;
+    [SerializeField] protected Vector2Int speed;
     public int MaxHp { get { return maxHp; } set {  maxHp = value; } }
     public List<int> Groggy { get {  return groggy; } set {  groggy = value; } }
 
 
     [Header("------")]
-    [SerializeField] private AttackSlot[] attackSlots;
+    [SerializeField] protected AttackSlot[] attackSlots;
 
 
     [Header("---Status Effect---")]
-    [SerializeField] private StatusEffectContainer statusEffectContainer;
+    [SerializeField] protected StatusEffectContainer statusEffectContainer;
 
 
     [Header("---Component---")]
-    [SerializeField] private SpriteRenderer spriteRenderer;
-    [SerializeField] private Rigidbody2D rigid;
-    [SerializeField] private CharacterUI characterUI;
-
+    [SerializeField] protected SpriteRenderer spriteRenderer;
+    [SerializeField] protected Rigidbody2D rigid;
+    [SerializeField] protected CharacterUI characterUI;
 
     #region Status
     /// <summary>
@@ -45,8 +44,8 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// <param name="sync"></param>
     public void SetUp(StatusDataSO data, int level, int sync)
     {
-        Data_Setting(level, sync);
-        Status_Setting(data);
+        SetupData(level, sync);
+        SetupStatus(data);
         characterUI.UI_Setting(this);
     }
     
@@ -55,7 +54,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// </summary>
     /// <param name="level"></param>
     /// <param name="sync"></param>
-    public void Data_Setting(int level, int sync)
+    protected virtual void SetupData(int level, int sync)
     {
         this.level = level;
         this.sync = sync;
@@ -64,37 +63,14 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// <summary>
     /// 스테이터스 셋팅
     /// </summary>
-    public void Status_Setting(StatusDataSO data)
-    {
-        maxHp = data.BaseHp // 기본 체력
-            + data.SyncUpData[sync].hp // 동기화 체력 
-            + Mathf.RoundToInt(data.LevelUpData.hp * level * data.GrowthFactorData.hpFactor); // 레벨업 체력
-        
-        curHp = maxHp;
-
-        attack = data.BaseAttackPoint
-            + data.SyncUpData[sync].attack
-            + Mathf.RoundToInt(data.LevelUpData.attack * level * data.GrowthFactorData.attackFactor);
-
-        defence = data.BaseDefencePoint
-            + data.SyncUpData[sync].defence
-            + Mathf.RoundToInt(data.LevelUpData.defence * level * data.GrowthFactorData.defenceFactor);
-
-        speed = data.SyncUpData[sync].attackSpeed;
-
-        groggy.Clear();
-        foreach (int g in data.Groggy)
-        {
-            groggy.Add(Mathf.RoundToInt(maxHp * g / 100));
-        }
-    }
+    protected abstract void SetupStatus(StatusDataSO data);
     #endregion
 
 
     /// <summary>
     /// 공격 주사위 속도 셋팅
     /// </summary>
-    public void SlotSpeed_Setting()
+    protected void SlotSpeedSetting()
     {
 
     }

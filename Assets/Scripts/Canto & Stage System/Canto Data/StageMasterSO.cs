@@ -18,6 +18,10 @@ namespace Game.Stage
         /// </summary>
         [SerializeField] private string stageName;
         /// <summary>
+        /// 스테이지 레벨
+        /// </summary>
+        [SerializeField] private int stageLevel;
+        /// <summary>
         /// 스테이지 번호 N-NN
         /// </summary>
         [SerializeField] private string stageOrder;
@@ -25,6 +29,11 @@ namespace Game.Stage
         /// 스테이지 이미지
         /// </summary>
         [SerializeField] private Sprite stageImage;
+        /// <summary>
+        /// 유효 속성
+        /// </summary>
+        [SerializeField] private List<AttackType> validAttack;
+        [SerializeField] private List<Crime> validCrimes;
         /// <summary>
         ///  스테이지 진입 제약 조건
         /// </summary>
@@ -34,7 +43,11 @@ namespace Game.Stage
         /// </summary>
         [SerializeField] private ExClearCondition exClearCondition;
         /// <summary>
-        /// 등장 Enenmy 데이터
+        /// 등장 적 데이터
+        /// </summary>
+        [SerializeField] private List<EnemyMasterSO> enemyData;
+        /// <summary>
+        /// 웨이브 데이터
         /// </summary>
         [SerializeField] private List<EnemyWaveData> enemyWaveData;
 
@@ -42,10 +55,14 @@ namespace Game.Stage
         #region 프로퍼티
         public int Stageid => stageId;
         public string StageName => stageName;
+        public int StageLevel => stageLevel;
+        public List<AttackType> ValidAttack => validAttack;
+        public List<Crime> ValidCrimes => validCrimes;
         public string StageOrder => stageOrder;
         public Sprite StageSprite => stageImage;
         public ExClearCondition ExClearCondition => exClearCondition;
         public List<StageLimitData> LimitData => limitData;
+        public List<EnemyMasterSO> EnemyData => enemyData;
         public List<EnemyWaveData> EnemyWaveData => enemyWaveData;
         #endregion
     }

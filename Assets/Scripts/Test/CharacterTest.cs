@@ -2,8 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class CharacterTest : CharacterBase
 {
+    protected override void SetupStatus(StatusDataSO data)
+    {
+        throw new System.NotImplementedException();
+    }
+
     public override void Die()
     {
         // 이거 최종적으로는 PlayerCharacter 스크립트 단일이 동작하게 할 예정
