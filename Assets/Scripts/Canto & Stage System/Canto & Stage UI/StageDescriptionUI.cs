@@ -1,7 +1,6 @@
 using Game.Character;
 using Game.Stage;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -19,6 +18,7 @@ public class StageDescriptionUI : MonoBehaviour
     [Header("---UI---")]
     [SerializeField] private TextMeshProUGUI stageNameText;
     [SerializeField] private TextMeshProUGUI levelText;
+    [SerializeField] private TextMeshProUGUI exClearText;
     [SerializeField] private RectTransform validAttributeRect;
     [SerializeField] private RectTransform enemyRect;
     [SerializeField] private RectTransform rewardRect;
@@ -62,19 +62,33 @@ public class StageDescriptionUI : MonoBehaviour
         // UI 세팅
         stageNameText.text = data.stageSO.StageName;
         levelText.text = $"Lv.{data.stageSO.StageLevel}";
+        switch (data.stageSO.ExClearCondition.ConditionType)
+        {
+            case ExClear.StageClear:
+                exClearText.text = "스테이지 클리어";
+                break;
+
+            case ExClear.TurnLimit:
+                exClearText.text = $"{data.stageSO.ExClearCondition.conditionCount}턴 이내에 스테이지 클리어";
+                break;
+
+            case ExClear.NoDied:
+                exClearText.text = "아무도 죽지 않은 상태에서 스테이지 클리어";
+                break;
+        }
 
         // 유효 속성 UI
         foreach (AttackType type in data.stageSO.ValidAttack)
         {
             GameObject obj = Instantiate(attackTypeIconDic[type], validAttributeRect);
         }
-        foreach(Crime type in data.stageSO.ValidCrimes)
+        foreach (Crime type in data.stageSO.ValidCrimes)
         {
             GameObject obj = Instantiate(crimeIconDic[type], validAttributeRect);
         }
 
         // 등장 몬스터 UI
-        foreach(EnemyMasterSO enemy in data.stageSO.EnemyData)
+        foreach (EnemyMasterSO enemy in data.stageSO.EnemyData)
         {
             GameObject obj = Instantiate(enemyDataIcon, enemyRect);
             EnemyIconUI icon = obj.GetComponent<EnemyIconUI>();
@@ -101,10 +115,12 @@ public class StageDescriptionUI : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+        /*
         foreach (Transform child in rewardRect)
         {
             Destroy(child.gameObject);
         }
+        */
     }
     #endregion
 
@@ -123,7 +139,7 @@ public class StageDescriptionUI : MonoBehaviour
     /// </summary>
     public void ClickOut()
     {
-
+        BattleContentManager.instance.StageDescriptionUI(false);
     }
     #endregion
 }

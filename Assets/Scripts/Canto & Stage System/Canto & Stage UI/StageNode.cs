@@ -70,13 +70,15 @@ public class StageNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        Debug.Log($"노드 클릭 {data.canEnter}");
+
         if (data.canEnter)
         {
             // 스테이지 설명 UI 표시
             Debug.Log("노드 클릭 / 설명 표시");
-            BattleContentManager.instance.ShowStageDataUI(data);
+            BattleContentManager.instance.SetUpStageDescription(data);
+            BattleContentManager.instance.StageDescriptionUI(true);
         }
-
     }
     #endregion
 }

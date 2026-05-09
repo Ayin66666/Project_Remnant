@@ -14,7 +14,6 @@ public class CantoManager : MonoBehaviour
     [SerializeField] private List<RewardData> rewardDatas;
     [SerializeField] private List<StageData> stageDatas;
 
-
     [Header("---Reward---")]
     [SerializeField] private List<RewardButton> rewardButtons;
 
@@ -30,6 +29,7 @@ public class CantoManager : MonoBehaviour
         // 스테이지 슬롯에 데이터 전달
         for (int i = 0; i < data.stageData.Count; i++)
         {
+            Debug.Log("call stage node set");
             stageNodes[i].SetUp(data.stageData[i]);
         }
 

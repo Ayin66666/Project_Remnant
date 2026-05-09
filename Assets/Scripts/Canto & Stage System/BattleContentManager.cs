@@ -13,10 +13,11 @@ public class BattleContentManager : MonoBehaviour
     [SerializeField] private CantoDatabaseSO cantoDatabaseSO;
     [SerializeField] private Dictionary<int, CantoRuntimeData> cantoRuntimeData;
 
+
     [Header("---UI---")]
     [SerializeField] private CantoButtonUI[] cantoSlot;
     [SerializeField] private CantoManager[] cantoManagers;
-    [SerializeField] private GameObject stageDescriptionUI;
+    [SerializeField] private StageDescriptionUI stageDescriptionUI;
 
     // 지금 생각이 꼬이는 이유
     // 기존 로더 -> 런타임 로직에서 이건 바로 런타임임
@@ -46,10 +47,11 @@ public class BattleContentManager : MonoBehaviour
     {
         // 런타임 칸토 데이터 생성
         cantoRuntimeData = new Dictionary<int, CantoRuntimeData>(cantoDatabaseSO.CantoData.Count);
-        foreach (var canto in cantoDatabaseSO.CantoData)
+        for (int i = 0; i < cantoDatabaseSO.CantoData.Count; i++)
         {
-            CantoRuntimeData cantoData = new CantoRuntimeData(canto);
+            CantoRuntimeData cantoData = new CantoRuntimeData(cantoDatabaseSO.CantoData[i]);
             cantoRuntimeData.Add(cantoData.cantoData.CantoId, cantoData);
+            cantoManagers[i].SetUp(cantoData);
         }
     }
     #endregion
@@ -189,15 +191,21 @@ public class BattleContentManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 스테이지 노드 클릭 시 동작 - 스테이지 설명 UI 표기
+    /// 스테이지 노드 클릭 시 동작 - 스테이지 설명 UI On/Off
     /// </summary>
     /// <param name="stageSO"></param>
-    public void ShowStageDataUI(StageData data)
+    public void StageDescriptionUI(bool isOn)
     {
-        // 데이터 세팅
+        stageDescriptionUI.gameObject.SetActive(isOn);
+    }
 
-
-        // UI 활성화
+    /// <summary>
+    /// 스테이지 노드 클릭 시 동작 - 스테이지 설명 UI 설정
+    /// </summary>
+    /// <param name="data"></param>
+    public void SetUpStageDescription(StageData data)
+    {
+        stageDescriptionUI.SetUp(data);
     }
     #endregion
 }
