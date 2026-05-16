@@ -11,8 +11,6 @@ public class OrganizationManager : MonoBehaviour
 
     [Header("---현제 편성중인 캐릭터의 데이터---")]
     [SerializeField] private CharacterId curSinner;
-    public CharacterId CurSinner => curSinner;
-
     /// <summary>
     /// 외부 할당용
     /// </summary>
@@ -29,8 +27,10 @@ public class OrganizationManager : MonoBehaviour
     /// 실제 로직 동작용
     /// </summary>
     [SerializeField] private Dictionary<Rank, EgoEquipSlot> egoSlotDic;
+    public CharacterId CurSinner => curSinner;
 
     [Header("---UI---")]
+    [SerializeField] private GameObject organizationUI;
     [SerializeField] private GameObject selectUI;
     [SerializeField] private GameObject identityListUI;
     [SerializeField] private GameObject egoListUI;
@@ -53,6 +53,21 @@ public class OrganizationManager : MonoBehaviour
     }
     #endregion
 
+    /// <summary>
+    /// 편성창 UI On/Off
+    /// </summary>
+    /// <param name="isOn">편성창 UI On/Off 여부</param>
+    /// <param name="isStageIn">스테이지 선택 - 진입 전 편성창인지 여부 체크</param>
+    public void OrganizationUI(bool isOn, bool isStageIn)
+    {
+        if(isStageIn)
+        {
+            // 하단 UI 종료
+            MainSceneManager.instance.BottomUISetting(false);
+        }
+
+        organizationUI.SetActive(isOn);
+    }
 
     #region 인격
     /// <summary>

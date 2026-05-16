@@ -48,7 +48,6 @@ public class TitleManager : MonoBehaviour
             // 저장 데이터가 없다면 - 튜토리얼 이동
             SceneLoadManager.LoadScene("Tutorial_Scene", "튜토리얼 \n- 엄지 산하 지부");
         }
-
     }
 
     public void Click_Option()

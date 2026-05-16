@@ -14,6 +14,7 @@ public class StageDescriptionUI : MonoBehaviour
     [SerializeField] private List<GameObject> crimeIcon;
     private Dictionary<AttackType, GameObject> attackTypeIconDic;
     private Dictionary<Crime, GameObject> crimeIconDic;
+    private bool isSetUp = false;
 
     [Header("---UI---")]
     [SerializeField] private TextMeshProUGUI stageNameText;
@@ -24,9 +25,6 @@ public class StageDescriptionUI : MonoBehaviour
     [SerializeField] private RectTransform rewardRect;
 
 
-
-
-
     private void Awake()
     {
         AddIconToDic();
@@ -34,6 +32,9 @@ public class StageDescriptionUI : MonoBehaviour
 
     private void AddIconToDic()
     {
+        Debug.Log("아이콘 딕셔너리 세팅");
+        isSetUp = true;
+
         // 아이콘 데이터 딕셔너리에 배치
         attackTypeIconDic = new Dictionary<AttackType, GameObject>();
         crimeIconDic = new Dictionary<Crime, GameObject>();
@@ -44,7 +45,7 @@ public class StageDescriptionUI : MonoBehaviour
         }
         for (int i = 0; i < Enum.GetValues(typeof(Crime)).Length; i++)
         {
-            crimeIconDic.Add((Crime)i, attackTypeIcon[i]);
+            crimeIconDic.Add((Crime)i, crimeIcon[i]);
         }
     }
 
@@ -56,8 +57,11 @@ public class StageDescriptionUI : MonoBehaviour
     /// <param name="data"></param>
     public void SetUp(StageData data)
     {
+        if (!isSetUp) 
+            AddIconToDic();
+
         // 초기화
-        Cleer();
+        Clear();
 
         // UI 세팅
         stageNameText.text = data.stageSO.StageName;
@@ -78,8 +82,10 @@ public class StageDescriptionUI : MonoBehaviour
         }
 
         // 유효 속성 UI
+
         foreach (AttackType type in data.stageSO.ValidAttack)
         {
+            Debug.Log(attackTypeIconDic[type]);
             GameObject obj = Instantiate(attackTypeIconDic[type], validAttributeRect);
         }
         foreach (Crime type in data.stageSO.ValidCrimes)
@@ -102,7 +108,7 @@ public class StageDescriptionUI : MonoBehaviour
     /// <summary>
     /// 초기화 로직
     /// </summary>
-    public void Cleer()
+    public void Clear()
     {
         stageNameText.text = string.Empty;
         levelText.text = string.Empty;
@@ -131,7 +137,7 @@ public class StageDescriptionUI : MonoBehaviour
     /// </summary>
     public void ClickEnter()
     {
-
+        Debug.Log("편성창으로 진입");
     }
 
     /// <summary>
@@ -139,6 +145,7 @@ public class StageDescriptionUI : MonoBehaviour
     /// </summary>
     public void ClickOut()
     {
+        Debug.Log("설명 종료");
         BattleContentManager.instance.StageDescriptionUI(false);
     }
     #endregion
