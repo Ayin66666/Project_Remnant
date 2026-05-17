@@ -5,7 +5,7 @@ using Game.Character;
 
 namespace Game.Stage
 {
-    [CreateAssetMenu(fileName = "StageData_Canto00_Stage00", menuName = "Canto/Stage/StageManager", order = int.MaxValue)]
+    [CreateAssetMenu(fileName = "StageData_Canto00_Stage00", menuName = "Canto/Stage/StageMasterSO", order = int.MaxValue)]
     public class StageMasterSO : ScriptableObject
     {
         [Header("---Setting---")]
@@ -13,6 +13,10 @@ namespace Game.Stage
         /// 스테이지 id
         /// </summary>>
         [SerializeField] private int stageId;
+        /// <summary>
+        /// 진입할 씬의 이름
+        /// </summary>
+        [SerializeField] private string sceneName;
         /// <summary>
         /// 스테이지 이름
         /// </summary>
@@ -54,6 +58,7 @@ namespace Game.Stage
 
         #region 프로퍼티
         public int Stageid => stageId;
+        public string SceneName => sceneName;
         public string StageName => stageName;
         public int StageLevel => stageLevel;
         public List<AttackType> ValidAttack => validAttack;

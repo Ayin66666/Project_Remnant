@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    // ¸ğµç ±â´É ÃÑ°ı? À¯ÀÏÇÑ ½Ì±ÛÅæ?
+    // ¸ğµç ±â´É ÃÑ°ı & ¸Å´ÏÀú °ü¸®
     public static GameManager instance;
 
     [Header("---Manager---")]
@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour
     public OptionManager optionManager;
     public LevelManager levelManager;
     public InventoryManager inventory;
+
+    [Header("---Data---")]
+    public StageData tutorialData;
+    public StageData mainSceneData;
 
     [Header("---UI---")]
     public CharacterDescription characterDescription;

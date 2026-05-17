@@ -1,15 +1,14 @@
 using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 
 public class SceneLoadManager : MonoBehaviour
 {
     [Header("---Setting---")]
-    public static string sceneName = "";
-    public static string stageName = "";
+    public static StageData stageData;
     private Coroutine loadCoroutine;
     [SerializeField, TextArea] private string[] tips;
 
@@ -24,36 +23,37 @@ public class SceneLoadManager : MonoBehaviour
     /// 씬 호출
     /// </summary>
     /// <param name="sceneName"></param>
-    public static void LoadScene(string sceneName, string stageNameText)
+    public static void LoadScene(StageData data)
     {
-        SceneLoadManager.sceneName = sceneName;
-        SceneLoadManager.stageName = stageNameText;
+        Debug.Log(data == null ? "null" : data);
+
+        // 데이터 세팅
+        stageData = data;
+
+        // 씬 이동
         SceneManager.LoadScene("Loading_Scene");
     }
 
 
+    #region 씬 로직
     private void Start()
     {
         if (loadCoroutine != null) StopCoroutine(loadCoroutine);
         loadCoroutine = StartCoroutine(Load());
-        Tip();
-        StageName();
+
+        SetUpUI();
     }
 
-    private void Tip()
+    private void SetUpUI()
     {
+        stageNameText.text = stageData.stageSO.StageName;
         tipText.text = tips[Random.Range(0, tips.Length)];
-    }
-
-    private void StageName()
-    {
-        stageNameText.text = stageName;
     }
 
     private IEnumerator Load()
     {
         // 로딩 로직
-        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+        AsyncOperation operation = SceneManager.LoadSceneAsync(stageData.stageSO.SceneName);
         operation.allowSceneActivation = false;
         while (!operation.isDone)
         {
@@ -65,16 +65,15 @@ public class SceneLoadManager : MonoBehaviour
             {
                 progressbar.value = Mathf.MoveTowards(progressbar.value, 1f, Time.deltaTime);
             }
-
+            
             if (Input.GetKeyDown(KeyCode.Space) && progressbar.value >= 1f && operation.progress >= 0.9f)
             {
                 // Scene Move
-                SceneLoadManager.sceneName = "";
-                SceneLoadManager.stageName = "";
                 operation.allowSceneActivation = true;
             }
 
             yield return null;
         }
     }
+    #endregion
 }

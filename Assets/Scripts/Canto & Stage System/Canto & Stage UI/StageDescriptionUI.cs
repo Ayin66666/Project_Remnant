@@ -25,6 +25,7 @@ public class StageDescriptionUI : MonoBehaviour
     [SerializeField] private RectTransform rewardRect;
 
 
+    #region 시작 로직
     private void Awake()
     {
         AddIconToDic();
@@ -48,6 +49,7 @@ public class StageDescriptionUI : MonoBehaviour
             crimeIconDic.Add((Crime)i, crimeIcon[i]);
         }
     }
+    #endregion
 
 
     #region 데이터 로직
@@ -138,6 +140,7 @@ public class StageDescriptionUI : MonoBehaviour
     public void ClickEnter()
     {
         Debug.Log("편성창으로 진입");
+        OrganizationManager.instance.OrganizationUI(true, true);
     }
 
     /// <summary>

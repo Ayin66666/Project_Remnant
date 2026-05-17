@@ -12,18 +12,15 @@ public class BattleContentManager : MonoBehaviour
     [Header("---Runtime Data---")]
     [SerializeField] private CantoDatabaseSO cantoDatabaseSO;
     [SerializeField] private Dictionary<int, CantoRuntimeData> cantoRuntimeData;
-
+    [SerializeField] private StageData selectedStageData;
 
     [Header("---UI---")]
     [SerializeField] private CantoButtonUI[] cantoSlot;
     [SerializeField] private CantoManager[] cantoManagers;
     [SerializeField] private StageDescriptionUI stageDescriptionUI;
 
-    // 지금 생각이 꼬이는 이유
-    // 기존 로더 -> 런타임 로직에서 이건 바로 런타임임
-    // 기존 베이스 런타임 데이터 -> 데이터 덮어쓰기에서 이건 바로 생성 & 덮어쓰기임
 
-
+    #region 시작 로직
     private void Awake()
     {
         if (instance == null)
@@ -38,8 +35,6 @@ public class BattleContentManager : MonoBehaviour
         CreateRuntimeData();
     }
 
-
-    #region 시작 로직
     /// <summary>
     /// 베이스 런타임 데이터 생성하기
     /// </summary>
@@ -139,7 +134,7 @@ public class BattleContentManager : MonoBehaviour
     #endregion
 
 
-    #region 런타임 데이터 업데이트
+    #region 런타임 로직
     /// <summary>
     /// 칸토 데이터 업데이트
     /// </summary>
@@ -147,6 +142,28 @@ public class BattleContentManager : MonoBehaviour
     public void UpdataCantoData(int index, CantoRuntimeData data)
     {
         cantoRuntimeData[index] = data;
+    }
+
+    /// <summary>
+    /// 현재 선택된 스테이지 데이터 세팅 - 일단은 진입점을 위한 데이터를 받는 용도
+    /// </summary>
+    /// <param name="data"></param>
+    public void SelectedStage(StageData data)
+    {
+        selectedStageData = data;
+    }
+
+    public void StageEnter()
+    {
+        if(selectedStageData != null)
+        {
+            // 스테이지 진입
+            SceneLoadManager.LoadScene(selectedStageData);
+        }
+        else
+        {
+            Debug.Log("선택된 스테이지에 진입할 수 없습니다. / Null");
+        }
     }
     #endregion
 

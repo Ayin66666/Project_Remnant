@@ -34,6 +34,8 @@ public class OrganizationManager : MonoBehaviour
     [SerializeField] private GameObject selectUI;
     [SerializeField] private GameObject identityListUI;
     [SerializeField] private GameObject egoListUI;
+    [SerializeField] private GameObject stageInUI;
+    [SerializeField] private GameObject backgroundUI;
 
     [Header("---Component---")]
     [SerializeField] private SlotPooling pooling;
@@ -60,14 +62,48 @@ public class OrganizationManager : MonoBehaviour
     /// <param name="isStageIn">스테이지 선택 - 진입 전 편성창인지 여부 체크</param>
     public void OrganizationUI(bool isOn, bool isStageIn)
     {
-        if(isStageIn)
-        {
-            // 하단 UI 종료
-            MainSceneManager.instance.BottomUISetting(false);
-        }
+        // 하단 UI 종료
+        MainSceneManager.instance.BottomUISetting(isStageIn);
 
+        // 배경 UI 활성화
+        backgroundUI.SetActive(isStageIn);
+
+        // 스테이지 진입 UI 활성화
+        stageInUI.SetActive(isStageIn);
+
+        // 편성 UI 활성화 -> 이때 UI 레이아웃 이슈로 인해 스테이지 UI를 비활성화 하던가 해야할듯?
         organizationUI.SetActive(isOn);
     }
+
+
+    #region 스테이지 진입 전 편성창 버튼 로직
+    /// <summary>
+    /// 스테이지 진입 버튼 클릭 - 스테이지 진입 (SceneLoadManager)
+    /// </summary>
+    public void ClickStageEnter()
+    {
+        // 데이터 저장
+        GameManager.instance.saveDataManager.SaveData();
+
+        // 입력으로 인한 로직은 어디에? - 배틀 컨텐츠 매니저가 관리하는게 맞지 않나?
+        BattleContentManager.instance.StageEnter();
+
+    }
+
+    /// <summary>
+    /// 스테이지 진입 취소 버튼 클릭 - 스테이지 선택 UI
+    /// </summary>
+    public void ClickStageOut()
+    {
+        // 데이터 저장
+        GameManager.instance.saveDataManager.SaveData();
+
+        // 관련 UI 비활성화
+        BattleContentManager.instance.StageDescriptionUI(false);
+        OrganizationUI(false, false);
+    }
+    #endregion
+
 
     #region 인격
     /// <summary>

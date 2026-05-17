@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -11,7 +9,6 @@ public class TitleManager : MonoBehaviour
 
     [Header("---Setting---")]
     [SerializeField] private GameObject[] uiset;
-
 
     private void Update()
     {
@@ -41,12 +38,12 @@ public class TitleManager : MonoBehaviour
         if(true/*SaveData_Manager.CheckData()*/)
         {
             // 저장 데이터가 있다면 - 메인화면 이동
-            SceneLoadManager.LoadScene("Main_Scene", "임시 피난처");
+            SceneLoadManager.LoadScene(GameManager.instance.mainSceneData);
         }
         else
         {
             // 저장 데이터가 없다면 - 튜토리얼 이동
-            SceneLoadManager.LoadScene("Tutorial_Scene", "튜토리얼 \n- 엄지 산하 지부");
+            SceneLoadManager.LoadScene(GameManager.instance.tutorialData);
         }
     }
 

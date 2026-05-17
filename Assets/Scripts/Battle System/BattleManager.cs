@@ -200,7 +200,7 @@ public class BattleManager : MonoBehaviour
         yield return new WaitWhile(() => isUIEvent);
 
         // 씬 전환
-        SceneLoadManager.LoadScene("Main_Scene", "거점 기지");
+        SceneLoadManager.LoadScene(GameManager.instance.mainSceneData);
     }
     #endregion
 
