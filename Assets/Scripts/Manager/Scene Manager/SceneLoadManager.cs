@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Game.Stage;
 
 
 public class SceneLoadManager : MonoBehaviour
@@ -26,7 +27,7 @@ public class SceneLoadManager : MonoBehaviour
     public static void LoadScene(StageData data)
     {
         Debug.Log(data == null ? "null" : data);
-
+        Debug.Log(data.stageSO);
         // 데이터 세팅
         stageData = data;
 
@@ -38,7 +39,8 @@ public class SceneLoadManager : MonoBehaviour
     #region 씬 로직
     private void Start()
     {
-        if (loadCoroutine != null) StopCoroutine(loadCoroutine);
+        if (loadCoroutine != null) 
+            StopCoroutine(loadCoroutine);
         loadCoroutine = StartCoroutine(Load());
 
         SetUpUI();
@@ -53,7 +55,18 @@ public class SceneLoadManager : MonoBehaviour
     private IEnumerator Load()
     {
         // 로딩 로직
-        AsyncOperation operation = SceneManager.LoadSceneAsync(stageData.stageSO.SceneName);
+        string sceneName = string.Empty;
+        switch (stageData.stageSO.StageType)
+        {
+            case StageType.Main:
+                sceneName = "Main_Scene";
+                break;
+            case StageType.Battle:
+                sceneName = "BattleScene";
+                break;
+        }
+
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
         operation.allowSceneActivation = false;
         while (!operation.isDone)
         {

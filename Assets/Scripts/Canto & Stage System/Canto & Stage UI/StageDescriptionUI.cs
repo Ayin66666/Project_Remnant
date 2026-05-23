@@ -149,7 +149,11 @@ public class StageDescriptionUI : MonoBehaviour
     public void ClickOut()
     {
         Debug.Log("설명 종료");
+        // UI 종료
         BattleContentManager.instance.StageDescriptionUI(false);
+
+        // 데이터 초기화
+        BattleContentManager.instance.SelectedStage(null);
     }
     #endregion
 }

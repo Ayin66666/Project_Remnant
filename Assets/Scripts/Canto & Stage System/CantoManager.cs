@@ -29,7 +29,7 @@ public class CantoManager : MonoBehaviour
         // 스테이지 슬롯에 데이터 전달
         for (int i = 0; i < data.stageData.Count; i++)
         {
-            Debug.Log("call stage node set");
+            Debug.Log($"스테이지 노드 데이터 전달 / {data.stageData[i].stageSO}");
             stageNodes[i].SetUp(data.stageData[i]);
         }
 

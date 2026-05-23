@@ -17,22 +17,20 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private List<SpawnPoint> spawnPoints;
 
     [Header("---Background---")]
-    [SerializeField] private GameObject wallPrefab;
-    [SerializeField] private RectTransform wallRect;
     [SerializeField] private SpriteRenderer floor;
+    [SerializeField] private GameObject wallPrefab;
+    [SerializeField] private Transform wallRect;
     [SerializeField] private List<GameObject> wall;
 
-    [Header("---Post Processing---")]
+    [Header("---Component---")]
     [SerializeField] private Volume postprocessing;
-
-    [Header("---Audio---")]
     [SerializeField] private AudioSource audioSource;
 
     [Header("---UI---")]
     [SerializeField] private bool isUIEvent;
+    [SerializeField] private CanvasGroup fadeUI;
     [SerializeField] private List<CanvasGroup> startUI;
     [SerializeField] private List<GameObject> clearUI;
-    [SerializeField] private CanvasGroup fadeUI;
 
 
     #region 시작 로직
@@ -90,12 +88,15 @@ public class BattleManager : MonoBehaviour
     public void StageSetting(int phase)
     {
         // 초기화
+        Debug.Log("초기화");
         floor.sprite = null;
         wall.Clear();
 
-        // UI 배치
+        // 맵 배치
+        floor.sprite = stageSO.PhaseDataList[phase].floor;
         if (stageSO.PhaseDataList[phase].haveChageableBackground)
         {
+            Debug.Log("맵 배치");
             floor.sprite = stageSO.PhaseDataList[phase].floor;
             for (int i = 0; i < wall.Count; i++)
             {
@@ -109,6 +110,7 @@ public class BattleManager : MonoBehaviour
         // 포스트 프로세싱 세팅
         if (stageSO.PhaseDataList[phase].postProcessingProfile != null)
         {
+            Debug.Log("포스트 프로세싱 세팅");
             postprocessing.profile = stageSO.PhaseDataList[phase].postProcessingProfile;
         }
     }

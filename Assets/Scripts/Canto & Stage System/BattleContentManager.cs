@@ -40,12 +40,15 @@ public class BattleContentManager : MonoBehaviour
     /// </summary>
     private void CreateRuntimeData()
     {
+        selectedStageData = null;
+
         // 런타임 칸토 데이터 생성
         cantoRuntimeData = new Dictionary<int, CantoRuntimeData>(cantoDatabaseSO.CantoData.Count);
         for (int i = 0; i < cantoDatabaseSO.CantoData.Count; i++)
         {
             CantoRuntimeData cantoData = new CantoRuntimeData(cantoDatabaseSO.CantoData[i]);
             cantoRuntimeData.Add(cantoData.cantoData.CantoId, cantoData);
+            Debug.Log($"스테이지 데이터 입력 {cantoData.cantoData.CantoId} / {cantoData}");
             cantoManagers[i].SetUp(cantoData);
         }
     }
@@ -153,17 +156,26 @@ public class BattleContentManager : MonoBehaviour
         selectedStageData = data;
     }
 
+    /// <summary>
+    /// 입장 버튼 클릭 - 선택된 스테이지 진입
+    /// </summary>
     public void StageEnter()
     {
-        if(selectedStageData != null)
+        if (selectedStageData.stageSO == null)
         {
-            // 스테이지 진입
-            SceneLoadManager.LoadScene(selectedStageData);
+            Debug.Log("스테이지 진입 불가 / SO null");
+            return;
         }
-        else
+
+        if(!selectedStageData.canEnter)
         {
-            Debug.Log("선택된 스테이지에 진입할 수 없습니다. / Null");
+            Debug.Log("스테이지 진입 불가 / 진입 조건 미충족");
+            return;
         }
+
+        // 스테이지 진입
+        Debug.Log($"선택된 스테이지 진입 / {selectedStageData.stageSO}");
+        SceneLoadManager.LoadScene(selectedStageData);
     }
     #endregion
 

@@ -14,9 +14,9 @@ namespace Game.Stage
         /// </summary>>
         [SerializeField] private int stageId;
         /// <summary>
-        /// 진입할 씬의 이름
+        /// 진입할 스테이지의 타입 (메인, 배틀, 튜토리얼)
         /// </summary>
-        [SerializeField] private string sceneName;
+        [SerializeField] private StageType stageType;
         /// <summary>
         /// 스테이지 이름
         /// </summary>
@@ -58,7 +58,7 @@ namespace Game.Stage
 
         #region 프로퍼티
         public int Stageid => stageId;
-        public string SceneName => sceneName;
+        public StageType StageType => stageType;
         public string StageName => stageName;
         public int StageLevel => stageLevel;
         public List<AttackType> ValidAttack => validAttack;
@@ -123,25 +123,32 @@ namespace Game.Stage
 
 
     #region Public Enum
+    public enum StageType
+    {
+        Main,
+        Battle,
+        Tutorial
+    }
+
     /// <summary>
     /// Ex 클리어를 위한 조건 enum
     /// </summary>
-    public enum ExClear 
-    { 
-        StageClear, 
-        TurnLimit, 
-        NoDied 
+    public enum ExClear
+    {
+        StageClear,
+        TurnLimit,
+        NoDied
     }
 
     /// <summary>
     /// 스테이지 진입 전 제한 조건
     /// </summary>
-    public enum StageLimit 
-    { 
-        None, 
-        MustUse, 
-        CantUse, 
-        OrganizationLimit 
+    public enum StageLimit
+    {
+        None,
+        MustUse,
+        CantUse,
+        OrganizationLimit
     }
 
     /// <summary>
