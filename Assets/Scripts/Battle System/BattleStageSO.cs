@@ -8,7 +8,11 @@ public class BattleStageSO : ScriptableObject
 {
     [Header("---Setting---")]
     [SerializeField] private StageType stageType;
-    [SerializeField] private List<PhaseData> phaseData;
+    [SerializeField] private List<PhaseData> phaseDatajList;
+
+    public StageType Type => stageType;
+    public List<PhaseData> PhaseDataList => phaseDatajList;
+
 
     public enum StageType
     {
@@ -31,7 +35,7 @@ public class BattleStageSO : ScriptableObject
         public List<BattleStageEventSO> eventList;
 
         [Header("---Enemy Data---")]
-        public List<SpawnData> enemies;
+        public List<SpawnData> spwanDataList;
 
         [Header("---Post Processing---")]
         public VolumeProfile postProcessingProfile;
@@ -43,27 +47,23 @@ public class BattleStageSO : ScriptableObject
         public List<Sprite> background;
         public AudioClip phaseBgm;
     }
-
-    public StageType Type => stageType;
-    public List<PhaseData> PhaseDataList => phaseData;
 }
+
 
 [System.Serializable]
 public class SpawnData
 {
-    /* 일단 제거
+    [Header("---Enemy Data---")]
+    public SpawnType spawnType;
+    public int spawnNum;
+    public int level;
+    public EnemyMasterSO enemy;
+
     public enum SpawnType
     {
         Random,
         Fixed
     }
-    public SpawnType spawnType;
-    */
-
-    [Header("---Enemy Data---")]
-    public int spawnNum;
-    public int level;
-    public EnemyMasterSO enemy;
 }
 
 

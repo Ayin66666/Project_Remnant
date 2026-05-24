@@ -4,17 +4,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Game.Character;
+using TMPro;
 
 
 public class BattleManager : MonoBehaviour
 {
     public static BattleManager instance;
 
+    [Header("---Battle Setting---")]
+    [SerializeField] private Phase curPhase;
+    public enum Phase { StageStart, Select, Battle, Event, StageEnd }
+
     [Header("---Stage Setting---")]
-    [SerializeField] private int curPhase;
+    [SerializeField] private int waveNum;
     [SerializeField] private BattleStageSO stageSO;
     [SerializeField] private List<WaveRuntimeData> spawnDatas;
     [SerializeField] private List<SpawnPoint> spawnPoints;
+    private Coroutine logicCoroutine;
+    private Coroutine uiCoroutine;
 
     [Header("---Background---")]
     [SerializeField] private SpriteRenderer floor;
@@ -29,8 +36,12 @@ public class BattleManager : MonoBehaviour
     [Header("---UI---")]
     [SerializeField] private bool isUIEvent;
     [SerializeField] private CanvasGroup fadeUI;
-    [SerializeField] private List<CanvasGroup> startUI;
-    [SerializeField] private List<GameObject> clearUI;
+    [SerializeField] private CanvasGroup bossUI;
+    [SerializeField] private CanvasGroup waveUI;
+    [SerializeField] private TextMeshProUGUI waveText;
+    [SerializeField] private CanvasGroup turnUI;
+    [SerializeField] private TextMeshProUGUI turnText;
+    [SerializeField] private CanvasGroup clearUI;
 
 
     #region 시작 로직
@@ -61,20 +72,59 @@ public class BattleManager : MonoBehaviour
         // so 데이터 기반 런타임 데이터 생성
         for (int i = 0; i < stageSO.PhaseDataList.Count; i++)
         {
-            // 데이터 생성
-            WaveRuntimeData runtimeData = new WaveRuntimeData(stageSO.PhaseDataList[i]);
+            // 페이즈 별 몬스터 List 데이터 생성
+            List<CharacterBase> enemyList = new List<CharacterBase>();
+            for (int j = 0; j < stageSO.PhaseDataList[i].spwanDataList.Count; j++)
+            {
+                // 몬스터 생성
+                SpawnData spawnData = stageSO.PhaseDataList[i].spwanDataList[j];
+                GameObject enemy = Instantiate(spawnData.enemy.prefab);
+
+                // 몬스터에 데이터 삽입
+                CharacterBase enemyBase = enemy.GetComponent<CharacterBase>();
+                enemyBase.SetUp(spawnData.enemy.statData, spawnData.level, 1);
+
+                // 리스트에 추가
+                enemyList.Add(enemyBase);
+            }
+
+            // 런타임 데이터 생성
+            WaveRuntimeData runtimeData = new WaveRuntimeData(enemyList);
             spawnDatas.Add(runtimeData);
         }
 
-        // 전투 시작 UI
-        if (true)
-        {
-            // 1. 특수연출이라면
-        }
-        else
-        {
-            // 2. 일반전이라면
-        }
+        // 시작 UI & 이벤트 & 전투 진입 로직 호출
+        if (logicCoroutine != null) StopCoroutine(logicCoroutine);
+        logicCoroutine = StartCoroutine(StageStart());
+    }
+
+    /// <summary>
+    /// 스테이지 시작 시 연출 제어 로직 
+    /// (페이드 아웃 -> 시작 UI -> 시작 이벤트 -> 전투 진입 순)
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator StageStart()
+    {
+        curPhase = Phase.StageStart;
+
+        // 0. 페이드 아웃
+        if (uiCoroutine != null) StopCoroutine(uiCoroutine);
+        uiCoroutine = StartCoroutine(Fade(true));
+
+        yield return new WaitWhile(() => isUIEvent);
+
+        // 1. 시작 UI 동작 (스테이지 타입에 따른 일반 & 보스전 UI 연출)
+        if (uiCoroutine != null) StopCoroutine(uiCoroutine);
+        uiCoroutine = StartCoroutine(stageSO.Type == BattleStageSO.StageType.Normal
+            ? WaveUI() : BossUI());
+
+        // 이벤트 대기
+        yield return new WaitWhile(() => isUIEvent);
+
+        // 2. 시작 이벤트
+        // 일단 없다 가정 
+
+        // 3. 전투 로직 시작
     }
     #endregion
 
@@ -85,7 +135,7 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     /// <param name="so"></param>
     /// <param name="phase"></param>
-    public void StageSetting(int phase)
+    private void StageSetting(int phase)
     {
         // 초기화
         Debug.Log("초기화");
@@ -119,7 +169,7 @@ public class BattleManager : MonoBehaviour
     /// 스테이지 BGM 세팅
     /// </summary>
     /// <param name="index"></param>
-    public void BGMSetting(int index)
+    private void BGMSetting(int index)
     {
         if (stageSO.PhaseDataList[index].phaseBgm == null)
         {
@@ -136,58 +186,13 @@ public class BattleManager : MonoBehaviour
     /// 소환 로직 구현 중 -> 일단 기본적인건 만들었고 페이즈 체크 기능 필요!
     /// </summary>
     /// <param name="phase"></param>
-    public void EnemySpawn()
+    private void EnemySpawn()
     {
         // 해당 페이즈의 몬스터 소환
         // -> 만약 남은 몬스터가 없다면 다음 페이즈로 전환
+        // 1. 웨이브 체크 (남은 웨이브가 있는가?)
+        // 2. 몬스터 소환
 
-        if (spawnDatas[curPhase].currentCount < spawnDatas[curPhase].totalCount)
-        {
-            // 소환해야 하는 몬스터 수 체크
-            int spawnCount = 0;
-            foreach (SpawnPoint point in spawnPoints)
-            {
-                if (point.character == null)
-                    spawnCount++;
-            }
-
-            // 몬스터 소환
-            for (int i = 0; i < spawnCount; i++)
-            {
-                // 소환 위치 설정
-                SpawnPoint spawn = spawnPoints.FirstOrDefault(x => x.character == null);
-
-                // 몬스터 배치 -> IdentityMasterSO에서 EnemyMasterSO로 변경했음으로 새로 구현 필요
-                /*
-                CharacterBase enemy = spawnDatas[curPhase].enemyList[spawnDatas[curPhase].currentCount];
-                spawn.character = enemy;
-                enemy.transform.position = spawn.spawnPos.position;
-                enemy.SetUp();
-                enemy.gameObject.SetActive(true);
-                */
-                // 소환된 몬스터 수 업데이트
-                spawnDatas[curPhase].currentCount++;
-            }
-        }
-        else
-        {
-            // 다음 페이즈가 있는지 체크
-            if (curPhase + 1 >= stageSO.PhaseDataList.Count)
-            {
-                // 스테이지 클리어
-                // 일단은 디버그만 찍지만, 실제로는 UI 표시 후 이벤트 체크, 스테이지에서 나가는 로직 필요
-                Debug.Log("스테이지 클리어!");
-            }
-            else
-            {
-                // 다음 페이즈로 전환
-                curPhase++;
-
-                StageSetting(curPhase);
-                BGMSetting(curPhase);
-            }
-
-        }
     }
 
     /// <summary>
@@ -208,48 +213,114 @@ public class BattleManager : MonoBehaviour
 
 
     #region 전투 시스템 로직
+    /// <summary>
+    /// 플레이어의 스킬 & 대상 선택 턴
+    /// </summary>
+    public void SelectPhase()
+    {
+
+    }
+
+    /// <summary>
+    /// 전투 턴
+    /// </summary>
+    public void BattlePhase()
+    {
+
+    }
     #endregion
 
 
     #region UI 로직
     /// <summary>
-    /// 시작 타입에 따른 UI 연출 변경
+    /// 화면 페이드 효과
     /// </summary>
-    /// <param name="startType"></param>
+    /// <param name="isOn"></param>
     /// <returns></returns>
-    public IEnumerator StartUI(int startType)
+    private IEnumerator Fade(bool isOn)
     {
         isUIEvent = true;
 
-        // 페이드
         fadeUI.gameObject.SetActive(true);
-        fadeUI.alpha = 1f;
+
+        float start = isOn ? 0f : 1f;
+        float end = isOn ? 1f : 0f;
+        float timer = 0f;
+        fadeUI.alpha = start;
+        while (timer < 1f)
+        {
+            timer += Time.deltaTime;
+            fadeUI.alpha = Mathf.Lerp(timer, start, end);
+            yield return null;
+        }
+        fadeUI.alpha = end;
+
+        if (!isOn)
+            fadeUI.gameObject.SetActive(false);
+
+        isUIEvent = false;
+    }
+
+    /// <summary>
+    /// 웨이브 표시 UI - 전투 시작 & 웨이브 변경 시 호출
+    /// </summary>
+    /// <param name="waveNum"></param>
+    /// <returns></returns>
+    private IEnumerator WaveUI()
+    {
+        isUIEvent = true;
+
+        // UI 세팅
+        waveText.text = $"WAVE {waveNum}";
+        waveUI.gameObject.SetActive(true);
+
+        // 페이드 인
+        float timer = 0;
+        while (timer < 1f)
+        {
+            timer += Time.deltaTime;
+            waveUI.alpha = Mathf.Lerp(0f, 1f, timer);
+            yield return null;
+        }
+        timer = 0;
 
         // 대기
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.75f);
 
-        // 페이드 종료
-        float timer = 0f;
-        while (timer < 1)
+        // 페이드 아웃
+        while (timer < 1f)
         {
             timer += Time.deltaTime;
-            fadeUI.alpha = Mathf.Lerp(1f, 0f, timer);
+            waveUI.alpha = Mathf.Lerp(1f, 0f, timer);
             yield return null;
         }
-        fadeUI.alpha = 1;
 
-        // 시작 UI
-        startUI[startType].gameObject.SetActive(true);
+        waveUI.gameObject.SetActive(false);
+        isUIEvent = false;
+    }
 
-        // 시작 UI 종료
-        while(timer < 1f)
+    /// <summary>
+    /// 보스전 시작 시 호출 - 특수 연출
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator BossUI()
+    {
+        isUIEvent = true;
+
+        // UI 표시
+        bossUI.gameObject.SetActive(true);
+
+        // 대기
+        yield return new WaitForSeconds(1f);
+
+        // 페이드 아웃
+        float tiemr = 0;
+        while (tiemr < 1f)
         {
-            timer += Time.deltaTime;
-            startUI[startType].alpha = Mathf.Lerp(1f, 0f, timer);
+            tiemr += Time.deltaTime;
+            bossUI.alpha = Mathf.Lerp(1f, 0f, tiemr);
             yield return null;
         }
-        fadeUI.alpha = 0;
-        startUI[startType].gameObject.SetActive(false);
 
         isUIEvent = false;
     }
@@ -266,18 +337,20 @@ public class BattleManager : MonoBehaviour
     {
         isUIEvent = true;
 
-        clearUI[clearType].SetActive(true);
-        yield return new WaitForSeconds(0.5f);
+        // 페이드 인
+        clearUI.gameObject.SetActive(true);
 
-        fadeUI.gameObject.SetActive(true);
-        float timer = 0f;
+        // 대기
+        yield return new WaitForSeconds(1f);
+
+        // 페이드 아웃
+        float timer = 0;
         while (timer < 1f)
         {
             timer += Time.deltaTime;
-            fadeUI.alpha = Mathf.Lerp(0f, 1f, timer);
+            clearUI.alpha = Mathf.Lerp(1f, 0f, timer);
             yield return null;
         }
-        fadeUI.alpha = 1f;
 
         isUIEvent = false;
     }
@@ -299,27 +372,17 @@ public class BattleManager : MonoBehaviour
         /// <summary>
         /// 몬스터 오브젝트 리스트
         /// </summary>
-        public List<EnemyMasterSO> enemyList;
+        public List<CharacterBase> enemyList;
 
         /// <summary>
         /// 생성자
         /// </summary>
         /// <param name="so"></param>
-        public WaveRuntimeData(BattleStageSO.PhaseData so)
+        public WaveRuntimeData( List<CharacterBase> enemyList)
         {
-            // 몬스터 수 세팅
-            totalCount = so.enemies.Count;
+            totalCount = enemyList.Count;
             currentCount = 0;
-
-            // 몬스터 소환 후 리스트 채우기
-            enemyList = new List<EnemyMasterSO>();
-            for (int i = 0; i < so.enemies.Count; i++)
-            {
-                for (int j = 0; j < so.enemies[i].spawnNum; j++)
-                {
-                    // 새로 구현 필요
-                }
-            }
+            this.enemyList = enemyList;
         }
     }
 
