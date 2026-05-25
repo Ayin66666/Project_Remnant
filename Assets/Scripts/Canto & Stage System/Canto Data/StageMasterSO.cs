@@ -47,14 +47,13 @@ namespace Game.Stage
         /// </summary>
         [SerializeField] private ExClearCondition exClearCondition;
         /// <summary>
-        /// 등장 적 데이터
+        /// 등장 적 프리뷰 데이터 - 스테이지 선택 시 초상화로 보여줄 등장 적 데이터
         /// </summary>
-        [SerializeField] private List<EnemyMasterSO> enemyData;
+        [SerializeField] private List<EnemyMasterSO> previewEnemies;
         /// <summary>
-        /// 웨이브 데이터
+        /// 인게임 전투 스테이지의 배치 및 몬스터 데이터 SO
         /// </summary>
-        [SerializeField] private List<EnemyWaveData> enemyWaveData;
-
+        [SerializeField] private BattleStageSO battleStageSO;
 
         #region 프로퍼티
         public int Stageid => stageId;
@@ -67,8 +66,9 @@ namespace Game.Stage
         public Sprite StageSprite => stageImage;
         public ExClearCondition ExClearCondition => exClearCondition;
         public List<StageLimitData> LimitData => limitData;
-        public List<EnemyMasterSO> EnemyData => enemyData;
-        public List<EnemyWaveData> EnemyWaveData => enemyWaveData;
+        public List<EnemyMasterSO> EnemyData => previewEnemies;
+        public BattleStageSO BattleStageSO => battleStageSO;
+
         #endregion
     }
 
@@ -103,21 +103,6 @@ namespace Game.Stage
         /// 가용 가능 수감자 수
         /// </summary>
         public int count;
-    }
-
-    /// <summary>
-    /// 스테이지 내 적 소환 웨이브 데이터
-    /// </summary>
-    public class EnemyWaveData
-    {
-        /// <summary>
-        /// 개발자용 & 웨이브 이름 작성용 변수
-        /// </summary>
-        [SerializeField] private string waveName;
-        /// <summary>
-        /// 적 리스트
-        /// </summary>
-        public List<IdentityMasterSO> enemyList;
     }
     #endregion
 

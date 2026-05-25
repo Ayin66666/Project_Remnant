@@ -97,7 +97,7 @@ public class DataLoader : MonoBehaviour
     /// </summary>
     private void LoadStageData()
     {
-        cantoSO = Resources.Load<CantoDatabaseSO>("Canto/CantoDatabase");
+        cantoSO = Resources.Load<CantoDatabaseSO>("Canto & Main/CantoDatabase");
         if (cantoSO == null)
         {
             Debug.LogError("칸토 SO 로드 실패!");

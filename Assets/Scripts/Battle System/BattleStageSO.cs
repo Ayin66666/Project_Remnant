@@ -8,10 +8,10 @@ public class BattleStageSO : ScriptableObject
 {
     [Header("---Setting---")]
     [SerializeField] private StageType stageType;
-    [SerializeField] private List<PhaseData> phaseDatajList;
+    [SerializeField] private List<PhaseData> phaseDataList;
 
     public StageType Type => stageType;
-    public List<PhaseData> PhaseDataList => phaseDatajList;
+    public List<PhaseData> PhaseDataList => phaseDataList;
 
 
     public enum StageType
@@ -54,16 +54,8 @@ public class BattleStageSO : ScriptableObject
 public class SpawnData
 {
     [Header("---Enemy Data---")]
-    public SpawnType spawnType;
-    public int spawnNum;
     public int level;
     public EnemyMasterSO enemy;
-
-    public enum SpawnType
-    {
-        Random,
-        Fixed
-    }
 }
 
 

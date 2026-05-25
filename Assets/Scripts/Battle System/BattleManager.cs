@@ -1,10 +1,8 @@
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Game.Character;
-using TMPro;
 
 
 public class BattleManager : MonoBehaviour
@@ -13,12 +11,13 @@ public class BattleManager : MonoBehaviour
 
     [Header("---Battle Setting---")]
     [SerializeField] private Phase curPhase;
+
     public enum Phase { StageStart, Select, Battle, Event, StageEnd }
 
     [Header("---Stage Setting---")]
     [SerializeField] private int waveNum;
     [SerializeField] private BattleStageSO stageSO;
-    [SerializeField] private List<WaveRuntimeData> spawnDatas;
+    [SerializeField] private List<WaveRuntimeData> waveRuntimeDataList;
     [SerializeField] private List<SpawnPoint> spawnPoints;
     private Coroutine logicCoroutine;
     private Coroutine uiCoroutine;
@@ -57,11 +56,17 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        SetUp(SceneLoadManager.stageData.stageSO.BattleStageSO);
+    }
+
     /// <summary>
     /// 스테이지 데이터를 받아서 맵 & 몬스터 세팅
     /// </summary>
     public void SetUp(BattleStageSO so)
     {
+        Debug.Log($"스테이지 세팅 / SO / {so}");
         // 데이터 세팅
         stageSO = so;
 
@@ -90,7 +95,7 @@ public class BattleManager : MonoBehaviour
 
             // 런타임 데이터 생성
             WaveRuntimeData runtimeData = new WaveRuntimeData(enemyList);
-            spawnDatas.Add(runtimeData);
+            waveRuntimeDataList.Add(runtimeData);
         }
 
         // 시작 UI & 이벤트 & 전투 진입 로직 호출
@@ -106,20 +111,24 @@ public class BattleManager : MonoBehaviour
     private IEnumerator StageStart()
     {
         curPhase = Phase.StageStart;
+        Debug.Log("스테이지 시작 연출 동작");
 
-        // 0. 페이드 아웃
-        if (uiCoroutine != null) StopCoroutine(uiCoroutine);
-        uiCoroutine = StartCoroutine(Fade(true));
-
-        yield return new WaitWhile(() => isUIEvent);
+        // 0. 페이드 아웃 -> 일반 스테이지에서만
+        if (stageSO.Type == BattleStageSO.StageType.Normal)
+        {
+            if (uiCoroutine != null) StopCoroutine(uiCoroutine);
+            uiCoroutine = StartCoroutine(Fade(false));
+            yield return new WaitWhile(() => isUIEvent);
+            Debug.Log("페이드 아웃 종료");
+        }
 
         // 1. 시작 UI 동작 (스테이지 타입에 따른 일반 & 보스전 UI 연출)
         if (uiCoroutine != null) StopCoroutine(uiCoroutine);
         uiCoroutine = StartCoroutine(stageSO.Type == BattleStageSO.StageType.Normal
             ? WaveUI() : BossUI());
-
-        // 이벤트 대기
         yield return new WaitWhile(() => isUIEvent);
+        Debug.Log("웨이브 종료");
+
 
         // 2. 시작 이벤트
         // 일단 없다 가정 
@@ -143,6 +152,7 @@ public class BattleManager : MonoBehaviour
         wall.Clear();
 
         // 맵 배치
+        Debug.Log($"바닥 {stageSO.PhaseDataList[phase]}");
         floor.sprite = stageSO.PhaseDataList[phase].floor;
         if (stageSO.PhaseDataList[phase].haveChageableBackground)
         {
@@ -212,21 +222,17 @@ public class BattleManager : MonoBehaviour
     #endregion
 
 
-    #region 전투 시스템 로직
-    /// <summary>
-    /// 플레이어의 스킬 & 대상 선택 턴
-    /// </summary>
-    public void SelectPhase()
+    #region 플로우 로직
+    public IEnumerator BattleLoop()
     {
+        // 0. 턴 시작 이벤트 체크
+        yield return new WaitWhile();
+        // 1. 플레이어 선택
 
-    }
+        // 2. 합 진행
 
-    /// <summary>
-    /// 전투 턴
-    /// </summary>
-    public void BattlePhase()
-    {
-
+        // 3. 이벤트 체크 (전투 종료 포함)
+        yield return null;
     }
     #endregion
 
@@ -250,7 +256,7 @@ public class BattleManager : MonoBehaviour
         while (timer < 1f)
         {
             timer += Time.deltaTime;
-            fadeUI.alpha = Mathf.Lerp(timer, start, end);
+            fadeUI.alpha = Mathf.Lerp(start, end, timer);
             yield return null;
         }
         fadeUI.alpha = end;
