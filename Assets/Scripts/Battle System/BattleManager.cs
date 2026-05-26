@@ -19,7 +19,8 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private BattleStageSO stageSO;
     [SerializeField] private List<WaveRuntimeData> waveRuntimeDataList;
     [SerializeField] private List<SpawnPoint> spawnPoints;
-    private Coroutine logicCoroutine;
+    private Coroutine battleLoopCoroutine;
+    private Coroutine crashCoroutine;
     private Coroutine uiCoroutine;
 
     [Header("---Background---")]
@@ -99,8 +100,8 @@ public class BattleManager : MonoBehaviour
         }
 
         // 시작 UI & 이벤트 & 전투 진입 로직 호출
-        if (logicCoroutine != null) StopCoroutine(logicCoroutine);
-        logicCoroutine = StartCoroutine(StageStart());
+        if (battleLoopCoroutine != null) StopCoroutine(battleLoopCoroutine);
+        battleLoopCoroutine = StartCoroutine(StageStart());
     }
 
     /// <summary>
@@ -226,13 +227,25 @@ public class BattleManager : MonoBehaviour
     public IEnumerator BattleLoop()
     {
         // 0. 턴 시작 이벤트 체크
-        yield return new WaitWhile();
+
         // 1. 플레이어 선택
+        yield return new WaitWhile(()=> curPhase == Phase.Select);
 
         // 2. 합 진행
+        yield return new WaitWhile(() => crashCoroutine != null);
 
         // 3. 이벤트 체크 (전투 종료 포함)
-        yield return null;
+    }
+
+    private IEnumerator BattleLogic()
+    {
+        // 공격 리스트가 모두 종료될때까지 반복
+        while(true)
+        {
+            yield return null;
+        }
+
+        crashCoroutine = null;
     }
     #endregion
 
@@ -397,6 +410,27 @@ public class BattleManager : MonoBehaviour
     {
         public CharacterBase character;
         public Transform spawnPos;
+    }
+
+    public class AttackData
+    {
+        // 공격 타입
+        // 공격 캐릭터들
+        // 공격 종류 -> 이거 구조체나 딕셔너리로?
+
+        public ClashType clashType;
+        public List<AttackAction> attackAction;
+
+        [System.Serializable]
+        public class AttackAction
+        {
+            public CharacterBase attacker;
+            public SkillBase skill;
+            public CharacterBase mainTarget;
+            public List<CharacterBase> targetList;
+        }
+
+        public enum ClashType { OneSided, Clash }
     }
     #endregion
 }
