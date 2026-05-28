@@ -4,12 +4,12 @@ using UnityEngine.UI;
 using TMPro;
 
 
-public class AttackSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("---state---")]
     [SerializeField] private bool haveSkill;
     [SerializeField] private SkillBase skill;
-    [SerializeField] private AttackSlot targetSlot;
+    [SerializeField] private SkillSlot targetSlot;
 
     [Header("---UI---")]
     [SerializeField] private Image icon;

@@ -24,7 +24,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
 
     [Header("------")]
-    [SerializeField] protected AttackSlot[] attackSlots;
+    [SerializeField] protected SkillSlot[] attackSlots;
 
 
     [Header("---Status Effect---")]

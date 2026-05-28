@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -11,6 +12,14 @@ public class BattleManager : MonoBehaviour
 
     [Header("---Battle Setting---")]
     [SerializeField] private Phase curPhase;
+    /// <summary>
+    /// 몬스터의 공격 데이터 원본 (합 해제 시 돌아갈 데이터)
+    /// </summary>
+    [SerializeField] private List<AttackData> originalEnemyAction;
+    /// <summary>
+    /// 플레이어의 합 & 일방 공격으로 인한 최종 공격 데이터
+    /// </summary>
+    [SerializeField] private List<AttackData> attackData;
 
     public enum Phase { StageStart, Select, Battle, Event, StageEnd }
 
@@ -223,29 +232,50 @@ public class BattleManager : MonoBehaviour
     #endregion
 
 
-    #region 플로우 로직
+    #region 전투 로직
     public IEnumerator BattleLoop()
     {
         // 0. 턴 시작 이벤트 체크
 
-        // 1. 플레이어 선택
-        yield return new WaitWhile(()=> curPhase == Phase.Select);
-
-        // 2. 합 진행
-        yield return new WaitWhile(() => crashCoroutine != null);
-
-        // 3. 이벤트 체크 (전투 종료 포함)
-    }
-
-    private IEnumerator BattleLogic()
-    {
-        // 공격 리스트가 모두 종료될때까지 반복
+        // 해당 코루틴은 스테이지 종료까지 반복
         while(true)
         {
-            yield return null;
+            // 1. 플레이어 선택
+            SetEnemyAttack();
+            yield return new WaitWhile(() => curPhase == Phase.Select);
+
+            // 2. 합 진행
+            yield return new WaitWhile(() => crashCoroutine != null);
+
+            // 3. 이벤트 체크 (전투 종료 포함)
         }
 
-        crashCoroutine = null;
+        // 4. 스테이지 종료 이벤트
+
+        // 5. 스테이지 종료
+    }
+
+    /// <summary>
+    /// 몬스터의 공격 설정
+    /// </summary>
+    private void SetEnemyAttack()
+    {
+
+    }
+
+    /// <summary>
+    /// 공격 추가
+    /// </summary>
+    public void AddAttack(AttackData addData)
+    {
+        // 이 슬롯이 이미 내 슬롯을 공격하는 중인지 체크
+        AttackData data = attackData
+            .Where(x => x.actionList[0].mainTarget == addData.actionList[0].owner
+            && x.actionList[0].slot == addData.actionList[0].slot
+            && x.speed < addData.speed)
+            .FirstOrDefault();
+
+
     }
     #endregion
 
@@ -380,6 +410,7 @@ public class BattleManager : MonoBehaviour
     [System.Serializable]
     public class WaveRuntimeData
     {
+        [Header("---Runtime Wave Data---")]
         /// <summary>
         /// 총 몬스터 수
         /// </summary>
@@ -408,29 +439,30 @@ public class BattleManager : MonoBehaviour
     [System.Serializable]
     public class SpawnPoint
     {
+        [Header("---Spawn Data---")]
         public CharacterBase character;
         public Transform spawnPos;
     }
 
+    [System.Serializable]
     public class AttackData
     {
-        // 공격 타입
-        // 공격 캐릭터들
-        // 공격 종류 -> 이거 구조체나 딕셔너리로?
-
+        [Header("---Setting---")]
         public ClashType clashType;
-        public List<AttackAction> attackAction;
-
-        [System.Serializable]
-        public class AttackAction
-        {
-            public CharacterBase attacker;
-            public SkillBase skill;
-            public CharacterBase mainTarget;
-            public List<CharacterBase> targetList;
-        }
-
+        public int speed;
+        public List<ActionData> actionList;
         public enum ClashType { OneSided, Clash }
+    }
+
+    [System.Serializable]
+    public class ActionData
+    {
+        [Header("---Action Data---")]
+        public CharacterBase owner;
+        public SkillSlot slot;
+        public SkillBase skill;
+        public CharacterBase mainTarget;
+        public List<CharacterBase> targetList;
     }
     #endregion
 }
