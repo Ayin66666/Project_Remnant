@@ -15,11 +15,11 @@ public class BattleManager : MonoBehaviour
     /// <summary>
     /// 몬스터의 공격 데이터 원본 (합 해제 시 돌아갈 데이터)
     /// </summary>
-    [SerializeField] private List<AttackData> originalEnemyAction;
+    [SerializeField] private List<BattleActionData> originalEnemyAction;
     /// <summary>
     /// 플레이어의 합 & 일방 공격으로 인한 최종 공격 데이터
     /// </summary>
-    [SerializeField] private List<AttackData> attackData;
+    [SerializeField] private List<BattleActionData> attackData;
 
     public enum Phase { StageStart, Select, Battle, Event, StageEnd }
 
@@ -238,7 +238,7 @@ public class BattleManager : MonoBehaviour
         // 0. 턴 시작 이벤트 체크
 
         // 해당 코루틴은 스테이지 종료까지 반복
-        while(true)
+        while (true)
         {
             // 1. 플레이어 선택
             SetEnemyAttack();
@@ -266,17 +266,112 @@ public class BattleManager : MonoBehaviour
     /// <summary>
     /// 공격 추가
     /// </summary>
-    public void AddAttack(AttackData addData)
+    public void AddAttack(AttackRequest request)
     {
-        // 이 슬롯이 이미 내 슬롯을 공격하는 중인지 체크
-        AttackData data = attackData
-            .Where(x => x.actionList[0].mainTarget == addData.actionList[0].owner
-            && x.actionList[0].slot == addData.actionList[0].slot
-            && x.speed < addData.speed)
-            .FirstOrDefault();
+        // 0. 내가 공격하고자 하는 슬롯에 공격 데이터가 있는지 체크
+        BattleActionData targetAction =
+            attackData.FirstOrDefault(x => 
+            x.attacker.character == request.target &&
+            x.attacker.slot == request.targetSlot);
 
+        // 해당 슬롯이 공격 행동이 없는 빈 슬롯이라면
+        if (targetAction == null)
+        {
+            // 일방 공격 추가
+            return;
+        }
 
+        // 1. 두 슬롯이 서로를 노리는 상태인지 체크
+        bool isMutualAttack =
+            targetAction.defender.character == request.owner &&
+            targetAction.defender.slot == request.ownerSlot;
+
+        // 2. 만약 서로 공격하려 한다면
+        if (isMutualAttack)
+        {
+            // 속도 무관 합 공격 전환
+            return;
+        }
+
+        // 3. 내 속도가 상대보다 빠른지 체크
+        bool requestIsFaster =
+            request.ownerSlot.Speed > targetAction.attacker.slot.Speed;
+
+        // 상대 속도보다 빠르다면
+        if(requestIsFaster)
+        {
+            // 합 공격 전환
+        }
+        else
+        {
+            // 일방 공격 추가
+        }
     }
+
+    // 생성 조건이 2종류 필요해서 오버로딩 구현
+    /// <summary>
+    /// 공격 데이터 생성 함수 (일방 공격)
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name=""></param>
+    /// <returns></returns>
+    private BattleActionData CreateBattleActionData(AttackRequest request)
+    {
+        BattleActionData data = new BattleActionData()
+        {
+            clashType = ClashType.OneSided,
+            actionSpeed = request.ownerSlot.Speed,
+
+            attacker = new BattleActionData.AttackSide()
+            {
+                character = request.owner,
+                slot = request.ownerSlot,
+                targetList = request.attackTargets
+            },
+
+            defender = new BattleActionData.AttackSide()
+            {
+                character = request.target,
+                slot = request.targetSlot,
+                targetList = null
+            }
+        };
+
+        return data;
+    }
+
+    /// <summary>
+    /// 공격 데이터 생성 함수 (합 공격)
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="request"></param>
+    /// <param name="targetAction"></param>
+    /// <returns></returns>
+    private BattleActionData CreateClashData(AttackRequest request, BattleActionData targetAction)
+    {
+        BattleActionData data = new BattleActionData()
+        {
+            clashType = ClashType.Clash,
+            actionSpeed = Mathf.Max(request.ownerSlot.Speed, targetAction.attacker.slot.Speed),
+
+            attacker = new BattleActionData.AttackSide()
+            {
+                character = request.owner,
+                slot = request.ownerSlot,
+                targetList = request.attackTargets
+            },
+
+            defender = new BattleActionData.AttackSide()
+            {
+                character = targetAction.attacker.character,
+                slot = targetAction.attacker.slot,
+                targetList = targetAction.attacker.targetList
+            }   
+        };
+
+        return data;
+    }
+
     #endregion
 
 
@@ -428,7 +523,7 @@ public class BattleManager : MonoBehaviour
         /// 생성자
         /// </summary>
         /// <param name="so"></param>
-        public WaveRuntimeData( List<CharacterBase> enemyList)
+        public WaveRuntimeData(List<CharacterBase> enemyList)
         {
             totalCount = enemyList.Count;
             currentCount = 0;
@@ -444,25 +539,47 @@ public class BattleManager : MonoBehaviour
         public Transform spawnPos;
     }
 
+
     [System.Serializable]
-    public class AttackData
+    /// <summary>
+    /// 공격 요청 시 필요한 데이터를 전달하는 데이터 클래스
+    /// </summary>
+    public class AttackRequest
     {
-        [Header("---Setting---")]
-        public ClashType clashType;
-        public int speed;
-        public List<ActionData> actionList;
-        public enum ClashType { OneSided, Clash }
+        [Header("---Attacker Data---")]
+        public CharacterBase owner;
+        public SkillSlot ownerSlot;
+
+        [Header("---Target Data---")]
+        public CharacterBase target;
+        public SkillSlot targetSlot;
+        public List<CharacterBase> attackTargets;
     }
 
     [System.Serializable]
-    public class ActionData
+    /// <summary>
+    /// 합 & 일방 공격 런타임 데이터
+    /// </summary>
+    public class BattleActionData
     {
-        [Header("---Action Data---")]
-        public CharacterBase owner;
-        public SkillSlot slot;
-        public SkillBase skill;
-        public CharacterBase mainTarget;
-        public List<CharacterBase> targetList;
+        [Header("---Clash Data---")]
+        public ClashType clashType;
+        public int actionSpeed;
+
+        [Header("---Data---")]
+        public AttackSide attacker;
+        public AttackSide defender;
+
+
+        [System.Serializable]
+        public class AttackSide
+        {
+            public CharacterBase character;
+            public SkillSlot slot;
+            public List<CharacterBase> targetList;
+        }
     }
+
+    public enum ClashType { OneSided, Clash }
     #endregion
 }

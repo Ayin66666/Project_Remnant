@@ -9,7 +9,8 @@ public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     [Header("---state---")]
     [SerializeField] private bool haveSkill;
     [SerializeField] private SkillBase skill;
-    [SerializeField] private SkillSlot targetSlot;
+    [SerializeField] private int speed;
+    public int Speed => speed;  
 
     [Header("---UI---")]
     [SerializeField] private Image icon;
