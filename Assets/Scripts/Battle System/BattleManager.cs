@@ -20,8 +20,8 @@ public class BattleManager : MonoBehaviour
     /// 플레이어의 합 & 일방 공격으로 인한 최종 공격 데이터
     /// </summary>
     [SerializeField] private List<BattleActionData> attackData;
-
     public enum Phase { StageStart, Select, Battle, Event, StageEnd }
+    public enum ClashType { OneSided, Clash }
 
     [Header("---Stage Setting---")]
     [SerializeField] private int waveNum;
@@ -278,6 +278,8 @@ public class BattleManager : MonoBehaviour
         if (targetAction == null)
         {
             // 일방 공격 추가
+            Debug.Log("일방 공격 / 빈 슬롯");
+            attackData.Add(CreateBattleActionData(request));
             return;
         }
 
@@ -290,25 +292,33 @@ public class BattleManager : MonoBehaviour
         if (isMutualAttack)
         {
             // 속도 무관 합 공격 전환
+            Debug.Log("합 공격 / 서로 공격중임");
+            attackData.Add(CreateBattleActionData(request, targetAction));
+            attackData.Remove(targetAction);
             return;
         }
 
         // 3. 내 속도가 상대보다 빠른지 체크
         bool requestIsFaster =
-            request.ownerSlot.Speed > targetAction.attacker.slot.Speed;
+            request.owner.Speed > targetAction.attacker.character.Speed;
 
         // 상대 속도보다 빠르다면
         if(requestIsFaster)
         {
             // 합 공격 전환
+            Debug.Log("합 공격 / 속도 우위");
+            attackData.Add(CreateBattleActionData(request, targetAction));
+            attackData.Remove(targetAction);
         }
         else
         {
             // 일방 공격 추가
+            Debug.Log("일방 공격 / 속도 느림");
+            attackData.Add(CreateBattleActionData(request));
         }
     }
 
-    // 생성 조건이 2종류 필요해서 오버로딩 구현
+    // 생성 조건이 2종류 필요해서 오버로딩 구현 (일방의 경우 리퀘스트만, 합 공격의 경우 리퀘스트 + 기존 데이터)
     /// <summary>
     /// 공격 데이터 생성 함수 (일방 공격)
     /// </summary>
@@ -320,7 +330,7 @@ public class BattleManager : MonoBehaviour
         BattleActionData data = new BattleActionData()
         {
             clashType = ClashType.OneSided,
-            actionSpeed = request.ownerSlot.Speed,
+            actionSpeed = request.owner.Speed,
 
             attacker = new BattleActionData.AttackSide()
             {
@@ -347,12 +357,12 @@ public class BattleManager : MonoBehaviour
     /// <param name="request"></param>
     /// <param name="targetAction"></param>
     /// <returns></returns>
-    private BattleActionData CreateClashData(AttackRequest request, BattleActionData targetAction)
+    private BattleActionData CreateBattleActionData(AttackRequest request, BattleActionData targetAction)
     {
         BattleActionData data = new BattleActionData()
         {
             clashType = ClashType.Clash,
-            actionSpeed = Mathf.Max(request.ownerSlot.Speed, targetAction.attacker.slot.Speed),
+            actionSpeed = Mathf.Max(request.owner.Speed, targetAction.attacker.character.Speed),
 
             attacker = new BattleActionData.AttackSide()
             {
@@ -371,7 +381,6 @@ public class BattleManager : MonoBehaviour
 
         return data;
     }
-
     #endregion
 
 
@@ -579,7 +588,5 @@ public class BattleManager : MonoBehaviour
             public List<CharacterBase> targetList;
         }
     }
-
-    public enum ClashType { OneSided, Clash }
     #endregion
 }

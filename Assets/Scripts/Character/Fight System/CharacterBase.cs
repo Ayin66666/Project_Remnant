@@ -18,23 +18,23 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] protected List<int> groggy;
     [SerializeField] protected int attack;
     [SerializeField] protected int defence;
-    [SerializeField] protected Vector2Int speed;
-    public int MaxHp { get { return maxHp; } set {  maxHp = value; } }
-    public List<int> Groggy { get {  return groggy; } set {  groggy = value; } }
-
+    [SerializeField] protected int speed;
+    [SerializeField] protected Vector2Int speedRange;
+    public int MaxHp => maxHp;
+    public List<int> Groggy => groggy;
+    public int Speed => speed;
 
     [Header("------")]
     [SerializeField] protected SkillSlot[] attackSlots;
 
-
     [Header("---Status Effect---")]
     [SerializeField] protected StatusEffectContainer statusEffectContainer;
-
 
     [Header("---Component---")]
     [SerializeField] protected SpriteRenderer spriteRenderer;
     [SerializeField] protected Rigidbody2D rigid;
     [SerializeField] protected CharacterUI characterUI;
+
 
     #region Status
     /// <summary>

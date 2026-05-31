@@ -16,7 +16,7 @@ public class EnemyBase : CharacterBase
         curHp = maxHp;
         attack = data.BaseAttackPoint;
         defence = data.BaseDefencePoint;
-        speed = data.SyncUpData[0].attackSpeed;
+        speedRange = data.SyncUpData[0].attackSpeed;
 
         groggy.Clear();
         foreach (int g in data.Groggy)

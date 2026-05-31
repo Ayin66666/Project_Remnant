@@ -26,7 +26,7 @@ public class PlayerCharacter : CharacterBase
             + data.SyncUpData[sync].defence
             + Mathf.RoundToInt(data.LevelUpData.defence * level * data.GrowthFactorData.defenceFactor);
 
-        speed = data.SyncUpData[sync].attackSpeed;
+        speedRange = data.SyncUpData[sync].attackSpeed;
 
         groggy.Clear();
         foreach (int g in data.Groggy)
