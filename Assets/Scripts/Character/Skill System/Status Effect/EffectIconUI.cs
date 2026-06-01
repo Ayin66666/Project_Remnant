@@ -51,12 +51,12 @@ public class EffectIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public void OnPointerEnter(PointerEventData eventData)
     {
         // 설명 UI On - UI의 동작 위치는 CharacterUI에서 / 자신의 데이터만 전달해줌
-        ui.ShowStatusEffectTooltip(gameObject);
+        // 이거 위치 변경 필요 - 캐릭터의 스테이터스 UI는 어디까지나 월드 오브젝트임!
+        // UI는 표시할거면 스크린 좌표에서 필요하니 다른 UI에서 호출하는게 맞음!
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         // 설명 UI Off
-        ui.HideEffectTooltip();
     }
 }

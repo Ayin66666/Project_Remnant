@@ -1,14 +1,16 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 
 public abstract class CharacterBase : MonoBehaviour, IDamageable
 {
     // 플레이어 & 몬스터의 공용 기능
-
     // 1. 피격 계산
     // 2. 공격 슬롯
     // 3. 스테이터스 (체력, 흐트러짐, 정신력)
     // 4. 인게임 UI (체력바, 이름, 버프 & 디버프 표시)
+
 
     [Header("---Status---")]
     [SerializeField] protected int level;
@@ -24,19 +26,30 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     public List<int> Groggy => groggy;
     public int Speed => speed;
 
-    [Header("------")]
+    [Header("---Slot---")]
     [SerializeField] protected SkillSlot[] attackSlots;
 
     [Header("---Status Effect---")]
     [SerializeField] protected StatusEffectContainer statusEffectContainer;
 
     [Header("---Component---")]
-    [SerializeField] protected SpriteRenderer spriteRenderer;
+    [SerializeField] protected Transform body;
     [SerializeField] protected Rigidbody2D rigid;
+    [SerializeField] protected Animator anim;
     [SerializeField] protected CharacterUI characterUI;
 
+    [Header("---Setting---")]
+    private bool isMove;
+    public bool IsMove => isMove;
+    private Coroutine movementCoroutine;
+    public enum Facing
+    {
+        Left,
+        Right
+    }
 
-    #region Status
+
+    #region 시작 로직
     /// <summary>
     /// 통합 능력치 설정 함수 - Data_Setting() & Status_Setting() 둘 다 호출함
     /// </summary>
@@ -46,7 +59,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     {
         SetupData(level, sync);
         SetupStatus(data);
-        characterUI.UI_Setting(this);
+        characterUI.SetUp(this);
     }
     
     /// <summary>
@@ -67,16 +80,106 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     #endregion
 
 
+    #region 전투 로직
     /// <summary>
-    /// 공격 주사위 속도 셋팅
+    /// 바디의 바라보는 방향 설정
     /// </summary>
-    protected void SlotSpeedSetting()
+    /// <param name="facing"></param>
+    protected void SetFacing(Facing facing)
     {
+        switch (facing)
+        {
+            case Facing.Left:
+                body.localScale = new Vector3(-1, 1, 1);
+                break;
 
+            case Facing.Right:
+                body.localScale = new Vector3(1, 1, 1);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 공격 주사위 속도 세팅
+    /// </summary>
+    protected void SpeedSetUp()
+    {
+        // 속도 세팅
+        speed = Random.Range(speedRange.x, speedRange.y);
+
+        // UI 반영
+        // characterUI.UpdataHpUI();
     }
 
 
-    #region Damage
+    /// <summary>
+    /// 캐릭터 이동 로직 호출부
+    /// </summary>
+    public void CharacterMove(int moveSpeed, Vector2 pos)
+    {
+        if (movementCoroutine != null) 
+            StopCoroutine(movementCoroutine);
+
+        movementCoroutine = StartCoroutine(CharacterMoveCoroutine(moveSpeed, pos));
+    }
+
+    /// <summary>
+    /// 캐릭터 이동 로직 동작부
+    /// </summary>
+    /// <param name="moveSpeed"></param>
+    /// <param name="movePos"></param>
+    /// <returns></returns>
+    private IEnumerator CharacterMoveCoroutine(int moveSpeed, Vector2 movePos)
+    {
+        isMove = true;
+
+        // 좌우 체크 & 스프라이트 반전
+        float dir = movePos.x - transform.position.x;
+        SetFacing(dir > 0 ? Facing.Right : Facing.Left);
+
+        // 이동
+        Vector2 startPos = transform.position;
+        float timer = 0;
+        while(timer < 1)
+        {
+            timer += Time.deltaTime / moveSpeed;
+            transform.position = Vector3.Lerp(startPos, movePos, timer);
+            yield return null;
+        }
+        transform.position = movePos;
+
+        isMove = false;
+        movementCoroutine = null;
+    }
+
+
+    /// <summary>
+    /// 캐릭터 합 밀림 로직 호출부
+    /// </summary>
+    public void ClashKnockback()
+    {
+        if(movementCoroutine != null) 
+            StopCoroutine(movementCoroutine);
+
+        movementCoroutine = StartCoroutine(ClashKonckbackCoroutine());
+    }
+
+    /// <summary>
+    /// 캐릭터 합 밀림 로직 동작부
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator ClashKonckbackCoroutine()
+    {
+        isMove = true;
+
+        yield return null;
+
+        isMove = false;
+    }
+    #endregion
+
+
+    #region 데미지 로직
     public void TakeDamage(DamageInfo info)
     {
         int damage = info.damageType switch
@@ -115,7 +218,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
         return (int)damage;
     }
-
 
     public abstract void Die();
     #endregion

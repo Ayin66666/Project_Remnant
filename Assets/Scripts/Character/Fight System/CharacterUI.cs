@@ -22,17 +22,12 @@ public class CharacterUI : MonoBehaviour
     [SerializeField] private RectTransform effectIconRect;
     [SerializeField] private GameObject effectIconPrefab;
 
-    [SerializeField] private GameObject effectDescripionSet;
-    [SerializeField] private Image effectIconImage;
-    [SerializeField] private TextMeshProUGUI effectNameText;
-    [SerializeField] private TextMeshProUGUI effectDescripionText;
-
 
     /// <summary>
     /// 체력 & 그로기 UI 셋팅 (최초 1회)
     /// </summary>
     /// <param name="character"></param>
-    public void UI_Setting(CharacterBase character)
+    public void SetUp(CharacterBase character)
     {
         this.character = character;
         hpSlider.maxValue = character.MaxHp;
@@ -58,9 +53,9 @@ public class CharacterUI : MonoBehaviour
     }
 
     /// <summary>
-    /// 체력 & 그로기 UI 업데이트
-    /// </summary>
-    public void UI_Update()
+    /// 체력 & 그로기 UI 업데이트 -> 이거 코드 이상함
+    /// </summary> 
+    public void UpdateHpUI()
     {
         hpSlider.value = character.MaxHp;
         hpText.text = character.MaxHp.ToString();
@@ -81,7 +76,6 @@ public class CharacterUI : MonoBehaviour
         }
     }
 
-
     /// <summary>
     /// 버프 & 디버프 추가
     /// </summary>
@@ -91,28 +85,5 @@ public class CharacterUI : MonoBehaviour
         GameObject obj = Instantiate(effectIconPrefab, effectIconRect);
         EffectIconUI ui = obj.GetComponent<EffectIconUI>();
         ui.SetUp(effectInfo, this);
-    }
-
-    /// <summary>
-    /// 버프 & 디버프 툴팁 On
-    /// </summary>
-    /// <param name="debuffInfo"></param>
-    public void ShowStatusEffectTooltip(GameObject debuffInfo)
-    {
-        effectDescripionSet.SetActive(true);
-        // effectIconImage.sprite = debuffInfo.;
-        effectNameText.text = "";
-        effectDescripionText.text = "";
-    }
-
-    /// <summary>
-    /// 버프 & 디버프 툴팁 Off
-    /// </summary>
-    public void HideEffectTooltip()
-    {
-        effectDescripionSet.SetActive(false);
-        effectIconImage.sprite = null;
-        effectNameText.text = "";
-        effectDescripionText.text = "";
     }
 }

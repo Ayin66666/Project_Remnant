@@ -6,26 +6,54 @@ using TMPro;
 
 public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    // 슬롯 역할
+    // 1. 스킬 표시
+    // 2. 도발치 표시
+    // 3. 마우스 오버 시 스킬 & 합 설명 On/Off 이벤트 전달
+
     [Header("---state---")]
     [SerializeField] private bool haveSkill;
-    [SerializeField] private SkillBase skill;
+    [SerializeField] private SkillBase skillBase;
 
     [Header("---UI---")]
     [SerializeField] private Image icon;
     [SerializeField] private Image tunatImage;
-    [SerializeField] private TextMeshProUGUI speedText;
 
 
-    public void Skill_Setting(bool isOn, GameObject skillInfo)
+    #region 데이터 세팅
+    /// <summary>
+    /// 스킬 슬롯에 데이터 & UI 세팅
+    /// </summary>
+    /// <param name="skill"></param>
+    public void SetUp(SkillBase skill)
     {
-        // 스킬 데이터를 받은 뒤 UI 표시
-        // - 일단은 Gameobject라 해뒀지만 나중에 Skill_Base 만들면 그거로 변경
-        haveSkill = isOn;
+        // 데이터 삽입
+        haveSkill = true;
+        skillBase = skill;
+
+        // UI 세팅
+        icon.sprite = skill.Icon;
     }
 
+    /// <summary>
+    /// 스킬 슬롯 데이터 & UI 초기화
+    /// </summary>
+    public void Clear()
+    {
+        // 데이터 초기화
+        haveSkill = false;
+        skillBase = null;
+
+        // UI 초기화
+        icon.sprite = null;
+    }
+    #endregion
+
+
+    #region 마우스 이벤트
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if(haveSkill)
+        if (haveSkill)
         {
             // UI 표시
         }
@@ -33,14 +61,10 @@ public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if(haveSkill)
+        if (haveSkill)
         {
             // UI 종료
         }
     }
-
-    // 슬롯 역할
-    // 1. 스킬 & 속도 표시
-    // 2. 도발치 표시
-    // 3. 마우스 오버 시 스킬 & 합 설명 On/Off
+    #endregion
 }
