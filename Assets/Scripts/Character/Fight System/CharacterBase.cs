@@ -11,6 +11,10 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     // 3. 스테이터스 (체력, 흐트러짐, 정신력)
     // 4. 인게임 UI (체력바, 이름, 버프 & 디버프 표시)
 
+    [Header("---Test---")]
+    [SerializeField] private float testSpeed;
+    [SerializeField] private Transform testPos;
+    [SerializeField] private KnockbackType testKnockbackType;
 
     [Header("---Status---")]
     [SerializeField] protected int level;
@@ -39,7 +43,8 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] protected CharacterUI characterUI;
 
     [Header("---Setting---")]
-    private bool isMove;
+    [SerializeField] private Facing facing;
+    [SerializeField] private bool isMove;
     public bool IsMove => isMove;
     private Coroutine movementCoroutine;
     public enum Facing
@@ -48,6 +53,22 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         Right
     }
 
+    public enum KnockbackType
+    {
+        Low,
+        Mid,
+        High
+    }
+
+
+    private void Update()
+    {
+        // 테스트용 입력
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            ClashKnockback(testKnockbackType, testSpeed);
+        }
+    }
 
     #region 시작 로직
     /// <summary>
@@ -82,24 +103,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
     #region 전투 로직
     /// <summary>
-    /// 바디의 바라보는 방향 설정
-    /// </summary>
-    /// <param name="facing"></param>
-    protected void SetFacing(Facing facing)
-    {
-        switch (facing)
-        {
-            case Facing.Left:
-                body.localScale = new Vector3(-1, 1, 1);
-                break;
-
-            case Facing.Right:
-                body.localScale = new Vector3(1, 1, 1);
-                break;
-        }
-    }
-
-    /// <summary>
     /// 공격 주사위 속도 세팅
     /// </summary>
     protected void SpeedSetUp()
@@ -111,11 +114,31 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         // characterUI.UpdataHpUI();
     }
 
+    /// <summary>
+    /// 바디의 바라보는 방향 설정
+    /// </summary>
+    /// <param name="facing"></param>
+    protected void SetFacing(Facing facing)
+    {
+        switch (facing)
+        {
+            case Facing.Left:
+                this.facing = Facing.Left;
+                body.localScale = new Vector3(-1, 1, 1);
+                break;
+
+            case Facing.Right:
+                this.facing = Facing.Right;
+                body.localScale = new Vector3(1, 1, 1);
+                break;
+        }
+    }
+
 
     /// <summary>
     /// 캐릭터 이동 로직 호출부
     /// </summary>
-    public void CharacterMove(int moveSpeed, Vector2 pos)
+    public void CharacterMove(float moveSpeed, Vector2 pos)
     {
         if (movementCoroutine != null) 
             StopCoroutine(movementCoroutine);
@@ -129,7 +152,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// <param name="moveSpeed"></param>
     /// <param name="movePos"></param>
     /// <returns></returns>
-    private IEnumerator CharacterMoveCoroutine(int moveSpeed, Vector2 movePos)
+    private IEnumerator CharacterMoveCoroutine(float moveSpeed, Vector2 movePos)
     {
         isMove = true;
 
@@ -156,24 +179,48 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// <summary>
     /// 캐릭터 합 밀림 로직 호출부
     /// </summary>
-    public void ClashKnockback()
+    /// <param name="type">밀림 타입 (Low = 1f, Mid = 3f, High = 5f)</param>
+    /// <param name="time">밀림 시간</param>
+    public void ClashKnockback(KnockbackType type, float time)
     {
         if(movementCoroutine != null) 
             StopCoroutine(movementCoroutine);
 
-        movementCoroutine = StartCoroutine(ClashKonckbackCoroutine());
+        movementCoroutine = StartCoroutine(ClashKnockbackCoroutine(type, time));
     }
 
     /// <summary>
     /// 캐릭터 합 밀림 로직 동작부
     /// </summary>
     /// <returns></returns>
-    private IEnumerator ClashKonckbackCoroutine()
+    private IEnumerator ClashKnockbackCoroutine(KnockbackType type, float time)
     {
         isMove = true;
 
-        yield return null;
+        // 이동 위치 세팅
+        float distance = type switch
+        {
+            KnockbackType.Low => 1f,
+            KnockbackType.Mid => 3f,
+            KnockbackType.High => 5f,
+            _ => 0f,
+        };
+        Vector2 dir = facing == Facing.Left ? Vector2.right : Vector2.left;
+        Vector2 startPos = transform.position;
+        Vector2 endPos = startPos + dir * distance;
+        endPos.y += Random.Range(-0.25f, 0.25f);
 
+        // 이동
+        float timer = 0;
+        while(timer < 1)
+        {
+            timer += Time.deltaTime / time;
+            transform.position = Vector2.Lerp(startPos, endPos, timer);
+            yield return null;
+        }
+        transform.position = endPos;
+
+        movementCoroutine = null;
         isMove = false;
     }
     #endregion
@@ -219,6 +266,9 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         return (int)damage;
     }
 
-    public abstract void Die();
+    public virtual void Die()
+    {
+        // 사망 스프라이트
+    }
     #endregion
 }

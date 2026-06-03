@@ -13,11 +13,14 @@ public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     [Header("---state---")]
     [SerializeField] private bool haveSkill;
+    [SerializeField] private float tunatValue;
     [SerializeField] private SkillBase skillBase;
+    public float TunatValue => tunatValue;
 
     [Header("---UI---")]
     [SerializeField] private Image icon;
-    [SerializeField] private Image tunatImage;
+    [SerializeField] private GameObject tunatUI;
+    [SerializeField] private TextMeshProUGUI tunatText;
 
 
     #region 데이터 세팅
@@ -36,6 +39,21 @@ public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     }
 
     /// <summary>
+    /// 도발치 UI 세팅
+    /// </summary>
+    /// <param name="isOn"></param>
+    /// <param name="value"></param>
+    public void TunatSetUp(bool isOn, int value)
+    {
+        if (isOn)
+        {
+            tunatValue = value;
+            tunatText.text = $"! {tunatValue}";
+        }
+        tunatUI.SetActive(isOn);
+    }
+
+    /// <summary>
     /// 스킬 슬롯 데이터 & UI 초기화
     /// </summary>
     public void Clear()
@@ -43,9 +61,12 @@ public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         // 데이터 초기화
         haveSkill = false;
         skillBase = null;
+        tunatValue = 0f;
 
         // UI 초기화
         icon.sprite = null;
+        tunatUI.SetActive(false);
+        tunatText.text = string.Empty;
     }
     #endregion
 

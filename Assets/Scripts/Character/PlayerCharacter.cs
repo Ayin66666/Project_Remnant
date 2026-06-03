@@ -6,6 +6,13 @@ using Game.Character;
 
 public class PlayerCharacter : CharacterBase
 {
+    private void Start()
+    {
+        // 전투 시작 시 보정
+        // -> 일단 여기에 넣었지만 나중에 BattleManager에서 SetUp() 과정에서 관리할것
+        SetFacing(Facing.Right);
+    }
+
     /// <summary>
     /// 플레이어 - 동기화 기반 스테이터스 세팅 기능
     /// </summary>
@@ -34,9 +41,5 @@ public class PlayerCharacter : CharacterBase
             groggy.Add(Mathf.RoundToInt(maxHp * g / 100));
         }
     }
-
-    public override void Die()
-    {
-        throw new System.NotImplementedException();
-    }
 }
+    

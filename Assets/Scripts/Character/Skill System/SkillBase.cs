@@ -10,6 +10,10 @@ public abstract class SkillBase : MonoBehaviour
     // 2. 이펙트 & 데미지 이벤트 함수
     // 3. 스킬의 세부 동작 & 조건은 상속받은 스크립트에서 구현
 
+    [Header("---Setting---")]
+    [SerializeField] private Crime crimeType;
+    public Crime CrimeType => crimeType;
+
     [Header("---UI---")]
     [SerializeField] private Sprite icon;
     [SerializeField] private string skillName;
