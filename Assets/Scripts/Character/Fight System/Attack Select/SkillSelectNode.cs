@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-public class SkillSelectNode : MonoBehaviour
+public class SkillSelectNode : MonoBehaviour, IPointerEnterHandler
 {
     [Header("---Setting---")]
     [SerializeField] private SkillBase skill;
@@ -37,5 +38,10 @@ public class SkillSelectNode : MonoBehaviour
         // UI √ ±‚»≠
         icon.sprite = null;
         border.color = Color.white;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        throw new System.NotImplementedException();
     }
 }
