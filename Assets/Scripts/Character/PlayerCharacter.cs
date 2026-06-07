@@ -6,10 +6,14 @@ using Game.Character;
 
 public class PlayerCharacter : CharacterBase
 {
+    [Header("---Player Setting---")]
+    [SerializeField] private IdentityMasterSO identityMasterSO;
+    public IdentityMasterSO IdentityMasterSO => identityMasterSO;
+
+
     private void Start()
     {
-        // 전투 시작 시 보정
-        // -> 일단 여기에 넣었지만 나중에 BattleManager에서 SetUp() 과정에서 관리할것
+        // 전투 시작 시 보정 -> 일단 여기에 넣었지만 나중에 BattleManager에서 SetUp() 과정에서 관리할것
         SetFacing(Facing.Right);
     }
 

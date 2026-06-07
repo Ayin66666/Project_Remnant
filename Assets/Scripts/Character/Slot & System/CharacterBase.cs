@@ -1,3 +1,4 @@
+using Game.Character;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,6 +22,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] protected int sync;
     [SerializeField] protected int maxHp;
     [SerializeField] protected int curHp;
+    [SerializeField] protected int mentality;
     [SerializeField] protected List<int> groggy;
     [SerializeField] protected int attack;
     [SerializeField] protected int defence;
@@ -28,6 +30,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] protected Vector2Int speedRange;
     public int MaxHp => maxHp;
     public List<int> Groggy => groggy;
+    public int Mentality => mentality;
     public int Speed => speed;
 
     [Header("---Slot---")]

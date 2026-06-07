@@ -4,7 +4,7 @@ using UnityEngine;
 using Game.Character;
 
 
-public class EnemyBase : CharacterBase
+public class EnemyCharacter : CharacterBase
 {
     /// <summary>
     /// 에너미 - 스테이터스 기반 능력치 세팅 (추가 계산 x)
