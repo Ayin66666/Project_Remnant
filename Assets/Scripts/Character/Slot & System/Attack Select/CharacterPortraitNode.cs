@@ -38,4 +38,16 @@ public class CharacterPortraitNode : MonoBehaviour
         float t = Mathf.InverseLerp(-45f, 45f, character.Mentality);
         mentalImage.color = gradient.Evaluate(t);
     }
+
+    /// <summary>
+    /// 초기화 함수
+    /// </summary>
+    public void Clear()
+    {
+        character = null;
+        portraitImage.sprite = null;
+        mentalText.text = string.Empty;
+        float t = Mathf.InverseLerp(-45f, 45f, 0);
+        mentalImage.color = gradient.Evaluate(t);
+    }
 }

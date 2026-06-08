@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -9,11 +7,20 @@ public class SkillSelectNode : MonoBehaviour, IPointerEnterHandler
 {
     [Header("---Setting---")]
     [SerializeField] private SkillBase skill;
+    [SerializeField] private SelectNodeGroup myGroup;
 
     [Header("---UI---")]
     [SerializeField] private Image icon;
     [SerializeField] private Image border;
 
+    /// <summary>
+    /// 자신이 속한 그룹 데이터 전달
+    /// </summary>
+    /// <param name="group"></param>
+    public void SetUp(SelectNodeGroup group)
+    {
+        myGroup = group;
+    }
 
     /// <summary>
     /// 선택 노드에 스킬 세팅
@@ -42,6 +49,6 @@ public class SkillSelectNode : MonoBehaviour, IPointerEnterHandler
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+
     }
 }
