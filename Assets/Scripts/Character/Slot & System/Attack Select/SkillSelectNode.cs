@@ -13,6 +13,8 @@ public class SkillSelectNode : MonoBehaviour, IPointerEnterHandler
     [SerializeField] private Image icon;
     [SerializeField] private Image border;
 
+
+    #region 데이터 세팅 & 초기화 로직
     /// <summary>
     /// 자신이 속한 그룹 데이터 전달
     /// </summary>
@@ -46,9 +48,17 @@ public class SkillSelectNode : MonoBehaviour, IPointerEnterHandler
         icon.sprite = null;
         border.color = Color.white;
     }
+    #endregion
 
+
+    #region 마우스 이벤트
+    /// <summary>
+    /// 마우스 접근 시 동작 - startPoint에 자신이 닿았음을 전달
+    /// </summary>
+    /// <param name="eventData"></param>
     public void OnPointerEnter(PointerEventData eventData)
     {
-
+        SkillSelectManager.instance.StartPoint.Select(myGroup, this);
     }
+    #endregion
 }

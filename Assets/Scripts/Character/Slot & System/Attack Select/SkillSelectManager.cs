@@ -9,6 +9,10 @@ public class SkillSelectManager : MonoBehaviour
     [Header("---Data---")]
     [SerializeField] private List<SelectNodeGroup> skillNodeGroups;
 
+    [Header("---Component---")]
+    [SerializeField] private SelectStartPoint startPoint;
+    public SelectStartPoint StartPoint => startPoint;
+
     [Header("---UI---")]
     [SerializeField] private RectTransform skillGroupRect;
     [SerializeField] private GameObject nodeGroupPrefab;
@@ -29,11 +33,11 @@ public class SkillSelectManager : MonoBehaviour
     }
 
 
-    #region 스킬 선택 & 해제 처리 -> 이거 필요한지 참 애매하네
+    #region 스킬 선택 & 해제 처리 -> 라인은 선택 데이터에 대한 할당만 받기
     /// <summary>
     /// 어떤 노드에서 어떤 스킬이 선택되었는지 저장하는 함수
     /// </summary>
-    public void SkillSelect()
+    public void SkillSelect(SelectNodeGroup group, SkillSelectNode node)
     {
 
     }
