@@ -7,6 +7,8 @@ public class SkillSelectManager : MonoBehaviour
     public static SkillSelectManager instance;
 
     [Header("---Data---")]
+    [SerializeField] private bool isSelecting;
+    [SerializeField] private int lastIndex;
     [SerializeField] private List<SelectNodeGroup> skillNodeGroups;
 
     [Header("---Component---")]
@@ -16,6 +18,7 @@ public class SkillSelectManager : MonoBehaviour
     [Header("---UI---")]
     [SerializeField] private RectTransform skillGroupRect;
     [SerializeField] private GameObject nodeGroupPrefab;
+    [SerializeField] private GameObject linePrefab;
 
 
     private void Awake()
@@ -32,24 +35,42 @@ public class SkillSelectManager : MonoBehaviour
         }
     }
 
-
-    #region 스킬 선택 & 해제 처리 -> 라인은 선택 데이터에 대한 할당만 받기
-    /// <summary>
-    /// 어떤 노드에서 어떤 스킬이 선택되었는지 저장하는 함수
-    /// </summary>
-    public void SkillSelect(SelectNodeGroup group, SkillSelectNode node)
+    private void Update()
     {
-
+        isSelecting = Input.GetMouseButton(0);
     }
 
-    /// <summary>
-    /// 어떤 노드에서 어떤 스킬이 선택 해제되었는지 저장하는 함수
-    /// </summary>
-    public void SkillRemove()
-    {
 
+    public void SkillSelect(SelectNodeGroup group)
+    {
+        // 선택모드인지 체크
+        if (!isSelecting) 
+            return;
+
+        // 시작 지점보다 이전 노드를 선택했다면
+        if (group.GroupIndex < lastIndex)
+        {
+            // 해당 노드 앞의 선택 데이터를 초기화 데이터 초기화
+        }
+
+        // 시작 노드를 선택했다면
+        if (group.GroupIndex == lastIndex)
+        {
+            // 시작 노드의 데이터 변경 후 시작
+        }
+
+        // 다음 노드를 선택했다면
+        if (group.GroupIndex == lastIndex + 1)
+        {
+            // 바로 선택 데이터 입력
+        }
+
+        // 다음 이후(2번째~) 노드를 선택했다면
+        if (group.GroupIndex >= lastIndex + 2)
+        {
+            return;
+        }
     }
-    #endregion
 
 
     #region 그룹 추가 & 사망 처리

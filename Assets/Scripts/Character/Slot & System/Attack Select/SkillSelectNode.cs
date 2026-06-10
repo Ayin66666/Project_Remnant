@@ -6,8 +6,10 @@ using UnityEngine.UI;
 public class SkillSelectNode : MonoBehaviour, IPointerEnterHandler
 {
     [Header("---Setting---")]
+    [SerializeField] private Select nodeType;
     [SerializeField] private SkillBase skill;
     [SerializeField] private SelectNodeGroup myGroup;
+    public Select NodeType => nodeType;
 
     [Header("---UI---")]
     [SerializeField] private Image icon;
@@ -53,12 +55,12 @@ public class SkillSelectNode : MonoBehaviour, IPointerEnterHandler
 
     #region 마우스 이벤트
     /// <summary>
-    /// 마우스 접근 시 동작 - startPoint에 자신이 닿았음을 전달
+    /// 마우스 접근 시 동작 - 자신이 닿았음을 알림
     /// </summary>
     /// <param name="eventData"></param>
     public void OnPointerEnter(PointerEventData eventData)
     {
-        SkillSelectManager.instance.StartPoint.Select(myGroup, this);
+        SkillSelectManager.instance.SkillSelect();
     }
     #endregion
 }

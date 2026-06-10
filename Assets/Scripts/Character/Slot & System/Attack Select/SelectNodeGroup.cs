@@ -6,19 +6,16 @@ public class SelectNodeGroup : MonoBehaviour
 {
     [Header("---Setting---")]
     public CharacterBase owner;
-    public Select selectNode;
-    public enum Select
-    {
-        None,
-        Upper,
-        Lower
-    }
+    [SerializeField] private int groupIndex;
+    [SerializeField] private Select selectedNode;
+
+    public int GroupIndex => groupIndex;
+    public Select SelectedNode => selectedNode;
 
     [Header("---Node---")]
     [SerializeField] private SkillSelectNode upperNode;
     [SerializeField] private SkillSelectNode lowerNode;
     [SerializeField] private CharacterPortraitNode portraitNode;
-
 
 
     /// <summary>
@@ -48,17 +45,13 @@ public class SelectNodeGroup : MonoBehaviour
     /// </summary>
     public void Selected(Select type)
     {
-        selectNode = type;
+        selectedNode = type;
     }
+}
 
-    /// <summary>
-    /// 노드 그룹 초기화
-    /// </summary>
-    public void Clear()
-    {
-        owner = null;
-        upperNode.Clear();
-        lowerNode.Clear();
-        portraitNode.Clear();
-    }
+public enum Select
+{
+    None,
+    Upper,
+    Lower
 }
