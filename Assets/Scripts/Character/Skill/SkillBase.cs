@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -12,7 +11,9 @@ public abstract class SkillBase : MonoBehaviour
 
     [Header("---Setting---")]
     [SerializeField] private Crime crimeType;
+    [SerializeField] private int taragetCount;
     public Crime CrimeType => crimeType;
+    public int TargetCount => taragetCount;  
 
     [Header("---UI---")]
     [SerializeField] private Sprite icon;

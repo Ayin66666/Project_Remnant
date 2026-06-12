@@ -1,7 +1,7 @@
-using Game.Character;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Game.Character;
 
 
 public abstract class CharacterBase : MonoBehaviour, IDamageable
@@ -46,21 +46,29 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] protected CharacterUI characterUI;
 
     [Header("---Setting---")]
+    [SerializeField] protected CharacterGroup characterGroup;
     [SerializeField] private Facing facing;
     [SerializeField] private bool isMove;
     public bool IsMove => isMove;
+    public CharacterGroup CharacterType => characterGroup;
+
     private Coroutine movementCoroutine;
     public enum Facing
     {
         Left,
         Right
     }
-
     public enum KnockbackType
     {
         Low,
         Mid,
         High
+    }
+    public enum CharacterGroup
+    {
+        Player,
+        Enemy,
+        AllyNpc,
     }
 
 

@@ -1,5 +1,9 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using static BattleManager;
+
 
 
 public class SkillSelectManager : MonoBehaviour
@@ -10,10 +14,7 @@ public class SkillSelectManager : MonoBehaviour
     [SerializeField] private bool isSelecting;
     [SerializeField] private int lastIndex;
     [SerializeField] private List<SelectNodeGroup> skillNodeGroups;
-
-    [Header("---Component---")]
-    [SerializeField] private SelectStartPoint startPoint;
-    public SelectStartPoint StartPoint => startPoint;
+    private Coroutine selectCoroutine;
 
     [Header("---UI---")]
     [SerializeField] private RectTransform skillGroupRect;
@@ -35,17 +36,15 @@ public class SkillSelectManager : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        isSelecting = Input.GetMouseButton(0);
-    }
-
-
+    /* -> 일반 전투 코드 / 제외함
     public void SkillSelect(SelectNodeGroup group)
     {
         // 선택모드인지 체크
         if (!isSelecting) 
             return;
+
+        // 인덱스 받아오기
+        int index = skillNodeGroups.IndexOf(group);
 
         // 시작 지점보다 이전 노드를 선택했다면
         if (group.GroupIndex < lastIndex)
@@ -70,6 +69,90 @@ public class SkillSelectManager : MonoBehaviour
         {
             return;
         }
+    }
+    */
+
+
+    /// <summary>
+    /// 공격 선택
+    /// </summary>
+    public void Selecting(SkillSelectNode node)
+    {
+        if(selectCoroutine != null) StopCoroutine(selectCoroutine);
+        selectCoroutine = StartCoroutine(Line(node));
+    }
+
+    /// <summary>
+    /// 선 그리기 로직
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
+    private IEnumerator Line(SkillSelectNode node)
+    {
+        // 라인 소환
+        RectTransform startRect = node.GetComponent<RectTransform>();
+        GameObject lineObj = Instantiate(linePrefab, startRect);
+        RectTransform lineRect = lineObj.GetComponent<RectTransform>();
+
+        while (isSelecting)
+        {
+            // 위치 & dir 체크
+            Vector2 startPos = startRect.position;
+            Vector2 mousePos = Input.mousePosition;
+            Vector2 dir = mousePos - startPos;
+
+            // 회전 & 길이 조절
+            lineRect.up = dir.normalized;
+            lineRect.sizeDelta = new Vector2(lineRect.sizeDelta.x, dir.magnitude);
+
+            yield return null;
+        }
+
+        // 라인 제거
+        Destroy(lineObj);
+
+        // 마우스 종료 위치에 슬롯이 있는지 체크
+        Vector2 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        RaycastHit2D[] hits = Physics2D.RaycastAll(worldMousePos, Vector2.zero);
+        SkillSlot targetSlot = hits.Select(x=>x.transform.gameObject.GetComponent<SkillSlot>())
+            .OfType<SkillSlot>()
+            .FirstOrDefault();
+
+        // 만약 슬롯이 있다면
+        if (targetSlot != null)
+        {
+            switch (targetSlot.Onwer.CharacterType)
+            {
+                // 플레이어 & 아군 Npc면 공격 불가
+                case CharacterBase.CharacterGroup.Player:
+                case CharacterBase.CharacterGroup.AllyNpc:
+                    Debug.Log("아군 슬롯! 공격 불가!");
+                    break;
+
+                // 적이라면 공격 가능
+                case CharacterBase.CharacterGroup.Enemy:
+                    Debug.Log("적군 슬롯! 공격 가능!");
+
+                    // 공격 리퀘스트 작성
+                    AttackRequest request = new AttackRequest()
+                    {
+                        // 공격자 (플레이어)
+                        owner = node.Group.owner,
+                        ownerSlot = node.Slot,
+
+                        // 방어자 (몬스터)
+                        target =targetSlot.Onwer,
+                        targetSlot =targetSlot,
+                    };
+
+                    // 공격 추가
+                    BattleManager.instance.AddAttack(request);
+                    break;
+            }
+        }
+
+        // 코루틴 변수 초기화
+        selectCoroutine = null;
     }
 
 

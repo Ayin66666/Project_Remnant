@@ -12,10 +12,13 @@ public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     // 3. 마우스 오버 시 스킬 & 합 설명 On/Off 이벤트 전달
 
     [Header("---state---")]
+    [SerializeField] private CharacterBase onwer;
     [SerializeField] private bool haveSkill;
     [SerializeField] private float tunatValue;
     [SerializeField] private SkillBase skillBase;
+    public CharacterBase Onwer => onwer;
     public float TunatValue => tunatValue;
+    public SkillBase Skill => skillBase;
 
     [Header("---UI---")]
     [SerializeField] private Image icon;

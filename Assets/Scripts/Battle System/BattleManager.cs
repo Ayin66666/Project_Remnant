@@ -11,6 +11,7 @@ public class BattleManager : MonoBehaviour
     public static BattleManager instance;
 
     [Header("---Battle Setting---")]
+    #region
     [SerializeField] private Phase curPhase;
     /// <summary>
     /// 몬스터의 공격 데이터 원본 (합 해제 시 돌아갈 데이터)
@@ -22,8 +23,16 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private List<BattleActionData> attackData;
     public enum Phase { StageStart, Select, Battle, Event, StageEnd }
     public enum ClashType { OneSided, Clash }
+    #endregion
+
+    [Header("--- Player & Enemy ---")]
+    #region
+    [SerializeField] private List<CharacterBase> playerList;
+    [SerializeField] private List<CharacterBase> enemyList;
+    #endregion
 
     [Header("---Stage Setting---")]
+    #region
     [SerializeField] private int waveNum;
     [SerializeField] private BattleStageSO stageSO;
     [SerializeField] private List<WaveRuntimeData> waveRuntimeDataList;
@@ -31,18 +40,24 @@ public class BattleManager : MonoBehaviour
     private Coroutine battleLoopCoroutine;
     private Coroutine crashCoroutine;
     private Coroutine uiCoroutine;
+    #endregion
 
     [Header("---Background---")]
+    #region
     [SerializeField] private SpriteRenderer floor;
     [SerializeField] private GameObject wallPrefab;
     [SerializeField] private Transform wallRect;
     [SerializeField] private List<GameObject> wall;
+    #endregion
 
     [Header("---Component---")]
+    #region
     [SerializeField] private Volume postprocessing;
     [SerializeField] private AudioSource audioSource;
+    #endregion
 
     [Header("---UI---")]
+    #region
     [SerializeField] private bool isUIEvent;
     [SerializeField] private CanvasGroup fadeUI;
     [SerializeField] private CanvasGroup bossUI;
@@ -51,6 +66,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private CanvasGroup turnUI;
     [SerializeField] private TextMeshProUGUI turnText;
     [SerializeField] private CanvasGroup clearUI;
+    #endregion
 
 
     #region 시작 로직
@@ -233,6 +249,11 @@ public class BattleManager : MonoBehaviour
 
 
     #region 전투 로직
+    /// <summary>
+    /// 전투 시작 시 최초 1회 호출
+    /// 전투 종료까지 계속 돌아가는 배틀 시스템 코루틴
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator BattleLoop()
     {
         // 0. 턴 시작 이벤트 체크
@@ -270,16 +291,19 @@ public class BattleManager : MonoBehaviour
     {
         // 0. 내가 공격하고자 하는 슬롯에 공격 데이터가 있는지 체크
         BattleActionData targetAction =
-            attackData.FirstOrDefault(x => 
+            attackData.FirstOrDefault(x =>
             x.attacker.character == request.target &&
             x.attacker.slot == request.targetSlot);
+
+        // 타겟 데이터 세팅
+        List<CharacterBase> targetList = GetTargets(request);
 
         // 해당 슬롯이 공격 행동이 없는 빈 슬롯이라면
         if (targetAction == null)
         {
             // 일방 공격 추가
             Debug.Log("일방 공격 / 빈 슬롯");
-            attackData.Add(CreateBattleActionData(request));
+            attackData.Add(CreateBattleActionData(request, targetList));
             return;
         }
 
@@ -293,7 +317,7 @@ public class BattleManager : MonoBehaviour
         {
             // 속도 무관 합 공격 전환
             Debug.Log("합 공격 / 서로 공격중임");
-            attackData.Add(CreateBattleActionData(request, targetAction));
+            attackData.Add(CreateBattleActionData(request, targetList, targetAction));
             attackData.Remove(targetAction);
             return;
         }
@@ -303,29 +327,69 @@ public class BattleManager : MonoBehaviour
             request.owner.Speed > targetAction.attacker.character.Speed;
 
         // 상대 속도보다 빠르다면
-        if(requestIsFaster)
+        if (requestIsFaster)
         {
             // 합 공격 전환
             Debug.Log("합 공격 / 속도 우위");
-            attackData.Add(CreateBattleActionData(request, targetAction));
+            attackData.Add(CreateBattleActionData(request, targetList, targetAction));
             attackData.Remove(targetAction);
         }
         else
         {
             // 일방 공격 추가
             Debug.Log("일방 공격 / 속도 느림");
-            attackData.Add(CreateBattleActionData(request));
+            attackData.Add(CreateBattleActionData(request, targetList));
         }
     }
 
-    // 생성 조건이 2종류 필요해서 오버로딩 구현 (일방의 경우 리퀘스트만, 합 공격의 경우 리퀘스트 + 기존 데이터)
+    /// <summary>
+    /// 공격할 대상 서칭 후 반환
+    /// </summary>
+    private List<CharacterBase> GetTargets(AttackRequest request)
+    {
+        int attackCount = request.ownerSlot.Skill.TargetCount;
+        List<CharacterBase> targets = new List<CharacterBase>(attackCount);
+
+        // 메인 타겟을 제외한 attackCount-1 의 적을 선택
+        // 선택 조건 = 앞에 있는 인원부터 공격
+
+        // 공격자 체크
+        // 플레이어 & 아군 npc라면 적을,
+        // 적군이라면 아군 & 아군 npc 공격
+        switch (request.owner.CharacterType)
+        {
+            // 아군 공격 추가
+            case CharacterBase.CharacterGroup.Player:
+            case CharacterBase.CharacterGroup.AllyNpc:
+                targets.Add(request.target);
+                targets.AddRange(enemyList
+                    .Where(x => x != request.target)
+                    .Take(attackCount - 1));
+
+                break;
+
+            // 적군 공격 추가 
+            case CharacterBase.CharacterGroup.Enemy:
+                targets.Add(request.target);
+                targets.AddRange(playerList
+                    .Where(x => x != request.target)
+                    .Take(attackCount - 1));
+                break;
+        }
+
+        // 데이터 반환
+        return targets;
+    }
+
+    // 생성 조건이 2종류 필요해서 오버로딩 구현
+    // (일방의 경우 리퀘스트만, 합 공격의 경우 리퀘스트 + 기존 데이터)
     /// <summary>
     /// 공격 데이터 생성 함수 (일방 공격)
     /// </summary>
     /// <param name="request"></param>
     /// <param name=""></param>
     /// <returns></returns>
-    private BattleActionData CreateBattleActionData(AttackRequest request)
+    private BattleActionData CreateBattleActionData(AttackRequest request, List<CharacterBase> targets)
     {
         BattleActionData data = new BattleActionData()
         {
@@ -336,7 +400,7 @@ public class BattleManager : MonoBehaviour
             {
                 character = request.owner,
                 slot = request.ownerSlot,
-                targetList = request.attackTargets
+                targetList = targets
             },
 
             defender = new BattleActionData.AttackSide()
@@ -357,7 +421,7 @@ public class BattleManager : MonoBehaviour
     /// <param name="request"></param>
     /// <param name="targetAction"></param>
     /// <returns></returns>
-    private BattleActionData CreateBattleActionData(AttackRequest request, BattleActionData targetAction)
+    private BattleActionData CreateBattleActionData(AttackRequest request, List<CharacterBase> targets, BattleActionData targetAction)
     {
         BattleActionData data = new BattleActionData()
         {
@@ -368,7 +432,7 @@ public class BattleManager : MonoBehaviour
             {
                 character = request.owner,
                 slot = request.ownerSlot,
-                targetList = request.attackTargets
+                targetList = targets
             },
 
             defender = new BattleActionData.AttackSide()
@@ -376,7 +440,7 @@ public class BattleManager : MonoBehaviour
                 character = targetAction.attacker.character,
                 slot = targetAction.attacker.slot,
                 targetList = targetAction.attacker.targetList
-            }   
+            }
         };
 
         return data;
@@ -548,7 +612,6 @@ public class BattleManager : MonoBehaviour
         public Transform spawnPos;
     }
 
-
     [System.Serializable]
     /// <summary>
     /// 공격 요청 시 필요한 데이터를 전달하는 데이터 클래스
@@ -562,7 +625,6 @@ public class BattleManager : MonoBehaviour
         [Header("---Target Data---")]
         public CharacterBase target;
         public SkillSlot targetSlot;
-        public List<CharacterBase> attackTargets;
     }
 
     [System.Serializable]
