@@ -37,11 +37,11 @@ public class SkillContainerUI : MonoBehaviour
         skillIcon.sprite = skillSO.icon;
 
         // 코인 위력
-        coinPowerText.text = $"+ {skillSO.Skill[identity.sync].coinPower}";
+        coinPowerText.text = $"+ {skillSO.coinPower}";
 
         // 코인 개수
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < skillSO.Skill[identity.sync].coins.Count; i++)
+        for (int i = 0; i < skillSO.coins.Count; i++)
         {
             sb.Append("<sprite=1>");
         }
@@ -52,23 +52,23 @@ public class SkillContainerUI : MonoBehaviour
 
         // 데미지
         sb = new StringBuilder();
-        for(int i = 0; i < skillSO.Skill[identity.sync].coins.Count; i++)
+        for(int i = 0; i < skillSO.coins.Count; i++)
         {
-            sb.Append(skillSO.Skill[identity.sync].coins[i].value);
-            if (i < skillSO.Skill[identity.sync].coins.Count - 1) sb.Append(" / ");
+            sb.Append(skillSO.coins[i].value);
+            if (i < skillSO.coins.Count - 1) sb.Append(" / ");
         }
         damageText.text = sb.ToString();
 
         // 가중치
-        sb = new StringBuilder(skillSO.Skill[identity.sync].targetCount);
-        for(int i = 0; i < skillSO.Skill[identity.sync].targetCount; i++)
+        sb = new StringBuilder(skillSO.targetCount);
+        for(int i = 0; i < skillSO.targetCount; i++)
         {
             sb.Append("<sprite=1>");
         }
         targetCountText.text = sb.ToString();
 
         // 설명
-        descriptionText.text = skillSO.Skill[identity.sync].ui.skillDescription;
+        descriptionText.text = skillSO.uiDatas[identity.sync].skillDescription;
 
         // 비용 매우 비싸니 주의! - 절대 1회 이상 호출되는 경우가 없도록 할것!
         LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);

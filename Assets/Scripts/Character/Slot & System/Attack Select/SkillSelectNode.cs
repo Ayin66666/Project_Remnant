@@ -39,8 +39,8 @@ public class SkillSelectNode : MonoBehaviour, IPointerEnterHandler, IPointerExit
         this.skill = skill;
 
         // UI ¼¼ÆÃ
-        icon.sprite = skill.Icon;
-        border.color = SkillUIUtility.GetCrimeColor(skill.CrimeType);
+        icon.sprite = skill.SkillSO.icon;
+        border.color = SkillUIUtility.GetCrimeColor(skill.SkillSO.crimeType);
     }
 
     /// <summary>

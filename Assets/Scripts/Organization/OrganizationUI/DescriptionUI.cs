@@ -40,29 +40,29 @@ public class DescriptionUI : MonoBehaviour
         // UI 세팅
         icon.sprite = skillSO.icon;
         nameText.text = skillSO.skillName;
-        descriptionText.text = skillSO.Skill[identity.sync].ui.skillDescription;
+        descriptionText.text = skillSO.uiDatas[identity.sync].skillDescription;
 
         // 코인 개수
-        StringBuilder sb = new StringBuilder(skillSO.Skill[identity.sync].coins.Count);
-        for (int i = 0; i < skillSO.Skill[identity.sync].coins.Count; i++)
+        StringBuilder sb = new StringBuilder(skillSO.coins.Count);
+        for (int i = 0; i < skillSO.coins.Count; i++)
         {
             sb.Append("<sprite=0>");
         }
         coinText.text = sb.ToString();
 
         // 위력
-        sb = new StringBuilder(skillSO.Skill[identity.sync].coins.Count * 6);
-        for(int i = 0; i < skillSO.Skill[identity.sync].coins.Count; i++)
+        sb = new StringBuilder(skillSO.coins.Count * 6);
+        for(int i = 0; i < skillSO.coins.Count; i++)
         {
-            Vector2 value = skillSO.Skill[identity.sync].coins[i].value;
+            Vector2 value = skillSO.coins[i].value;
             sb.Append(value.ToString("0.0"));
-            if(i < skillSO.Skill[identity.sync].coins.Count-1) sb.Append(" / ");
+            if(i < skillSO.coins.Count-1) sb.Append(" / ");
         }
         valueText.text = sb.ToString();
 
         // 가중치
-        sb = new StringBuilder(skillSO.Skill[identity.sync].targetCount);
-        for (int i = 0; i < skillSO.Skill[identity.sync].targetCount; i++)
+        sb = new StringBuilder(skillSO.targetCount);
+        for (int i = 0; i < skillSO.targetCount; i++)
         {
             sb.Append("<sprite=0>");
         }

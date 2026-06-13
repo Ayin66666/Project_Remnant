@@ -347,7 +347,7 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     private List<CharacterBase> GetTargets(AttackRequest request)
     {
-        int attackCount = request.ownerSlot.Skill.TargetCount;
+        int attackCount = request.ownerSlot.Skill.SkillSO.targetCount;
         List<CharacterBase> targets = new List<CharacterBase>(attackCount);
 
         // 메인 타겟을 제외한 attackCount-1 의 적을 선택

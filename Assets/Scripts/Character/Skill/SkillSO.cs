@@ -5,57 +5,62 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Skill_SkillName", menuName = "Skill/SkillSO", order = int.MaxValue)]
 public class SkillSO : ScriptableObject
 {
-    [Header("---Type---")]
+    [Header("---Skill Data---")]
+    /// <summary>
+    /// 스킬 이름
+    /// </summary>
+    public string skillName;
+    /// <summary>
+    /// 죄악 타입
+    /// </summary>
+    public Crime crimeType;
+    /// <summary>
+    /// 스킬 종류 (1 ~ 3스킬, 방어 스킬)
+    /// </summary>
     public SkillType skillType;
+    /// <summary>
+    /// 참관타
+    /// </summary>
+    public AttackType attackType;
+    /// <summary>
+    /// 일반 & 강화스킬 여부
+    /// </summary>
     public SkillVariantType skillVariantType;
+    /// <summary>
+    /// 스킬의 기본 위력
+    /// </summary>
+    public int originalPower;
+    /// <summary>
+    /// 1코인 당 추가되는 위력 수치
+    /// </summary>
+    public int coinPower;
+    /// <summary>
+    /// 공격 가중치 (1 ~ 9)
+    /// </summary>
+    public int targetCount;
+    /// <summary>
+    /// 코인 데이터 (벨류, 타격 횟수)
+    /// </summary>
+    public List<CoinInfo> coins;
     public enum SkillVariantType { Base = 0, Enhanced = 1 }
 
-    [Header("---Skill Data---")]
-    [SerializeField] private List<SkillInfo> skillinfo;
-    public Sprite icon;
-    public string skillName;
-    public List<SkillInfo> Skill => skillinfo;
-
-
-    [Header("---Action---")]
+    [Header("---UI---")]
     /// <summary>
-    /// 애니메이션 & 애니메이션 이벤트 동작
+    /// 스킬 아이콘 - UI 및 전투 표시용
     /// </summary>
-    public SkillBase skill;
+    public Sprite icon;
+    /// <summary>
+    /// UI 데이터
+    /// </summary>
+    public List<SkillUI> uiDatas;
 
 
+
+    #region 데이터 구조체
     [System.Serializable]
-    public struct SkillInfo
-    {
-        [Header("---Skill Data---")]
-        /// <summary>
-        /// 참관타
-        /// </summary>
-        public AttackType attackType;
-        /// <summary>
-        /// 죄악 타입
-        /// </summary>
-        public Crime crimeType;
-        /// <summary>
-        /// 1코인 당 추가되는 위력 수치
-        /// </summary>
-        public int coinPower;
-        /// <summary>
-        /// 공격 가중치 (1 ~ 9)
-        /// </summary>
-        public int targetCount;
-        /// <summary>
-        /// 코인 데이터 (벨류, 타격 횟수)
-        /// </summary>
-        public List<CoinInfo> coins;
-
-        /// <summary>
-        /// UI 데이터
-        /// </summary>
-        public SkillUI ui;
-    }
-
-    [System.Serializable]
+    /// <summary>
+    /// 코인의 앞 & 뒷면 데미지 value, 공격 횟수, 공격 당 데미지 배율 데이터
+    /// </summary>
     public struct CoinInfo
     {
         /// <summary>
@@ -63,15 +68,28 @@ public class SkillSO : ScriptableObject
         /// </summary>
         public Vector2 value;
         /// <summary>
-        /// 타격 횟수 (데미지 / hitCount)
+        /// (value x 공격 레벨?)로 계산된 데미지를 기반으로 총 데미지 계산
+        /// + 총 데미지를 attackEffect의 damagePercent로 나눠서 각 타격마다 데미지 부여
         /// </summary>
-        public int hitCount;
+        public List<HitInfo> hitDatas;
+
+        [System.Serializable]
+        public struct HitInfo
+        {
+            [Header("---Attack Effect Setting---")]
+            public int hitCount;
+            public float damagePercent;
+        }
     }
 
     [System.Serializable]
+    /// <summary>
+    /// 동기화 별 UI 데이터
+    /// </summary>
     public struct SkillUI
     {
         [SerializeField] private string sync;
         [TextArea] public string skillDescription;
     }
+    #endregion
 }

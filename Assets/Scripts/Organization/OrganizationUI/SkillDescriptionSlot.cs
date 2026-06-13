@@ -46,8 +46,8 @@ public class SkillDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointe
 
         // UI ¹èÄ¡
         icon.sprite = skillSO.icon;
-        coinPowerText.text = $"+ {skillSO.Skill[identity.sync].coinPower}";
-        for (int i = 0; i < skillSO.Skill[identity.sync].coins.Count; i++)
+        coinPowerText.text = $"+ {skillSO.coinPower}";
+        for (int i = 0; i < skillSO.coins.Count; i++)
         {
             GameObject obj = Instantiate(coinPrefab, coinRect);
         }

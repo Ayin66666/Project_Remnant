@@ -38,7 +38,7 @@ public class SkillSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         skillBase = skill;
 
         // UI ¼¼ÆÃ
-        icon.sprite = skill.Icon;
+        icon.sprite = skill.SkillSO.icon;
     }
 
     /// <summary>
