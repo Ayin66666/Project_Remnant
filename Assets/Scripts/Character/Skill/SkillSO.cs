@@ -39,6 +39,11 @@ public class SkillSO : ScriptableObject
     /// </summary>
     public int targetCount;
     /// <summary>
+    /// CoinInfo 내의 effectNodes는 코인 별 효과, 
+    /// 해당 List<EffectNode>는 사용 시 효과 전용
+    /// </summary>
+    public List<EffectNodeSO> skillEffects;
+    /// <summary>
     /// 코인 데이터 (벨류, 타격 횟수)
     /// </summary>
     public List<CoinInfo> coins;
@@ -55,7 +60,6 @@ public class SkillSO : ScriptableObject
     public List<SkillUI> uiDatas;
 
 
-
     #region 데이터 구조체
     [System.Serializable]
     /// <summary>
@@ -63,6 +67,7 @@ public class SkillSO : ScriptableObject
     /// </summary>
     public struct CoinInfo
     {
+        [Header("---Damage---")]
         /// <summary>
         /// 스킬 배율 (앞면 = X / 뒷면 = Y)
         /// </summary>
@@ -72,6 +77,13 @@ public class SkillSO : ScriptableObject
         /// + 총 데미지를 attackEffect의 damagePercent로 나눠서 각 타격마다 데미지 부여
         /// </summary>
         public List<HitInfo> hitDatas;
+
+        [Header("---Effects---")]
+        /// <summary>
+        /// 사용시, 적중시 같은 효과 발동 조건 데이터가 담긴 so
+        /// </summary>
+        public List<EffectNodeSO> effectNodes;
+
 
         [System.Serializable]
         public struct HitInfo
