@@ -10,35 +10,6 @@ public class StatusEffectContainer
 {
     [SerializeField] private CharacterBase owner;
     public List<StatusEffectInfo> effectlist;
-
-
-    /// <summary>
-    /// 최초 1회 호출 - 호출 위치 CharacterBase / 소환 직후
-    /// </summary>
-    /// <param name="owner"></param>
-    public void SetUp(CharacterBase owner)
-    {
-        this.owner = owner;
-    }
-
-    /// <summary>
-    /// 버프 & 디버프 추가
-    /// </summary>
-    /// <param name="newEffect"></param>
-    /// <param name="power"></param>
-    /// <param name="count"></param>
-    public void Add(StatusEffectSO newEffect, int power, int count)
-    {
-
-    }
-
-    /// <summary>
-    /// 버프 & 디버프 제거
-    /// </summary>
-    public void Remove()
-    {
-
-    }
 }
 
 /// <summary>
@@ -47,7 +18,7 @@ public class StatusEffectContainer
 [System.Serializable]
 public class StatusEffectInfo
 {
-    public StatusEffectSO effectSO;
+    public EffectBaseSO effectSO;
     public int power;
     public int count;
 }

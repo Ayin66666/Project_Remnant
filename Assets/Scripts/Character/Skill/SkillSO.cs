@@ -6,6 +6,7 @@ using UnityEngine;
 public class SkillSO : ScriptableObject
 {
     [Header("---Skill Data---")]
+    #region
     /// <summary>
     /// 스킬 이름
     /// </summary>
@@ -48,8 +49,10 @@ public class SkillSO : ScriptableObject
     /// </summary>
     public List<CoinInfo> coins;
     public enum SkillVariantType { Base = 0, Enhanced = 1 }
+    #endregion
 
     [Header("---UI---")]
+    #region
     /// <summary>
     /// 스킬 아이콘 - UI 및 전투 표시용
     /// </summary>
@@ -58,6 +61,7 @@ public class SkillSO : ScriptableObject
     /// UI 데이터
     /// </summary>
     public List<SkillUI> uiDatas;
+    #endregion
 
 
     #region 데이터 구조체
@@ -84,8 +88,10 @@ public class SkillSO : ScriptableObject
         /// </summary>
         public List<EffectNodeSO> effectNodes;
 
-
         [System.Serializable]
+        /// <summary>
+        /// 타격 횟수, 총 데미지 기준 비율(%) 데이터
+        /// </summary>
         public struct HitInfo
         {
             [Header("---Attack Effect Setting---")]

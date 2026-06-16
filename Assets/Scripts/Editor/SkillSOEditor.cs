@@ -4,17 +4,18 @@ using UnityEngine;
 [CustomEditor(typeof(SkillSO))]
 public class SkillSOEditor : Editor
 {
-    // 모든 커스텀 에디터 스크립트는 AI의 도움을 받아 작성하였습니다.
-
     // Skill Data
     SerializedProperty skillName;
     SerializedProperty crimeType;
     SerializedProperty skillType;
     SerializedProperty attackType;
     SerializedProperty skillVariantType;
+
     SerializedProperty originalPower;
     SerializedProperty coinPower;
     SerializedProperty targetCount;
+
+    SerializedProperty skillEffects;
     SerializedProperty coins;
 
     // UI
@@ -37,6 +38,7 @@ public class SkillSOEditor : Editor
         coinPower = serializedObject.FindProperty("coinPower");
         targetCount = serializedObject.FindProperty("targetCount");
 
+        skillEffects = serializedObject.FindProperty("skillEffects");
         coins = serializedObject.FindProperty("coins");
 
         icon = serializedObject.FindProperty("icon");
@@ -83,6 +85,11 @@ public class SkillSOEditor : Editor
         EditorGUILayout.PropertyField(coinPower);
         EditorGUILayout.PropertyField(targetCount);
 
+        EditorGUILayout.Space();
+
+        EditorGUILayout.LabelField("Skill Effects", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(skillEffects, true);
+
         EditorGUILayout.EndVertical();
     }
 
@@ -99,41 +106,51 @@ public class SkillSOEditor : Editor
 
         for (int i = 0; i < coins.arraySize; i++)
         {
-            SerializedProperty coin = coins.GetArrayElementAtIndex(i);
-
-            SerializedProperty value =
-                coin.FindPropertyRelative("value");
-
-            SerializedProperty hitDatas =
-                coin.FindPropertyRelative("hitDatas");
-
-            EditorGUILayout.BeginVertical("box");
-
-            EditorGUILayout.LabelField($"Coin {i + 1}", EditorStyles.boldLabel);
-
-            EditorGUILayout.PropertyField(value, new GUIContent("Front / Back Value"));
-
-            EditorGUILayout.Space();
-
-            DrawHitDatas(hitDatas);
-
-            EditorGUILayout.Space();
-
-            if (GUILayout.Button("Remove Coin"))
-            {
-                coins.DeleteArrayElementAtIndex(i);
-                break;
-            }
-
-            EditorGUILayout.EndVertical();
+            DrawCoin(coins.GetArrayElementAtIndex(i), i);
 
             EditorGUILayout.Space();
         }
 
         if (GUILayout.Button("Add Coin"))
         {
-            coins.InsertArrayElementAtIndex(coins.arraySize);
+            coins.arraySize++;
         }
+    }
+
+    void DrawCoin(SerializedProperty coin, int index)
+    {
+        SerializedProperty value =
+            coin.FindPropertyRelative("value");
+
+        SerializedProperty hitDatas =
+            coin.FindPropertyRelative("hitDatas");
+
+        SerializedProperty effectNodes =
+            coin.FindPropertyRelative("effectNodes");
+
+        EditorGUILayout.BeginVertical("box");
+
+        EditorGUILayout.LabelField($"Coin {index + 1}", EditorStyles.boldLabel);
+
+        EditorGUILayout.PropertyField(value, new GUIContent("Front / Back Value"));
+
+        EditorGUILayout.Space();
+
+        DrawHitDatas(hitDatas);
+
+        EditorGUILayout.Space();
+
+        EditorGUILayout.LabelField("Coin Effects", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(effectNodes, true);
+
+        EditorGUILayout.Space();
+
+        if (GUILayout.Button("Remove Coin"))
+        {
+            coins.DeleteArrayElementAtIndex(index);
+        }
+
+        EditorGUILayout.EndVertical();
     }
 
     void DrawHitDatas(SerializedProperty hitDatas)
@@ -165,11 +182,13 @@ public class SkillSOEditor : Editor
             }
 
             EditorGUILayout.EndVertical();
+
+            EditorGUILayout.Space();
         }
 
         if (GUILayout.Button("Add Hit"))
         {
-            hitDatas.InsertArrayElementAtIndex(hitDatas.arraySize);
+            hitDatas.arraySize++;
         }
     }
 
@@ -187,6 +206,8 @@ public class SkillSOEditor : Editor
         EditorGUILayout.BeginVertical("box");
 
         DrawIconPreview();
+
+        EditorGUILayout.Space();
 
         for (int i = 0; i < uiDatas.arraySize; i++)
         {
@@ -222,7 +243,7 @@ public class SkillSOEditor : Editor
 
         if (GUILayout.Button("Add UI Data"))
         {
-            uiDatas.InsertArrayElementAtIndex(uiDatas.arraySize);
+            uiDatas.arraySize++;
         }
 
         EditorGUILayout.EndVertical();
@@ -244,7 +265,8 @@ public class SkillSOEditor : Editor
 
         if (tex != null)
         {
-            GUILayout.Label(tex,
+            GUILayout.Label(
+                tex,
                 GUILayout.Width(96),
                 GUILayout.Height(96));
         }

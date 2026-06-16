@@ -24,7 +24,7 @@ public class EffectIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         statusEffectInfo = info;
         this.ui = ui;
 
-        icon.sprite = info.effectSO.effectIcon;
+        icon.sprite = info.effectSO.Icon;
         countText.text = $"{info.power} {info.count}";
     }
 
@@ -35,7 +35,7 @@ public class EffectIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public void UpdateDebuff(StatusEffectInfo info)
     {
         statusEffectInfo = info;
-        icon.sprite = info.effectSO.effectIcon;
+        icon.sprite = info.effectSO.Icon;
         countText.text = $"{info.power} {info.count}";
     }
 
