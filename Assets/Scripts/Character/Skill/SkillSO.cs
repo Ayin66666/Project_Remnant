@@ -43,7 +43,7 @@ public class SkillSO : ScriptableObject
     /// CoinInfo 내의 effectNodes는 코인 별 효과, 
     /// 해당 List<EffectNode>는 사용 시 효과 전용
     /// </summary>
-    public List<EffectNodeSO> skillEffects;
+    public List<EffectNode> skillEffects;
     /// <summary>
     /// 코인 데이터 (벨류, 타격 횟수)
     /// </summary>
@@ -86,7 +86,7 @@ public class SkillSO : ScriptableObject
         /// <summary>
         /// 사용시, 적중시 같은 효과 발동 조건 데이터가 담긴 so
         /// </summary>
-        public List<EffectNodeSO> effectNodes;
+        public List<EffectNode> effectNodes;
 
         [System.Serializable]
         /// <summary>

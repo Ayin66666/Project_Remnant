@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "Effect Node", menuName = "Skill/Effect Node", order = int.MaxValue)]
-public class EffectNodeSO : ScriptableObject
+[System.Serializable]
+public class EffectNode
 {
     [Header("---Effect Node---")]
     /// <summary>
@@ -13,7 +13,7 @@ public class EffectNodeSO : ScriptableObject
     [SerializeField] private TargetType targetType;
     [SerializeField] private List<ConditionNode> conditions;
 
-    public TriggerType Trigger => Trigger;
+    public TriggerType Trigger => triggerType;
     public TargetType Target => targetType;
     public List<ConditionNode> Conditions => conditions;
 
@@ -68,21 +68,22 @@ public class EffectNodeSO : ScriptableObject
         public ValueType valueType;
     }
 
-    /* 액션 노드 제거 결정 - 해당 기능은 skillbase 를 상속받은 세부 스크립트에서 선언
     [System.Serializable]
     /// <summary>
     /// 조건 만족 시 동작할 액션 타입 노드
     /// </summary>
     public struct ActionNode
     {
-        // 일단은 이렇게 적었으나,
-        // 최종적으로는 유틸리티 기반 기능 구현으로 갈듯
-        [Header("---Action---")]
-        public ActionType action;
-        public int value;
-        public enum ActionType { Add, Remove, Damage, Heal };
+        // 액션 노드는 설명과 액션 인덱스만 보유
+        // -> 세부 동작 선언은 SkillBase에서 해둠!
+        [Header("---Public Action---")]
+        public ActionType actionType;
+        public int actionValue;
+
+        [Header("---Original Action---")]
+        public int actionIndex;
+        [SerializeField, TextArea] private string actionDesCription;
     }
-    */
     #endregion
 }
 
@@ -105,4 +106,16 @@ public enum TriggerType
     // 턴
     TurnStart,
     TurnEnd
+}
+
+public enum ActionType
+{
+    Add,
+    Reomve,
+
+    healHp,
+    Damage,
+
+
+    Original
 }
