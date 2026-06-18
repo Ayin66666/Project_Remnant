@@ -54,7 +54,7 @@ public class SkillContainerUI : MonoBehaviour
         sb = new StringBuilder();
         for(int i = 0; i < skillSO.coins.Count; i++)
         {
-            sb.Append(skillSO.coins[i].value);
+            sb.Append(skillSO.coins[i].motionValue);
             if (i < skillSO.coins.Count - 1) sb.Append(" / ");
         }
         damageText.text = sb.ToString();

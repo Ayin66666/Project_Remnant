@@ -13,7 +13,7 @@ public class StageDescriptionUI : MonoBehaviour
     [SerializeField] private List<GameObject> attackTypeIcon;
     [SerializeField] private List<GameObject> crimeIcon;
     private Dictionary<AttackType, GameObject> attackTypeIconDic;
-    private Dictionary<Crime, GameObject> crimeIconDic;
+    private Dictionary<Sin, GameObject> crimeIconDic;
     private bool isSetUp = false;
 
     [Header("---UI---")]
@@ -38,15 +38,15 @@ public class StageDescriptionUI : MonoBehaviour
 
         // 아이콘 데이터 딕셔너리에 배치
         attackTypeIconDic = new Dictionary<AttackType, GameObject>();
-        crimeIconDic = new Dictionary<Crime, GameObject>();
+        crimeIconDic = new Dictionary<Sin, GameObject>();
 
         for (int i = 0; i < Enum.GetValues(typeof(AttackType)).Length; i++)
         {
             attackTypeIconDic.Add((AttackType)i, attackTypeIcon[i]);
         }
-        for (int i = 0; i < Enum.GetValues(typeof(Crime)).Length; i++)
+        for (int i = 0; i < Enum.GetValues(typeof(Sin)).Length; i++)
         {
-            crimeIconDic.Add((Crime)i, crimeIcon[i]);
+            crimeIconDic.Add((Sin)i, crimeIcon[i]);
         }
     }
     #endregion
@@ -90,7 +90,7 @@ public class StageDescriptionUI : MonoBehaviour
             Debug.Log(attackTypeIconDic[type]);
             GameObject obj = Instantiate(attackTypeIconDic[type], validAttributeRect);
         }
-        foreach (Crime type in data.stageSO.ValidCrimes)
+        foreach (Sin type in data.stageSO.ValidCrimes)
         {
             GameObject obj = Instantiate(crimeIconDic[type], validAttributeRect);
         }

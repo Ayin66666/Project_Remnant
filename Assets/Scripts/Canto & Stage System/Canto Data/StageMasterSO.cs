@@ -37,7 +37,7 @@ namespace Game.Stage
         /// 유효 속성
         /// </summary>
         [SerializeField] private List<AttackType> validAttack;
-        [SerializeField] private List<Crime> validCrimes;
+        [SerializeField] private List<Sin> validCrimes;
         /// <summary>
         ///  스테이지 진입 제약 조건
         /// </summary>
@@ -61,7 +61,7 @@ namespace Game.Stage
         public string StageName => stageName;
         public int StageLevel => stageLevel;
         public List<AttackType> ValidAttack => validAttack;
-        public List<Crime> ValidCrimes => validCrimes;
+        public List<Sin> ValidCrimes => validCrimes;
         public string StageOrder => stageOrder;
         public Sprite StageSprite => stageImage;
         public ExClearCondition ExClearCondition => exClearCondition;

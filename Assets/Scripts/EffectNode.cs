@@ -6,16 +6,25 @@ using UnityEngine;
 public class EffectNode
 {
     [Header("---Effect Node---")]
-    /// <summary>
-    /// 이펙트 노드
-    /// </summary>
     [SerializeField] private TriggerType triggerType;
     [SerializeField] private TargetType targetType;
-    [SerializeField] private List<ConditionNode> conditions;
 
+    [Header("---Condition---")]
+    [SerializeField] private CompareType compareType;
+    [SerializeField] private int conditionValue;
+    [SerializeField] private List<ValueNode> values;
+
+    [Header("---Action---")]
+    [SerializeField] private ActionNode action;
+
+    #region Getter
     public TriggerType Trigger => triggerType;
     public TargetType Target => targetType;
-    public List<ConditionNode> Conditions => conditions;
+    public CompareType Compare => compareType;
+    public int ConditionValue => conditionValue;
+    public List<ValueNode> Values => values;
+    public ActionNode Action => action;
+    #endregion
 
     #region Enum
     public enum TargetType
@@ -30,11 +39,9 @@ public class EffectNode
 
     public enum CompareType
     {
-        Less,
         LessEqual,
         Equal,
         GreaterEqual,
-        Greater
     }
 
     public enum ValueType
@@ -47,24 +54,12 @@ public class EffectNode
     #region 노드 구조체
     [System.Serializable]
     /// <summary>
-    /// 동작 조건 노드
-    /// </summary>
-    public struct ConditionNode
-    {
-        [Header("---Condition---")]
-        public List<ValueNode> values;
-        public CompareType compareType;
-        public int value;
-    }
-
-    [System.Serializable]
-    /// <summary>
     /// 조건 종류 & 조건 타입 노드
     /// </summary>>
     public struct ValueNode
     {
         [Header("---Value---")]
-        public EffectBaseSO effet;
+        public EffectBaseSO effect;
         public ValueType valueType;
     }
 
@@ -74,15 +69,15 @@ public class EffectNode
     /// </summary>
     public struct ActionNode
     {
-        // 액션 노드는 설명과 액션 인덱스만 보유
-        // -> 세부 동작 선언은 SkillBase에서 해둠!
         [Header("---Public Action---")]
         public ActionType actionType;
+        public ValueNode valueNode;
+        public Sin sinType;
         public int actionValue;
 
         [Header("---Original Action---")]
         public int actionIndex;
-        [SerializeField, TextArea] private string actionDesCription;
+        [TextArea] public string actionDescription;
     }
     #endregion
 }
@@ -110,12 +105,26 @@ public enum TriggerType
 
 public enum ActionType
 {
-    Add,
-    Reomve,
+    // 버프, 디버프 추가 & 제거
+    AddEffect,
+    RemoveEffect,
 
-    healHp,
+    // 회복
+    HealHp,
+    Shield,
+
+    // 데미지
     Damage,
+    DamageRatio,
 
+    // 데미지 증가
+    DamageMultiplier,
+    CriticalMultiplier,
 
+    // 재사용
+    ReuseCoin,
+    ReuseSkill,
+
+    // 오리지널 효과
     Original
 }

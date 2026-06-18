@@ -8,13 +8,9 @@ public class SkillSO : ScriptableObject
     [Header("---Skill Data---")]
     #region
     /// <summary>
-    /// 스킬 이름
-    /// </summary>
-    public string skillName;
-    /// <summary>
     /// 죄악 타입
     /// </summary>
-    public Crime crimeType;
+    public Sin crimeType;
     /// <summary>
     /// 스킬 종류 (1 ~ 3스킬, 방어 스킬)
     /// </summary>
@@ -54,6 +50,10 @@ public class SkillSO : ScriptableObject
     [Header("---UI---")]
     #region
     /// <summary>
+    /// 스킬 이름
+    /// </summary>
+    public string skillName;
+    /// <summary>
     /// 스킬 아이콘 - UI 및 전투 표시용
     /// </summary>
     public Sprite icon;
@@ -75,7 +75,7 @@ public class SkillSO : ScriptableObject
         /// <summary>
         /// 스킬 배율 (앞면 = X / 뒷면 = Y)
         /// </summary>
-        public Vector2 value;
+        public Vector2 motionValue;
         /// <summary>
         /// (value x 공격 레벨?)로 계산된 데미지를 기반으로 총 데미지 계산
         /// + 총 데미지를 attackEffect의 damagePercent로 나눠서 각 타격마다 데미지 부여
@@ -87,17 +87,17 @@ public class SkillSO : ScriptableObject
         /// 사용시, 적중시 같은 효과 발동 조건 데이터가 담긴 so
         /// </summary>
         public List<EffectNode> effectNodes;
+    }
 
-        [System.Serializable]
-        /// <summary>
-        /// 타격 횟수, 총 데미지 기준 비율(%) 데이터
-        /// </summary>
-        public struct HitInfo
-        {
-            [Header("---Attack Effect Setting---")]
-            public int hitCount;
-            public float damagePercent;
-        }
+    [System.Serializable]
+    /// <summary>
+    /// 타격 횟수, 총 데미지 기준 비율(%) 데이터
+    /// </summary>
+    public struct HitInfo
+    {
+        [Header("---Hit Info---")]
+        public int hitCount;
+        public float damagePercent;
     }
 
     [System.Serializable]

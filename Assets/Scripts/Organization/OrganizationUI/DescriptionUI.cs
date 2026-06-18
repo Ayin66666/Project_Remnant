@@ -54,7 +54,7 @@ public class DescriptionUI : MonoBehaviour
         sb = new StringBuilder(skillSO.coins.Count * 6);
         for(int i = 0; i < skillSO.coins.Count; i++)
         {
-            Vector2 value = skillSO.coins[i].value;
+            Vector2 value = skillSO.coins[i].motionValue;
             sb.Append(value.ToString("0.0"));
             if(i < skillSO.coins.Count-1) sb.Append(" / ");
         }

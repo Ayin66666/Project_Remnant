@@ -20,7 +20,7 @@ public enum DamageType
 /// <summary>
 /// 분노, 색욕, 나태, 탐식, 우울, 오만, 질투 - 에고 자원 & 스킬 유형
 /// </summary>
-public enum Crime
+public enum Sin
 {
     Wrath, // 분노
     Lust, // 색욕

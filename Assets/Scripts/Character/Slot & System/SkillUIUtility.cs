@@ -8,17 +8,17 @@ public static class SkillUIUtility
     /// </summary>
     /// <param name="crime">ак╬г а╬╥Ы</param>
     /// <returns></returns>
-    public static Color GetCrimeColor(Crime crime)
+    public static Color GetCrimeColor(Sin crime)
     {
         return crime switch
         {
-            Crime.Pride => new Color32(0, 0, 255, 255), // Blue
-            Crime.Wrath => new Color32(255, 0, 0, 255), // Red
-            Crime.Lust => new Color32(255, 128, 0, 255), // Orange
-            Crime.Sloth => new Color32(255, 255, 0, 255), // Yellow
-            Crime.Gula => new Color32(0, 255, 0, 255), // Green
-            Crime.Gloom => new Color32(135, 206, 235, 255), // Sky Blue
-            Crime.Envy => new Color32(128, 0, 128, 255), // Purple
+            Sin.Pride => new Color32(0, 0, 255, 255), // Blue
+            Sin.Wrath => new Color32(255, 0, 0, 255), // Red
+            Sin.Lust => new Color32(255, 128, 0, 255), // Orange
+            Sin.Sloth => new Color32(255, 255, 0, 255), // Yellow
+            Sin.Gula => new Color32(0, 255, 0, 255), // Green
+            Sin.Gloom => new Color32(135, 206, 235, 255), // Sky Blue
+            Sin.Envy => new Color32(128, 0, 128, 255), // Purple
             _ => Color.white
         };
     }
