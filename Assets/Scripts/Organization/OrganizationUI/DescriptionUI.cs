@@ -33,30 +33,30 @@ public class DescriptionUI : MonoBehaviour
     /// 스킬 셋업 - SkillSO
     /// </summary>
     /// <param name="skillSO"></param>
-    public void SetUp(IdentityData identity, SkillSO skillSO)
+    public void SkillSetUp(IdentityData identity, SkillSO skillSO)
     {
         Clear();
 
         // UI 세팅
         icon.sprite = skillSO.icon;
         nameText.text = skillSO.skillName;
-        descriptionText.text = skillSO.uiDatas[identity.sync].skillDescription;
+        descriptionText.text = SkillDescriptionBuilder.MakeDescription(skillSO, identity.sync);
 
         // 코인 개수
-        StringBuilder sb = new StringBuilder(skillSO.coins.Count);
-        for (int i = 0; i < skillSO.coins.Count; i++)
+        StringBuilder sb = new StringBuilder(skillSO.syncDatas[0].coins.Count);
+        for (int i = 0; i < skillSO.syncDatas[0].coins.Count; i++)
         {
             sb.Append("<sprite=0>");
         }
         coinText.text = sb.ToString();
 
         // 위력
-        sb = new StringBuilder(skillSO.coins.Count * 6);
-        for(int i = 0; i < skillSO.coins.Count; i++)
+        sb = new StringBuilder(skillSO.syncDatas[0].coins.Count * 6);
+        for (int i = 0; i < skillSO.syncDatas[0].coins.Count; i++)
         {
-            Vector2 value = skillSO.coins[i].motionValue;
+            Vector2 value = skillSO.syncDatas[0].coins[i].motionValue;
             sb.Append(value.ToString("0.0"));
-            if(i < skillSO.coins.Count-1) sb.Append(" / ");
+            if (i < skillSO.syncDatas[0].coins.Count - 1) sb.Append(" / ");
         }
         valueText.text = sb.ToString();
 
@@ -73,7 +73,7 @@ public class DescriptionUI : MonoBehaviour
     /// 에고 셋업 - EgoData
     /// </summary>
     /// <param name="ego"></param>
-    public void SetUp(EgoData ego)
+    public void EgoSetUp(EgoData ego)
     {
         Clear();
 

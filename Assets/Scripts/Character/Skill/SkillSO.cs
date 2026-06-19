@@ -6,7 +6,6 @@ using UnityEngine;
 public class SkillSO : ScriptableObject
 {
     [Header("---Skill Data---")]
-    #region
     /// <summary>
     /// 죄악 타입
     /// </summary>
@@ -24,31 +23,16 @@ public class SkillSO : ScriptableObject
     /// </summary>
     public SkillVariantType skillVariantType;
     /// <summary>
-    /// 스킬의 기본 위력
-    /// </summary>
-    public int originalPower;
-    /// <summary>
-    /// 1코인 당 추가되는 위력 수치
-    /// </summary>
-    public int coinPower;
-    /// <summary>
     /// 공격 가중치 (1 ~ 9)
     /// </summary>
     public int targetCount;
     /// <summary>
-    /// CoinInfo 내의 effectNodes는 코인 별 효과, 
-    /// 해당 List<EffectNode>는 사용 시 효과 전용
+    /// 동기화 별 스킬 데이터
     /// </summary>
-    public List<EffectNode> skillEffects;
-    /// <summary>
-    /// 코인 데이터 (벨류, 타격 횟수)
-    /// </summary>
-    public List<CoinInfo> coins;
+    public List<SyncData> syncDatas;
     public enum SkillVariantType { Base = 0, Enhanced = 1 }
-    #endregion
 
     [Header("---UI---")]
-    #region
     /// <summary>
     /// 스킬 이름
     /// </summary>
@@ -57,14 +41,34 @@ public class SkillSO : ScriptableObject
     /// 스킬 아이콘 - UI 및 전투 표시용
     /// </summary>
     public Sprite icon;
-    /// <summary>
-    /// UI 데이터
-    /// </summary>
-    public List<SkillUI> uiDatas;
-    #endregion
 
 
     #region 데이터 구조체
+    [System.Serializable]
+    /// <summary>
+    /// 동기화 별 스킬 데이터 묶음
+    /// </summary>
+    public struct SyncData
+    {
+        /// <summary>
+        /// 스킬의 기본 위력
+        /// </summary>
+        public int originalPower;
+        /// <summary>
+        /// 1코인 당 추가되는 위력 수치
+        /// </summary>
+        public int coinPower;
+        /// <summary>
+        /// CoinInfo 내의 effectNodes는 코인 별 효과, 
+        /// 해당 List<EffectNode>는 사용 시 효과 전용
+        /// </summary>
+        public List<EffectNode> skillEffects;
+        /// <summary>
+        /// 코인 데이터 (벨류, 타격 횟수)
+        /// </summary>
+        public List<CoinInfo> coins;
+    }
+
     [System.Serializable]
     /// <summary>
     /// 코인의 앞 & 뒷면 데미지 value, 공격 횟수, 공격 당 데미지 배율 데이터
@@ -98,16 +102,6 @@ public class SkillSO : ScriptableObject
         [Header("---Hit Info---")]
         public int hitCount;
         public float damagePercent;
-    }
-
-    [System.Serializable]
-    /// <summary>
-    /// 동기화 별 UI 데이터
-    /// </summary>
-    public struct SkillUI
-    {
-        [SerializeField] private string sync;
-        [TextArea] public string skillDescription;
     }
     #endregion
 }

@@ -236,7 +236,7 @@ public class CharacterDescription : MonoBehaviour
     {
         // 받은 정보를 기반으로 데이터 표시
         descriptionUI.gameObject.SetActive(isOn);
-        if (isOn) descriptionUI.SetUp(identity, skill);
+        if (isOn) descriptionUI.SkillSetUp(identity, skill);
     }
 
     /// <summary>
@@ -247,7 +247,7 @@ public class CharacterDescription : MonoBehaviour
     {
         // 받은 정보를 기반으로 데이터 표시
         descriptionUI.gameObject.SetActive(isOn);
-        if (isOn) descriptionUI.SetUp(ego);
+        if (isOn) descriptionUI.EgoSetUp(ego);
     }
     #endregion
 }

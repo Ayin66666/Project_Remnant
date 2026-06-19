@@ -9,18 +9,12 @@ public class SkillSOEditor : Editor
     SerializedProperty skillType;
     SerializedProperty attackType;
     SerializedProperty skillVariantType;
-
-    SerializedProperty originalPower;
-    SerializedProperty coinPower;
     SerializedProperty targetCount;
-
-    SerializedProperty skillEffects;
-    SerializedProperty coins;
+    SerializedProperty syncDatas;
 
     // UI
     SerializedProperty skillName;
     SerializedProperty icon;
-    SerializedProperty uiDatas;
 
     bool skillFoldout = true;
     bool coinFoldout = true;
@@ -33,18 +27,12 @@ public class SkillSOEditor : Editor
         skillType = serializedObject.FindProperty("skillType");
         attackType = serializedObject.FindProperty("attackType");
         skillVariantType = serializedObject.FindProperty("skillVariantType");
-
-        originalPower = serializedObject.FindProperty("originalPower");
-        coinPower = serializedObject.FindProperty("coinPower");
         targetCount = serializedObject.FindProperty("targetCount");
-
-        skillEffects = serializedObject.FindProperty("skillEffects");
-        coins = serializedObject.FindProperty("coins");
+        syncDatas = serializedObject.FindProperty("syncDatas");
 
         // UI
         skillName = serializedObject.FindProperty("skillName");
         icon = serializedObject.FindProperty("icon");
-        uiDatas = serializedObject.FindProperty("uiDatas");
     }
 
     public override void OnInspectorGUI()
@@ -52,10 +40,6 @@ public class SkillSOEditor : Editor
         serializedObject.Update();
 
         DrawSkillData();
-
-        EditorGUILayout.Space(10);
-
-        DrawCoins();
 
         EditorGUILayout.Space(10);
 
@@ -82,15 +66,11 @@ public class SkillSOEditor : Editor
 
         EditorGUILayout.Space();
 
-        EditorGUILayout.PropertyField(originalPower);
-        EditorGUILayout.PropertyField(coinPower);
         EditorGUILayout.PropertyField(targetCount);
 
         EditorGUILayout.Space();
 
-        EditorGUILayout.LabelField("Skill Effects", EditorStyles.boldLabel);
-
-        DrawEffectNodes(skillEffects);
+        DrawSyncDatas();
 
         EditorGUILayout.EndVertical();
     }
@@ -99,18 +79,88 @@ public class SkillSOEditor : Editor
 
     #region Coin
 
-    void DrawCoins()
+    void DrawSyncDatas()
     {
-        coinFoldout = EditorGUILayout.Foldout(coinFoldout, "Coins", true);
+        EditorGUILayout.LabelField(
+            "Sync Data",
+            EditorStyles.boldLabel);
 
-        if (!coinFoldout)
-            return;
+        for (int i = 0; i < syncDatas.arraySize; i++)
+        {
+            DrawSyncData(
+                syncDatas.GetArrayElementAtIndex(i),
+                i);
+
+            EditorGUILayout.Space();
+        }
+
+        if (GUILayout.Button("Add Sync"))
+        {
+            syncDatas.arraySize++;
+        }
+    }
+
+    void DrawSyncData(SerializedProperty sync, int index)
+    {
+        SerializedProperty originalPower =
+            sync.FindPropertyRelative("originalPower");
+
+        SerializedProperty coinPower =
+            sync.FindPropertyRelative("coinPower");
+
+        SerializedProperty skillEffects =
+            sync.FindPropertyRelative("skillEffects");
+
+        SerializedProperty coins =
+            sync.FindPropertyRelative("coins");
+
+        EditorGUILayout.BeginVertical("helpBox");
+
+        EditorGUILayout.LabelField(
+            $"Sync {index + 1}",
+            EditorStyles.boldLabel);
+
+        EditorGUILayout.Space();
+
+        EditorGUILayout.PropertyField(originalPower);
+        EditorGUILayout.PropertyField(coinPower);
+
+        EditorGUILayout.Space();
+
+        EditorGUILayout.LabelField(
+            "Skill Effects",
+            EditorStyles.boldLabel);
+
+        DrawEffectNodes(skillEffects);
+
+        EditorGUILayout.Space(50);
+
+        DrawCoins(coins);
+
+        EditorGUILayout.Space();
+
+        if (GUILayout.Button("Remove Sync"))
+        {
+            syncDatas.DeleteArrayElementAtIndex(index);
+        }
+
+        EditorGUILayout.EndVertical();
+    }
+
+    void DrawCoins(SerializedProperty coins)
+    {
+        EditorGUILayout.LabelField(
+            "Coins",
+            EditorStyles.boldLabel);
 
         for (int i = 0; i < coins.arraySize; i++)
         {
-            DrawCoin(coins.GetArrayElementAtIndex(i), i);
+            DrawCoin(
+                coins.GetArrayElementAtIndex(i),
+                coins,
+                i);
 
-            EditorGUILayout.Space();
+            EditorGUILayout.Space(50);
         }
 
         if (GUILayout.Button("Add Coin"))
@@ -119,7 +169,7 @@ public class SkillSOEditor : Editor
         }
     }
 
-    void DrawCoin(SerializedProperty coin, int index)
+    void DrawCoin(SerializedProperty coin, SerializedProperty coins, int index)
     {
         SerializedProperty motionValue =
             coin.FindPropertyRelative("motionValue");
@@ -132,7 +182,8 @@ public class SkillSOEditor : Editor
 
         EditorGUILayout.BeginVertical("box");
 
-        EditorGUILayout.LabelField($"Coin {index + 1}",
+        EditorGUILayout.LabelField(
+            $"Coin {index + 1}",
             EditorStyles.boldLabel);
 
         EditorGUILayout.PropertyField(
@@ -145,7 +196,8 @@ public class SkillSOEditor : Editor
 
         EditorGUILayout.Space();
 
-        EditorGUILayout.LabelField("Coin Effects",
+        EditorGUILayout.LabelField(
+            "Coin Effects",
             EditorStyles.boldLabel);
 
         DrawEffectNodes(effectNodes);
@@ -213,7 +265,7 @@ public class SkillSOEditor : Editor
                 break;
             }
 
-            EditorGUILayout.Space();
+            EditorGUILayout.Space(50);
         }
 
         if (GUILayout.Button("Add Effect"))
@@ -230,7 +282,7 @@ public class SkillSOEditor : Editor
             $"Effect {index + 1}",
             EditorStyles.boldLabel);
 
-        EditorGUILayout.Space();
+        EditorGUILayout.Space(20);
 
         EditorGUILayout.LabelField(
             "Trigger",
@@ -242,7 +294,7 @@ public class SkillSOEditor : Editor
         EditorGUILayout.PropertyField(
             node.FindPropertyRelative("targetType"));
 
-        EditorGUILayout.Space();
+        EditorGUILayout.Space(20);
 
         EditorGUILayout.LabelField(
             "Condition",
@@ -254,17 +306,17 @@ public class SkillSOEditor : Editor
         EditorGUILayout.PropertyField(
             node.FindPropertyRelative("conditionValue"));
 
-        EditorGUILayout.Space();
+        EditorGUILayout.Space(20);
 
         DrawValueNodes(
             node.FindPropertyRelative("values"));
 
-        EditorGUILayout.Space();
+        EditorGUILayout.Space(20);
 
-        DrawActionNode(
-            node.FindPropertyRelative("action"));
+        DrawActionNodes(
+            node.FindPropertyRelative("actions"));
 
-        EditorGUILayout.Space();
+        EditorGUILayout.Space(20);
 
         bool remove = GUILayout.Button("Remove Effect");
 
@@ -294,6 +346,8 @@ public class SkillSOEditor : Editor
             EditorGUILayout.PropertyField(
                 value.FindPropertyRelative("valueType"));
 
+            EditorGUILayout.Space(10);
+
             if (GUILayout.Button("Remove Value"))
             {
                 values.DeleteArrayElementAtIndex(i);
@@ -303,19 +357,37 @@ public class SkillSOEditor : Editor
             EditorGUILayout.EndVertical();
         }
 
+        EditorGUILayout.Space(10);
+
+
         if (GUILayout.Button("Add Value"))
         {
             values.arraySize++;
         }
     }
 
-    void DrawActionNode(SerializedProperty action)
+    void DrawActionNodes(SerializedProperty actions)
     {
-        EditorGUILayout.LabelField(
-            "Action",
-            EditorStyles.boldLabel);
+        for (int i = 0; i < actions.arraySize; i++)
+        {
+            DrawActionNode(
+                actions.GetArrayElementAtIndex(i),
+                i);
+        }
 
+        if (GUILayout.Button("Add Action"))
+        {
+            actions.arraySize++;
+        }
+    }
+
+    void DrawActionNode(SerializedProperty action, int index)
+    {
         EditorGUILayout.BeginVertical("box");
+
+        EditorGUILayout.LabelField(
+            $"Action {index + 1}",
+            EditorStyles.boldLabel);
 
         EditorGUILayout.PropertyField(
             action.FindPropertyRelative("actionType"));
@@ -341,6 +413,8 @@ public class SkillSOEditor : Editor
         EditorGUILayout.PropertyField(
             action.FindPropertyRelative("actionDescription"));
 
+        bool remove = GUILayout.Button("Remove Action");
+
         EditorGUILayout.EndVertical();
     }
 
@@ -352,50 +426,13 @@ public class SkillSOEditor : Editor
     {
         uiFoldout = EditorGUILayout.Foldout(uiFoldout, "UI", true);
 
-        if (!uiFoldout)
-            return;
+        if (!uiFoldout) return;
 
         EditorGUILayout.BeginVertical("box");
 
         EditorGUILayout.PropertyField(skillName);
 
         DrawIconPreview();
-
-        EditorGUILayout.Space();
-
-        for (int i = 0; i < uiDatas.arraySize; i++)
-        {
-            SerializedProperty ui =
-                uiDatas.GetArrayElementAtIndex(i);
-
-            EditorGUILayout.BeginVertical("helpBox");
-
-            EditorGUILayout.LabelField(
-                $"UI Data {i + 1}",
-                EditorStyles.boldLabel);
-
-            EditorGUILayout.PropertyField(
-                ui.FindPropertyRelative("sync"));
-
-            DrawLargeTextArea(
-                ui.FindPropertyRelative("skillDescription"),
-                10);
-
-            if (GUILayout.Button("Remove UI Data"))
-            {
-                uiDatas.DeleteArrayElementAtIndex(i);
-                break;
-            }
-
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.Space();
-        }
-
-        if (GUILayout.Button("Add UI Data"))
-        {
-            uiDatas.arraySize++;
-        }
 
         EditorGUILayout.EndVertical();
     }

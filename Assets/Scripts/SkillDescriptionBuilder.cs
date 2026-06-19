@@ -5,12 +5,23 @@ public static class SkillDescriptionBuilder
 {
     // 스킬 정보를 읽어 자동으로 string 화 시키는 로직
 
-    public static string MakeDescription(List<SkillSO.CoinInfo> coinInfo)
+    public static string MakeDescription(SkillSO skillSO, int sync)
     {
-        string description = string.Empty;
+        // 사용 시 발동 효과 데이터 텍스트화
         StringBuilder sd = new StringBuilder();
+        for (int i = 0; i < skillSO.syncDatas[sync].skillEffects.Count; i++)
+        {
+            // 조건 텍스트화
+            string triggerText = GetTriggerText(skillSO.syncDatas[sync].skillEffects[i].Trigger);
+            string conditionText = GetConditionText(skillSO.syncDatas[sync].skillEffects[i]);
+            string actionText = GetActionText(skillSO.syncDatas[sync].skillEffects[i].Actions);
 
-        // 코인 데이터만큼 반복
+            // 데이터 추가
+            sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
+        }
+
+        // 코인 효과 데이터 텍스트화
+        List<SkillSO.CoinInfo> coinInfo = skillSO.syncDatas[sync].coins;
         for (int i = 0; i < coinInfo.Count; i++)
         {
             // 코인 표시 텍스트
@@ -20,21 +31,20 @@ public static class SkillDescriptionBuilder
             for (int j = 0; j < coinInfo[i].effectNodes.Count; j++)
             {
                 // 트리거 - ([사용 시], [피격 시], [합 승리 시] 등등)
-                string TriggerText = GetTriggerText(coinInfo[i].effectNodes[j].Trigger);
+                string triggerText = GetTriggerText(coinInfo[i].effectNodes[j].Trigger);
 
                 // 조건 - (n1이 n2 이상이면, n1 + n2 의 합이 n3 이상이면 등등)
                 string conditionText = GetConditionText(coinInfo[i].effectNodes[j]);
 
                 // 효과 - (체력 50 회복, 실드 25% 획득, 주는 데미지 50% 증가 등등)
-                string actionText = GetActionText(coinInfo[i].effectNodes[j].Action);
+                string actionText = GetActionText(coinInfo[i].effectNodes[j].Actions);
 
                 // 텍스트 조립
-                sd.Append($"[{TriggerText}] {conditionText} {actionText}\n");
+                sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
             }
         }
 
-        description = sd.ToString();
-        return description;
+        return sd.ToString();
     }
 
 
@@ -128,38 +138,49 @@ public static class SkillDescriptionBuilder
     /// 동작 액션 텍스트 전환 함수
     /// </summary>
     /// <returns></returns>
-    private static string GetActionText(EffectNode.ActionNode node)
+    private static string GetActionText(List<EffectNode.ActionNode> nodes)
     {
+        StringBuilder sb = new StringBuilder();
+
         string re = string.Empty;
-
-        // 액션 텍스트 작성
-        re = node.actionType switch
+        for (int i = 0; i < nodes.Count; i++)
         {
-            // 효과 추가 & 제거
-            ActionType.AddEffect => $"{node.valueNode.effect.EffectName} {GetEffectTypeText(node.valueNode.valueType)} {node.actionValue} 부여",
-            ActionType.RemoveEffect => $"{node.valueNode.effect.EffectName} {GetEffectTypeText(node.valueNode.valueType)} 제거",
+            // 액션 텍스트 작성
+            re = nodes[i].actionType switch
+            {
+                // 효과 추가 & 제거
+                ActionType.AddEffect => $"{nodes[i].valueNode.effect.EffectName} {GetEffectTypeText(nodes[i].valueNode.valueType)} {nodes[i].actionValue} 부여",
+                ActionType.RemoveEffect => $"{nodes[i].valueNode.effect.EffectName} {GetEffectTypeText(nodes[i].valueNode.valueType)} 제거",
 
-            // 회복 & 실드
-            ActionType.HealHp => $"체력 {node.actionValue} 회복",
-            ActionType.Shield => $"실드 {node.actionValue} 획득",
+                // 회복 & 실드
+                ActionType.HealHp => $"체력 {nodes[i].actionValue} 회복",
+                ActionType.Shield => $"실드 {nodes[i].actionValue} 획득",
 
-            // 속성 데미지 & 퍼센트 데미지
-            ActionType.Damage => $"{node.sinType} 속성 피해 {node.actionValue}",
-            ActionType.DamageRatio => $"최종 피해량의 {node.actionValue}% 만큼 추가 데미지",
+                // 속성 데미지 & 퍼센트 데미지
+                ActionType.Damage => $"{nodes[i].sinType} 속성 피해 {nodes[i].actionValue}",
+                ActionType.DamageRatio => $"최종 피해량의 {nodes[i].actionValue}% 만큼 추가 데미지",
 
-            // 데미지 증가 & 치피 증가
-            ActionType.DamageMultiplier => $"데미지 {node.actionValue}% 증가",
-            ActionType.CriticalMultiplier => $"치명타 피해량 {node.actionValue}% 증가",
+                // 데미지 증가 & 치피 증가
+                ActionType.DamageMultiplier => $"데미지 {nodes[i].actionValue}% 증가",
+                ActionType.CriticalMultiplier => $"치명타 피해량 {nodes[i].actionValue}% 증가",
 
-            // 코인 & 스킬 재사용
-            ActionType.ReuseCoin => "이 코인을 재사용",
-            ActionType.ReuseSkill => "이 스킬을 재사용",
+                // 코인 & 스킬 재사용
+                ActionType.ReuseCoin => "이 코인을 재사용",
+                ActionType.ReuseSkill => "이 스킬을 재사용",
 
-            // 오리지널 액션
-            ActionType.Original => node.actionDescription,
-            _ => "",
-        };
+                // 오리지널 액션
+                ActionType.Original => nodes[i].actionDescription,
+                _ => "",
+            };
 
-        return re;
+            sb.Append(re);
+
+            if(i < nodes.Count-1)
+            {
+                sb.Append(", ");
+            }
+        }
+
+        return sb.ToString();
     }
 }

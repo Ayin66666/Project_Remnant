@@ -15,7 +15,7 @@ public class EffectNode
     [SerializeField] private List<ValueNode> values;
 
     [Header("---Action---")]
-    [SerializeField] private ActionNode action;
+    [SerializeField] private List<ActionNode> actions;
 
     #region Getter
     public TriggerType Trigger => triggerType;
@@ -23,7 +23,7 @@ public class EffectNode
     public CompareType Compare => compareType;
     public int ConditionValue => conditionValue;
     public List<ValueNode> Values => values;
-    public ActionNode Action => action;
+    public List<ActionNode> Actions => actions;
     #endregion
 
     #region Enum
