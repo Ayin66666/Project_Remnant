@@ -50,6 +50,7 @@ public class SkillSO : ScriptableObject
     /// </summary>
     public struct SyncData
     {
+        [Header("---동기화 별 스킬 기본 데이터---")]
         /// <summary>
         /// 스킬의 기본 위력
         /// </summary>
@@ -63,6 +64,8 @@ public class SkillSO : ScriptableObject
         /// 해당 List<EffectNode>는 사용 시 효과 전용
         /// </summary>
         public List<EffectNode> skillEffects;
+
+        [Header("---코인 데이터---")]
         /// <summary>
         /// 코인 데이터 (벨류, 타격 횟수)
         /// </summary>
@@ -75,7 +78,7 @@ public class SkillSO : ScriptableObject
     /// </summary>
     public struct CoinInfo
     {
-        [Header("---Damage---")]
+        [Header("---데미지 배율 & 타격 분할---")]
         /// <summary>
         /// 스킬 배율 (앞면 = X / 뒷면 = Y)
         /// </summary>
@@ -86,7 +89,7 @@ public class SkillSO : ScriptableObject
         /// </summary>
         public List<HitInfo> hitDatas;
 
-        [Header("---Effects---")]
+        [Header("---발동 효과---")]
         /// <summary>
         /// 사용시, 적중시 같은 효과 발동 조건 데이터가 담긴 so
         /// </summary>

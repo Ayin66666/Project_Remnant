@@ -125,6 +125,7 @@ public static class SkillDescriptionBuilder
     {
         string re = type switch
         {
+            EffectNode.CompareType.None => "",
             EffectNode.CompareType.Equal => "이라면 ",
             EffectNode.CompareType.LessEqual => "이하라면 ",
             EffectNode.CompareType.GreaterEqual => "이상이라면 ",

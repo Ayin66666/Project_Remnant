@@ -39,6 +39,7 @@ public class EffectNode
 
     public enum CompareType
     {
+        None,
         LessEqual,
         Equal,
         GreaterEqual,
