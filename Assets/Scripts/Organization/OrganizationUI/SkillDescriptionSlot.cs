@@ -45,7 +45,7 @@ public class SkillDescriptionSlot : MonoBehaviour, IPointerEnterHandler, IPointe
         Debug.Log(skillSO);
 
         // UI ¹èÄ¡
-        icon.sprite = skillSO.icon;
+        icon.sprite = skillSO.Icon;
         coinPowerText.text = $"+ {skillSO.syncDatas[identity.sync].coinPower}";
         for (int i = 0; i < skillSO.syncDatas[0].coins.Count; i++)
         {

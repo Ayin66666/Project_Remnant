@@ -21,23 +21,23 @@ public static class SkillDescriptionBuilder
         }
 
         // 코인 효과 데이터 텍스트화
-        List<SkillSO.CoinInfo> coinInfo = skillSO.syncDatas[sync].coins;
+        List<CoinInfoSO> coinInfo = skillSO.syncDatas[sync].coins;
         for (int i = 0; i < coinInfo.Count; i++)
         {
             // 코인 표시 텍스트
             sd.Append($"{i + 1} 코인\n");
 
             // 조건 & 동작 데이터
-            for (int j = 0; j < coinInfo[i].effectNodes.Count; j++)
+            for (int j = 0; j < coinInfo[i].EffectNodes.Count; j++)
             {
                 // 트리거 - ([사용 시], [피격 시], [합 승리 시] 등등)
-                string triggerText = GetTriggerText(coinInfo[i].effectNodes[j].Trigger);
+                string triggerText = GetTriggerText(coinInfo[i].EffectNodes[j].Trigger);
 
                 // 조건 - (n1이 n2 이상이면, n1 + n2 의 합이 n3 이상이면 등등)
-                string conditionText = GetConditionText(coinInfo[i].effectNodes[j]);
+                string conditionText = GetConditionText(coinInfo[i].EffectNodes[j]);
 
                 // 효과 - (체력 50 회복, 실드 25% 획득, 주는 데미지 50% 증가 등등)
-                string actionText = GetActionText(coinInfo[i].effectNodes[j].Actions);
+                string actionText = GetActionText(coinInfo[i].EffectNodes[j].Actions);
 
                 // 텍스트 조립
                 sd.Append($"[{triggerText}] {conditionText} {actionText}\n");

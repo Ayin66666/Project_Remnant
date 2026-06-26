@@ -38,8 +38,8 @@ public class DescriptionUI : MonoBehaviour
         Clear();
 
         // UI 세팅
-        icon.sprite = skillSO.icon;
-        nameText.text = skillSO.skillName;
+        icon.sprite = skillSO.Icon;
+        nameText.text = skillSO.SkillName;
         descriptionText.text = SkillDescriptionBuilder.MakeDescription(skillSO, identity.sync);
 
         // 코인 개수
@@ -54,7 +54,7 @@ public class DescriptionUI : MonoBehaviour
         sb = new StringBuilder(skillSO.syncDatas[0].coins.Count * 6);
         for (int i = 0; i < skillSO.syncDatas[0].coins.Count; i++)
         {
-            Vector2 value = skillSO.syncDatas[0].coins[i].motionValue;
+            Vector2 value = skillSO.syncDatas[0].coins[i].MotionValue;
             sb.Append(value.ToString("0.0"));
             if (i < skillSO.syncDatas[0].coins.Count - 1) sb.Append(" / ");
         }

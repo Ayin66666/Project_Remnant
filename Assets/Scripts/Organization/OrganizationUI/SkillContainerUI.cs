@@ -34,7 +34,7 @@ public class SkillContainerUI : MonoBehaviour
         this.skill = skillSO;
 
         // 아이콘
-        skillIcon.sprite = skillSO.icon;
+        skillIcon.sprite = skillSO.Icon;
 
         // 코인 위력
         coinPowerText.text = $"+ {skillSO.syncDatas[identity.sync].coinPower}";
@@ -48,13 +48,13 @@ public class SkillContainerUI : MonoBehaviour
         coinText.text = sb.ToString();
 
         // 스킬 이름
-        skillNameText.text = skillSO.skillName;
+        skillNameText.text = skillSO.SkillName;
 
         // 데미지
         sb = new StringBuilder();
         for(int i = 0; i < skillSO.syncDatas[0].coins.Count; i++)
         {
-            sb.Append(skillSO.syncDatas[0].coins[i].motionValue);
+            sb.Append(skillSO.syncDatas[0].coins[i].MotionValue);
             if (i < skillSO.syncDatas[0].coins.Count - 1) sb.Append(" / ");
         }
         damageText.text = sb.ToString();
