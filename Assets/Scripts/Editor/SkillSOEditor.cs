@@ -4,6 +4,7 @@ using UnityEngine;
 [CustomEditor(typeof(SkillSO))]
 public class SkillSOEditor : Editor
 {
+    /*
     // Skill Data
     SerializedProperty crimeType;
     SerializedProperty skillType;
@@ -481,4 +482,5 @@ public class SkillSOEditor : Editor
     }
 
     #endregion
+    */
 }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "StatusData", menuName = "ScriptableObject/Status", order = int.MaxValue)]
+[CreateAssetMenu(fileName = "StatusData", menuName = "Identity/Status", order = int.MaxValue)]
 public class StatusDataSO : ScriptableObject
 {
     // 스테이터스 종류

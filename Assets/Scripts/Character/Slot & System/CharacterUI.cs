@@ -80,7 +80,7 @@ public class CharacterUI : MonoBehaviour
     /// 버프 & 디버프 추가
     /// </summary>
     /// <param name="debuffInfo"></param>
-    public void AddStatusEffectIcon(StatusEffectInfo effectInfo)
+    public void AddStatusEffectIcon(StatEffectRuntimeData effectInfo)
     {
         GameObject obj = Instantiate(effectIconPrefab, effectIconRect);
         EffectIconUI ui = obj.GetComponent<EffectIconUI>();

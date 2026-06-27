@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class EffectIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("---Setting---")]
-    [SerializeField] private StatusEffectInfo statusEffectInfo;
+    [SerializeField] private StatEffectRuntimeData statusEffectInfo;
     [SerializeField] private CharacterUI ui;
 
     [Header("---UI---")]
@@ -19,7 +19,7 @@ public class EffectIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     /// 최초 1회 버프 & 디버프 추가 시 호출
     /// </summary>
     /// <param name="info"></param>
-    public void SetUp(StatusEffectInfo info, CharacterUI ui)
+    public void SetUp(StatEffectRuntimeData info, CharacterUI ui)
     {
         statusEffectInfo = info;
         this.ui = ui;
@@ -32,7 +32,7 @@ public class EffectIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     /// 디버프 데이터 업데이트 - 위력 & 횟수 변경 및 키워드 전환 시 호출
     /// </summary>
     /// <param name="debuffInfo"></param>
-    public void UpdateDebuff(StatusEffectInfo info)
+    public void UpdateDebuff(StatEffectRuntimeData info)
     {
         statusEffectInfo = info;
         icon.sprite = info.effectSO.Icon;

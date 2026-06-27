@@ -37,7 +37,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] protected SkillSlot[] attackSlots;
 
     [Header("---Status Effect---")]
-    [SerializeField] protected StatusEffectContainer statusEffectContainer;
+    [SerializeField] protected List<StatEffectRuntimeData> statusEffects;
 
     [Header("---Component---")]
     [SerializeField] protected Transform body;
@@ -282,4 +282,17 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         // 사망 스프라이트
     }
     #endregion
+}
+
+
+/// <summary>
+/// 버프 & 디버프의 종류, 위력, 횟수 런타임 데이터 
+/// </summary>
+[System.Serializable]
+public class StatEffectRuntimeData
+{
+    [Header("---이펙트 데이터---")]
+    public EffectBaseSO effectSO;
+    public int power;
+    public int count;
 }
