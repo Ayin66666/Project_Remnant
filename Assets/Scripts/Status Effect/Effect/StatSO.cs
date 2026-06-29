@@ -5,12 +5,12 @@ using UnityEngine;
 public class StatSO : EffectBaseSO
 {
     [Header("---Stat Setting---")]
-    [SerializeField] private StatType statType;
+    [SerializeField] private CombatEffectType statType;
 
     /// <summary>
     /// 공격 포인트, 방어 포인트, 최종뎀증, 최종뎀감
     /// </summary>
-    public enum StatType
+    public enum CombatEffectType
     { 
         None, 
         AttackPoint, 
@@ -19,7 +19,9 @@ public class StatSO : EffectBaseSO
         FinalDamageTaken,
     }
 
-    public override void Use(EffectContext data)
+
+
+    public override void Use(CharacterBase target)
     {
         // 이펙트 동작 방식은 내가 어떤 동작을 해야하는지 알려주는 방식이 맞지 않나?
         // 아니면 값을 받아서 동작해야하나?
@@ -35,24 +37,25 @@ public class StatSO : EffectBaseSO
 
         switch (statType)
         {
-            case StatType.None:
+            case CombatEffectType.None:
                 break;
 
-            case StatType.AttackPoint:
+            case CombatEffectType.AttackPoint:
                 // 공격 포인트 + 값
                 break;
 
-            case StatType.DefensePoint:
+            case CombatEffectType.DefensePoint:
                 // 방어 포인트 + 값
                 break;
 
-            case StatType.FinalDamageDealt:
+            case CombatEffectType.FinalDamageDealt:
                 // 최종 데미지 증가 + 값
                 break;
 
-            case StatType.FinalDamageTaken:
+            case CombatEffectType.FinalDamageTaken:
                 // 받뎀감 + 값
                 break;
         }
     }
+
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Character;
+using System.Linq;
 
 
 public abstract class CharacterBase : MonoBehaviour, IDamageable
@@ -242,7 +243,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     {
         int damage = info.damageType switch
         {
-            DamageType.Normal => CalNormalDamage(info),
+            DamageType.Normal => CalDamage(info),
             DamageType.Keyword => info.keywordDamage,
             _ => 0,
         };
@@ -260,7 +261,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// </summary>
     /// <param name="info"></param>
     /// <returns></returns>
-    public int CalNormalDamage(DamageInfo info)
+    public int CalDamage(DamageInfo info)
     {
         // 데미지 공식
         // (공격 포인트 * 모션 배율 * 치명타 배율[1.5]) * step
@@ -275,6 +276,13 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         damage = Mathf.Max(1, damage);
 
         return (int)damage;
+    }
+
+    public (int power, int count) GetKeyword(KeywordType keyword)
+    {
+        (int power, int count) = (0, 0);
+        // statusEffects.Where(x => x.effectSO.keyowrd == keyword);
+        return (power, count);
     }
 
     public virtual void Die()

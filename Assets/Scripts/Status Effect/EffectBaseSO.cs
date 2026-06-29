@@ -6,11 +6,16 @@ public abstract class EffectBaseSO : ScriptableObject
     [Header("---Setting---")]
     [SerializeField] private TriggerType triggerType;
     [SerializeField] private StackType stackType;
+    [SerializeField] private KeywordType keywordType;
+    /// <summary>
+    /// 스택 가능, 불가능 여부
+    /// </summary>
     public enum StackType
     {
         None,
         Stackable
     }
+
 
     [Header("---UI---")]
     [SerializeField] private Sprite icon;
@@ -24,20 +29,23 @@ public abstract class EffectBaseSO : ScriptableObject
     public string EffectDescription => effectDescription;
 
 
-
     /// <summary>
-    /// 세부 기능 구현부 함수
-    /// 필요 데이터는 (누구에게, 뭐를, 얼마나)임!
+    /// 세부 기능 구현부
     /// </summary>
-    public abstract void Use(EffectContext data);
+    public abstract void Use(CharacterBase target);
 }
 
-
-
-[System.Serializable]
-public class EffectContext
+/// <summary>
+/// 없음, 화상, 출혈, 진동, 침잠, 파열, 호흡, 충전
+/// </summary>
+public enum KeywordType
 {
-    public CharacterBase target;
-    public EffectNode.ValueType type;
-    public int value;
+    None,
+    Bleed,
+    Burn,
+    Vibration,
+    Sinking,
+    Rupture,
+    poise,
+    Charge
 }

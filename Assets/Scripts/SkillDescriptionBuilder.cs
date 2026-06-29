@@ -105,12 +105,12 @@ public static class SkillDescriptionBuilder
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    private static string GetEffectTypeText(EffectNode.ValueType type)
+    private static string GetEffectTypeText(ValueType type)
     {
         string re = type switch
         {
-            EffectNode.ValueType.Power => "À§·Â",
-            EffectNode.ValueType.Count => "È½¼ö",
+            ValueType.Power => "À§·Â",
+            ValueType.Count => "È½¼ö",
             _ => "",
         };
         return re;

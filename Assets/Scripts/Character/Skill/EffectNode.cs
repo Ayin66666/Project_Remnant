@@ -44,12 +44,6 @@ public class EffectNode
         Equal,
         GreaterEqual,
     }
-
-    public enum ValueType
-    {
-        Power,
-        Count
-    }
     #endregion
 
     #region 노드 구조체
@@ -128,4 +122,10 @@ public enum ActionType
 
     // 오리지널 효과
     Original
+}
+
+public enum ValueType
+{
+    Power,
+    Count
 }
