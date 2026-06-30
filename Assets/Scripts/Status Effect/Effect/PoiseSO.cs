@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "", menuName = "", order = int.MaxValue)]
+[CreateAssetMenu(fileName = "PoiseSO", menuName = "Character/StatusEffect/Poise", order = int.MaxValue)]
 public class PoiseSO : KeywordSO
 {
     public override void Use(CharacterBase target)
