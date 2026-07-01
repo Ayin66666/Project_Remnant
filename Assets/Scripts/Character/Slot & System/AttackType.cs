@@ -3,25 +3,18 @@
 /// </summary>
 public enum AttackType 
 { 
+    None,
     Slash, 
     Pierce, 
     Blunt 
 }
 
 /// <summary>
-/// 일반 데미지, 키워드 데미지
-/// </summary>
-public enum DamageType
-{ 
-    Normal, 
-    Keyword 
-}
-
-/// <summary>
 /// 분노, 색욕, 나태, 탐식, 우울, 오만, 질투 - 에고 자원 & 스킬 유형
 /// </summary>
-public enum Sin
+public enum SinType
 {
+    None, // 없음 - 무속성
     Wrath, // 분노
     Lust, // 색욕
     Sloth, // 나태

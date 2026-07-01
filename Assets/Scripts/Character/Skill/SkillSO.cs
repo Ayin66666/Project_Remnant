@@ -9,7 +9,7 @@ public class SkillSO : ScriptableObject
     /// <summary>
     /// 죄악 타입
     /// </summary>
-    public Sin sinType;
+    public SinType sinType;
     /// <summary>
     /// 스킬 종류 (1 ~ 3스킬, 방어 스킬)
     /// </summary>

@@ -67,7 +67,7 @@ public class EffectNode
         [Header("---Public Action---")]
         public ActionType actionType;
         public ValueNode valueNode;
-        public Sin sinType;
+        public SinType sinType;
         public int actionValue;
 
         [Header("---Original Action---")]

@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Game.Character;
 using System.Linq;
 
 
@@ -14,11 +13,14 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     // 4. 인게임 UI (체력바, 이름, 버프 & 디버프 표시)
 
     [Header("---Test---")]
+    #region
     [SerializeField] private float testSpeed;
     [SerializeField] private Transform testPos;
     [SerializeField] private KnockbackType testKnockbackType;
+    #endregion
 
     [Header("---Status---")]
+    #region
     [SerializeField] protected int level;
     [SerializeField] protected int sync;
     [SerializeField] protected int maxHp;
@@ -33,20 +35,25 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     public List<int> Groggy => groggy;
     public int Mentality => mentality;
     public int Speed => speed;
+    #endregion
 
     [Header("---Slot---")]
     [SerializeField] protected SkillSlot[] attackSlots;
 
     [Header("---Status Effect---")]
+    [SerializeField] protected Dictionary<KeywordType, StatEffectRuntimeData> keywordEffects;
     [SerializeField] protected List<StatEffectRuntimeData> statusEffects;
 
     [Header("---Component---")]
+    #region
     [SerializeField] protected Transform body;
     [SerializeField] protected Rigidbody2D rigid;
     [SerializeField] protected Animator anim;
     [SerializeField] protected CharacterUI characterUI;
+    #endregion
 
     [Header("---Setting---")]
+    #region
     [SerializeField] protected CharacterGroup characterGroup;
     [SerializeField] private Facing facing;
     [SerializeField] private bool isMove;
@@ -71,6 +78,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         Enemy,
         AllyNpc,
     }
+    #endregion
 
 
     private void Update()
@@ -239,15 +247,14 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
 
     #region 데미지 로직
-    public void TakeDamage(DamageInfo info)
+    public void TakeDamage(AttackInfo info)
     {
-        int damage = info.damageType switch
-        {
-            DamageType.Normal => CalDamage(info),
-            DamageType.Keyword => info.keywordDamage,
-            _ => 0,
-        };
+        // 데미지 계산 방식 변경 예정
+        // 1. target의 정보와 내 공격 정보를 기반으로 데미지 계산을 위한 Info 전달
+        // 2. info 기반 데미지 계산 후 반환
+        // 3. 반환 데미지를 target의 takeDamage에 전달
 
+        int damage = 0;
         curHp -= damage;
         if(curHp <= 0)
         {
@@ -261,15 +268,14 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// </summary>
     /// <param name="info"></param>
     /// <returns></returns>
-    public int CalDamage(DamageInfo info)
+    public int CalDamage(AttackInfo info)
     {
         // 데미지 공식
         // (공격 포인트 * 모션 배율 * 치명타 배율[1.5]) * step
         // step = 공격자의 공격 포인트 - 방어 포인트 했을 때, 얼마나 차이 나는지
         // (3 차이 날 때마다 데미지 10% 증감)
 
-        bool isCri = Random.Range(0, 100) < info.critChance;
-        float damage = info.attackPoint * info.motionValue * (isCri ? info.critMultiplier : 1);
+        float damage = info.attackPoint * info.motionValue * (info.isCritical ? info.critMultiplier : 1);
         int diff = info.attackPoint - defence;
         int step = diff / 3;
         damage *= 1 + step * 0.1f;
@@ -278,10 +284,19 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         return (int)damage;
     }
 
+    /// <summary>
+    /// 필요한 키워드의 보유 값 전달
+    /// </summary>
+    /// <param name="keyword">값이 필요한 키워드</param>
+    /// <returns></returns>
     public (int power, int count) GetKeyword(KeywordType keyword)
     {
         (int power, int count) = (0, 0);
-        // statusEffects.Where(x => x.effectSO.keyowrd == keyword);
+        foreach(var effect in statusEffects)
+        {
+
+        }
+
         return (power, count);
     }
 
@@ -293,14 +308,20 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 }
 
 
-/// <summary>
-/// 버프 & 디버프의 종류, 위력, 횟수 런타임 데이터 
-/// </summary>
+#region
 [System.Serializable]
-public class StatEffectRuntimeData
+public class KeywordEffectRuntimeData
 {
-    [Header("---이펙트 데이터---")]
-    public EffectBaseSO effectSO;
+    public EffectBaseSO keywordSO;
     public int power;
     public int count;
 }
+
+[System.Serializable]
+public class StatEffectRuntimeData
+{
+    public EffectBaseSO statSO;
+    public int power;
+    public int turn;
+}
+#endregion

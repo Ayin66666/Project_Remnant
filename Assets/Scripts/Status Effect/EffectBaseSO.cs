@@ -15,7 +15,7 @@ public abstract class EffectBaseSO : ScriptableObject
         None,
         Stackable
     }
-
+    public KeywordType Keyword => keywordType;
 
     [Header("---UI---")]
     [SerializeField] private Sprite icon;

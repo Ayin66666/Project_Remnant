@@ -8,6 +8,11 @@ public class BurnSO : KeywordSO
 {
     public override void Use(CharacterBase target)
     {
-        base.Use(target);
+        (int power, int count) = target.GetKeyword(KeywordType.Burn);
+        AttackInfo info = new AttackInfo()
+        {
+
+        };
+        target.TakeDamage(info);
     }
 }

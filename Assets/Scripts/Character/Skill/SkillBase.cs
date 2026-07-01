@@ -33,6 +33,15 @@ public abstract class SkillBase : MonoBehaviour
     protected abstract IEnumerator SkillAction();
 
     /// <summary>
+    /// 스킬 데미지 계산 함수
+    /// </summary>
+    protected void DamageCal()
+    {
+        AttackInfo info = new AttackInfo();
+        character.CalDamage(info);
+    }
+
+    /// <summary>
     /// 동작 초기화 - 혹시 모를 상황 대비
     /// </summary>
     public abstract void Reset();
