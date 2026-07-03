@@ -4,6 +4,10 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
+// 일반 & 키워드 데이터 분할로 인한 로직 변경 필요!
+// 26.07.02 기준 작업 아직임!
+
+
 public class EffectIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("---Setting---")]
@@ -24,8 +28,10 @@ public class EffectIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         statusEffectInfo = info;
         this.ui = ui;
 
+        /*
         icon.sprite = info.effectSO.Icon;
         countText.text = $"{info.power} {info.count}";
+        */
     }
 
     /// <summary>
@@ -35,8 +41,11 @@ public class EffectIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public void UpdateDebuff(StatEffectRuntimeData info)
     {
         statusEffectInfo = info;
+
+        /*
         icon.sprite = info.effectSO.Icon;
         countText.text = $"{info.power} {info.count}";
+        */
     }
 
     /// <summary>

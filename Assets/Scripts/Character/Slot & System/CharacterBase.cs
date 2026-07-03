@@ -41,7 +41,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] protected SkillSlot[] attackSlots;
 
     [Header("---Status Effect---")]
-    [SerializeField] protected Dictionary<KeywordType, StatEffectRuntimeData> keywordEffects;
+    [SerializeField] protected Dictionary<KeywordType, KeywordEffectRuntimeData> keywordEffects;
     [SerializeField] protected List<StatEffectRuntimeData> statusEffects;
 
     [Header("---Component---")]
@@ -247,14 +247,17 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
 
     #region 데미지 로직
-    public void TakeDamage(AttackInfo info)
+    /// <summary>
+    /// 데미지 계산 로직 / 모든 데미지 계산 후 해당 함수 호출해야함!
+    /// </summary>
+    /// <param name="damage"></param>
+    public void TakeDamage(int damage)
     {
         // 데미지 계산 방식 변경 예정
         // 1. target의 정보와 내 공격 정보를 기반으로 데미지 계산을 위한 Info 전달
         // 2. info 기반 데미지 계산 후 반환
         // 3. 반환 데미지를 target의 takeDamage에 전달
 
-        int damage = 0;
         curHp -= damage;
         if(curHp <= 0)
         {
@@ -285,24 +288,45 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     }
 
     /// <summary>
-    /// 필요한 키워드의 보유 값 전달
+    /// 사망 로직 / 사망 시 이벤트가 있다면 override해서 사용
     /// </summary>
-    /// <param name="keyword">값이 필요한 키워드</param>
-    /// <returns></returns>
-    public (int power, int count) GetKeyword(KeywordType keyword)
-    {
-        (int power, int count) = (0, 0);
-        foreach(var effect in statusEffects)
-        {
-
-        }
-
-        return (power, count);
-    }
-
     public virtual void Die()
     {
         // 사망 스프라이트
+    }
+
+
+    /// <summary>
+    /// 필요한 키워드의 보유 값 전달 / 없을 경우 null 반환
+    /// </summary>
+    /// <param name="keyword">값이 필요한 키워드</param>
+    /// <returns></returns>
+    public KeywordEffectRuntimeData GetKeyword(KeywordType keyword)
+    {
+        return keywordEffects.ContainsKey(keyword) ? keywordEffects[keyword] : null;
+    }
+
+    /// <summary>
+    /// 키워드 사용 시, 해당 키워드의 횟수를 차감시키는 함수
+    /// 전부 사용했다면 딕셔너리 or List에서 제거함
+    /// </summary>
+    /// <param name="type"></param>
+    public void ConsumeKeyword(KeywordType type, int consumeCount = 1)
+    {
+        // 키워드 보유 여부 체크
+        if(!keywordEffects.TryGetValue(type, out var keyword))
+        {
+            Debug.Log($"존재하지 않는 키워드에 접근함! / CharacterBase.UseKeyword({type})");
+            return;
+        }
+
+        // 키워드 감소
+        keyword.count -= consumeCount;
+        if (keyword.count <= 0)
+        {
+            // dic에서 키워드 제거
+            keywordEffects.Remove(type);
+        }
     }
     #endregion
 }
@@ -310,14 +334,21 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
 #region
 [System.Serializable]
+/// <summary>
+/// 키워드 런타임 데이터
+/// </summary>
 public class KeywordEffectRuntimeData
 {
+    [Header("---Data---")]
     public EffectBaseSO keywordSO;
     public int power;
     public int count;
 }
 
 [System.Serializable]
+/// <summary>
+/// 공통 스테이터스 런타임 데이터
+/// </summary>
 public class StatEffectRuntimeData
 {
     public EffectBaseSO statSO;
