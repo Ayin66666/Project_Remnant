@@ -1,22 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
+// 플레이어 & 몬스터의 공용 기능
+// 1. 피격 계산
+// 2. 공격 슬롯
+// 3. 스테이터스 (체력, 흐트러짐, 정신력)
+// 4. 인게임 UI (체력바, 이름, 버프 & 디버프 표시)
 
 public abstract class CharacterBase : MonoBehaviour, IDamageable
 {
-    // 플레이어 & 몬스터의 공용 기능
-    // 1. 피격 계산
-    // 2. 공격 슬롯
-    // 3. 스테이터스 (체력, 흐트러짐, 정신력)
-    // 4. 인게임 UI (체력바, 이름, 버프 & 디버프 표시)
-
     [Header("---Test---")]
     #region
-    [SerializeField] private float testSpeed;
-    [SerializeField] private Transform testPos;
-    [SerializeField] private KnockbackType testKnockbackType;
+    [SerializeField] private EffectBaseSO testEffect;
+    [SerializeField] private int power;
+    [SerializeField] private int count;
+    #endregion
+
+    [Header("---State---")]
+    #region
+    [SerializeField] private bool isPanic;
+    [SerializeField] private int panicTurn;
     #endregion
 
     [Header("---Status---")]
@@ -35,14 +39,19 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     public List<int> Groggy => groggy;
     public int Mentality => mentality;
     public int Speed => speed;
+    public int Attack => attack;
+    public int Defence => defence;
+    public int Sync => sync;
     #endregion
 
     [Header("---Slot---")]
     [SerializeField] protected SkillSlot[] attackSlots;
 
     [Header("---Status Effect---")]
+    #region
     [SerializeField] protected Dictionary<KeywordType, KeywordEffectRuntimeData> keywordEffects;
     [SerializeField] protected List<StatEffectRuntimeData> statusEffects;
+    #endregion
 
     [Header("---Component---")]
     #region
@@ -52,7 +61,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] protected CharacterUI characterUI;
     #endregion
 
-    [Header("---Setting---")]
+    [Header("---Movement---")]
     #region
     [SerializeField] protected CharacterGroup characterGroup;
     [SerializeField] private Facing facing;
@@ -86,11 +95,22 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         // 테스트용 입력
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            ClashKnockback(testKnockbackType, testSpeed);
+            AddEffect(new KeywordEffectRuntimeData()
+            {
+                keywordSO = testEffect as KeywordSO,
+                power = power,
+                count = count
+            });
         }
     }
 
     #region 시작 로직
+    private void Awake()
+    {
+        keywordEffects = new Dictionary<KeywordType, KeywordEffectRuntimeData>();
+        statusEffects = new List<StatEffectRuntimeData>();
+    }
+
     /// <summary>
     /// 통합 능력치 설정 함수 - Data_Setting() & Status_Setting() 둘 다 호출함
     /// </summary>
@@ -102,7 +122,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         SetupStatus(data);
         characterUI.SetUp(this);
     }
-    
+
     /// <summary>
     /// 캐릭터 데이터 전달
     /// </summary>
@@ -160,7 +180,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// </summary>
     public void CharacterMove(float moveSpeed, Vector2 pos)
     {
-        if (movementCoroutine != null) 
+        if (movementCoroutine != null)
             StopCoroutine(movementCoroutine);
 
         movementCoroutine = StartCoroutine(CharacterMoveCoroutine(moveSpeed, pos));
@@ -183,7 +203,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         // 이동
         Vector2 startPos = transform.position;
         float timer = 0;
-        while(timer < 1)
+        while (timer < 1)
         {
             timer += Time.deltaTime / moveSpeed;
             transform.position = Vector3.Lerp(startPos, movePos, timer);
@@ -203,7 +223,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// <param name="time">밀림 시간</param>
     public void ClashKnockback(KnockbackType type, float time)
     {
-        if(movementCoroutine != null) 
+        if (movementCoroutine != null)
             StopCoroutine(movementCoroutine);
 
         movementCoroutine = StartCoroutine(ClashKnockbackCoroutine(type, time));
@@ -232,7 +252,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
         // 이동
         float timer = 0;
-        while(timer < 1)
+        while (timer < 1)
         {
             timer += Time.deltaTime / time;
             transform.position = Vector2.Lerp(startPos, endPos, timer);
@@ -247,25 +267,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
 
     #region 데미지 로직
-    /// <summary>
-    /// 데미지 계산 로직 / 모든 데미지 계산 후 해당 함수 호출해야함!
-    /// </summary>
-    /// <param name="damage"></param>
-    public void TakeDamage(int damage)
-    {
-        // 데미지 계산 방식 변경 예정
-        // 1. target의 정보와 내 공격 정보를 기반으로 데미지 계산을 위한 Info 전달
-        // 2. info 기반 데미지 계산 후 반환
-        // 3. 반환 데미지를 target의 takeDamage에 전달
-
-        curHp -= damage;
-        if(curHp <= 0)
-        {
-            curHp = 0;
-            Die();
-        }
-    }
-
     /// <summary>
     /// 데미지 계산식을 활용한 일반 데미지 계산
     /// </summary>
@@ -288,14 +289,75 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     }
 
     /// <summary>
+    /// 데미지 계산 로직 / 모든 데미지 계산 후 해당 함수 호출해야함!
+    /// </summary>
+    /// <param name="damage"></param>
+    public void TakeDamage(int damage)
+    {
+        // 데미지 계산 방식 변경 예정
+        // 1. target의 정보와 내 공격 정보를 기반으로 데미지 계산을 위한 Info 전달
+        // 2. info 기반 데미지 계산 후 반환
+        // 3. 반환 데미지를 target의 takeDamage에 전달
+
+        curHp -= damage;
+        if (curHp <= 0)
+        {
+            curHp = 0;
+            Die();
+        }
+    }
+
+    /// <summary>
+    /// 정신력 데미지 계산 로직
+    /// </summary>
+    /// <param name="mDamage"></param>
+    public void TakeMDamage(int mDamage)
+    {
+        if (isPanic) return;
+
+        mentality -= mDamage;
+        if (mentality <= -45)
+        {
+            mentality = -45;
+            Panic();
+        }
+    }
+
+    /// <summary>
+    /// 패닉 동작 / 정신력이 -45 이하가 되면 패닉 상태로 전환, 패닉 상태에서는 공격 불가
+    /// </summary>
+    public virtual void Panic()
+    {
+        isPanic = true;
+        panicTurn = 1;
+    }
+
+    /// <summary>
+    /// 턴 종료 시 호출 / 패닉 상태라면 패틱 기간 감소 / 패닉 기간이 끝나면 패닉 상태 해제
+    /// </summary>
+    public void PanicCount()
+    {
+        if(!isPanic) return;
+
+        panicTurn--;
+        if (panicTurn <= 0)
+        {
+            isPanic = false;
+            panicTurn = 0;
+        }
+    }
+
+    /// <summary>
     /// 사망 로직 / 사망 시 이벤트가 있다면 override해서 사용
     /// </summary>
     public virtual void Die()
     {
         // 사망 스프라이트
     }
+    #endregion
 
 
+    #region 버프 & 디버프 로직
     /// <summary>
     /// 필요한 키워드의 보유 값 전달 / 없을 경우 null 반환
     /// </summary>
@@ -314,7 +376,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     public void ConsumeKeyword(KeywordType type, int consumeCount = 1)
     {
         // 키워드 보유 여부 체크
-        if(!keywordEffects.TryGetValue(type, out var keyword))
+        if (!keywordEffects.TryGetValue(type, out var keyword))
         {
             Debug.Log($"존재하지 않는 키워드에 접근함! / CharacterBase.UseKeyword({type})");
             return;
@@ -328,6 +390,59 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
             keywordEffects.Remove(type);
         }
     }
+
+    /// <summary>
+    /// 키워드 데이터 추가 - 기존 데이터가 있다면 합산, 없다면 신규 추가
+    /// </summary>
+    /// <param name="data"></param>
+    public void AddEffect(KeywordEffectRuntimeData data)
+    {
+        keywordEffects.TryGetValue(data.keywordSO.Keyword, out var runtimeData);
+        if (runtimeData == null)
+        {
+            // 데이터가 없다면 - 신규 데이터 추가
+            KeywordEffectRuntimeData newData = new KeywordEffectRuntimeData()
+            {
+                keywordSO = data.keywordSO,
+                power = data.power,
+                count = data.count
+            };
+
+            keywordEffects.Add(data.keywordSO.Keyword,newData);
+
+            Debug.Log("키워드 신규 추가 : " + keywordEffects.ContainsKey(data.keywordSO.Keyword));
+        }
+        else
+        {
+            // 데이터가 있다면 - 데이터 합산
+            if(data.keywordSO.IsDerived)
+            {
+                // 파생 키워드라면 / 추가하려는 파생 키워드로 전환
+                runtimeData.keywordSO = data.keywordSO;
+            }
+
+            runtimeData.power += data.power;
+            runtimeData.count += data.count;
+        }
+    }
+
+    /// <summary>
+    /// 공용 이펙트 데이터 추가 - 무조건 신규 추가
+    /// </summary>
+    /// <param name="data"></param>
+    public void AddEffect(StatEffectRuntimeData data)
+    {
+        // 데이터 생성
+        StatEffectRuntimeData newData = new StatEffectRuntimeData()
+        {
+            statSO = data.statSO,
+            power = data.power,
+            turn = data.turn
+        };
+
+        // 데이터 추가
+        statusEffects.Add(newData);
+    }
     #endregion
 }
 
@@ -340,7 +455,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 public class KeywordEffectRuntimeData
 {
     [Header("---Data---")]
-    public EffectBaseSO keywordSO;
+    public KeywordSO keywordSO;
     public int power;
     public int count;
 }

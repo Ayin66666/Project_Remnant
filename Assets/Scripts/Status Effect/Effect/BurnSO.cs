@@ -10,9 +10,6 @@ public class BurnSO : KeywordSO
         KeywordEffectRuntimeData data = target.GetKeyword(KeywordType.Burn);
         if(data == null) return;
 
-        // 데미지 인포 작성
-        // -> 이 부분 바로 TakeDamage에 int로 값을 받기 때문에 필요없어짐!
-
         // 데미지 작성
         int damage = data.power;
 

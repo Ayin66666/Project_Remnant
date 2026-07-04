@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -8,6 +6,14 @@ public class SinkingSO : KeywordSO
 {
     public override void Use(CharacterBase target)
     {
-        base.Use(target);
+        // 데이터 받아오기
+        KeywordEffectRuntimeData data = target.GetKeyword(KeywordType.Sinking);
+        if (data == null) return;
+
+        // 정신력 감소
+        target.TakeMDamage(data.power);
+
+        // 카운트 감소
+        target.ConsumeKeyword(KeywordType.Sinking, 1);
     }
 }
