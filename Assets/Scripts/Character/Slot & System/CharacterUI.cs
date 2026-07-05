@@ -9,6 +9,8 @@ public class CharacterUI : MonoBehaviour
     [Header("---Character---")]
     [SerializeField] private CharacterBase character;
 
+    [Header("---Slot Speed---")]
+    [SerializeField] private TextMeshProUGUI speedText;
 
     [Header("---Hp & Groggy---")]
     [SerializeField] private TextMeshProUGUI hpText;
@@ -16,7 +18,6 @@ public class CharacterUI : MonoBehaviour
     [SerializeField] private GameObject groggyLinePrefab;
     [SerializeField] private RectTransform groggyContainer;
     [SerializeField] private Dictionary<int, GameObject> groggyLine = new Dictionary<int, GameObject>();
-
 
     [Header("---Buff & Debuff---")]
     [SerializeField] private RectTransform effectIconRect;
@@ -54,6 +55,7 @@ public class CharacterUI : MonoBehaviour
 
     /// <summary>
     /// 체력 & 그로기 UI 업데이트 -> 이거 코드 이상함
+    /// 26.07.05 = 어디가 이상하다는건지?
     /// </summary> 
     public void UpdateHpUI()
     {
@@ -74,6 +76,14 @@ public class CharacterUI : MonoBehaviour
         {
             groggyLine.Remove(key);
         }
+    }
+
+    /// <summary>
+    /// 플레이어의 속도 표시 UI 업데이트
+    /// </summary>
+    public void UpdataSpeedUI()
+    {
+        speedText.text = character.Speed.ToString();
     }
 
     /// <summary>

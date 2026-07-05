@@ -10,7 +10,7 @@ public class KeywordSO : EffectBaseSO
 
     public override void Use(CharacterBase target)
     {
-
+        // 세부 구현은 override 하여 세부 클래스에서 구현함!
     }
 }
 

@@ -21,6 +21,8 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     #region
     [SerializeField] private bool isPanic;
     [SerializeField] private int panicTurn;
+    [SerializeField] private bool isStagger;
+    [SerializeField] private int staggerTurn;
     #endregion
 
     [Header("---Status---")]
@@ -151,7 +153,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         speed = Random.Range(speedRange.x, speedRange.y);
 
         // UI 반영
-        // characterUI.UpdataHpUI();
+        characterUI.UpdataSpeedUI();
     }
 
     /// <summary>
@@ -328,8 +330,28 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// </summary>
     public virtual void Panic()
     {
+        // 턴 진행 도중 패닉 상태가 되면 다음 턴에 패닉 상태 시작
+        // -> 그 전까진 정신력 -45 상태로 동작은 함!
+
         isPanic = true;
         panicTurn = 1;
+    }
+
+    /// <summary>
+    /// 흐트러짐 동작 / 흐트러짐 상태가 되면 턴 종료 시
+    /// </summary>
+    public void Stagger()
+    {
+        // 턴 진행 도중 흐트러짐 상태가 되면 해당 턴, 다음 턴에 흐트러짐 상태 유지
+        // 턴 시작 시 흐트러짐 상태가 되면 해당 턴만 흐트러짐 상태 유지
+
+        // 상태 변경
+        isStagger = true;
+        staggerTurn = 2;
+
+        // 애니메이션
+        // anim.SetTrigger("Action");
+        // anim.SetBool("isPanic", true);
     }
 
     /// <summary>
@@ -344,6 +366,21 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         {
             isPanic = false;
             panicTurn = 0;
+        }
+    }
+
+    /// <summary>
+    /// 턴 종료 시 호출 / 흐트러짐 상태라면 흐트러짐 기간 감소 / 흐트러짐 기간이 끝나면 흐트러짐 상태 해제
+    /// </summary>
+    public void StaggerCount()
+    {
+        if(!isStagger) return;
+
+        staggerTurn--;
+        if (staggerTurn <= 0)
+        {
+            isStagger = false;
+            staggerTurn = 0;
         }
     }
 

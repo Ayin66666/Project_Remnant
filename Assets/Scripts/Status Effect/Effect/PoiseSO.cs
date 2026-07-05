@@ -10,7 +10,7 @@ public class PoiseSO : KeywordSO
     public override void Use(CharacterBase target)
     {
         // 호흡 감소
-        target.ConsumeKeyword(KeywordType.poise);
+        target.ConsumeKeyword(KeywordType.Poise);
     }
 
     /// <summary>
@@ -21,7 +21,7 @@ public class PoiseSO : KeywordSO
     public static bool IsCritical(CharacterBase attacker)
     {
         // 호흡 값 받아오기
-        KeywordEffectRuntimeData data = attacker.GetKeyword(KeywordType.poise);
+        KeywordEffectRuntimeData data = attacker.GetKeyword(KeywordType.Poise);
         bool isCir = (data.power * 5) > Random.Range(0, 100);
 
         return true;

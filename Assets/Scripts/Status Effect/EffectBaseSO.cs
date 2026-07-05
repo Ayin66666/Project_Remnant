@@ -4,7 +4,7 @@ using UnityEngine;
 public abstract class EffectBaseSO : ScriptableObject
 {
     [Header("---Setting---")]
-    [SerializeField] private TriggerType triggerType;
+    [SerializeField] private TriggerType triggerType; // -> 이거 만약 트리거가 다중이면? / List 처리해야하나?
     [SerializeField] private StackType stackType;
     [SerializeField] private KeywordType keywordType;
     /// <summary>
@@ -41,11 +41,11 @@ public abstract class EffectBaseSO : ScriptableObject
 public enum KeywordType
 {
     None,
-    Bleed,
-    Burn,
-    Vibration,
-    Sinking,
-    Rupture,
-    poise,
+    Bleed, // 작업중
+    Burn,  // 완
+    Vibration, 
+    Sinking, // 완 
+    Rupture, 
+    Poise, // 완 
     Charge
 }
