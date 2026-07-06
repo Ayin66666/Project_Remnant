@@ -32,13 +32,13 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] protected int maxHp;
     [SerializeField] protected int curHp;
     [SerializeField] protected int mentality;
-    [SerializeField] protected List<int> groggy;
+    [SerializeField] protected List<int> stagger;
     [SerializeField] protected int attack;
     [SerializeField] protected int defence;
     [SerializeField] protected int speed;
     [SerializeField] protected Vector2Int speedRange;
     public int MaxHp => maxHp;
-    public List<int> Groggy => groggy;
+    public List<int> StaggerList => stagger;
     public int Mentality => mentality;
     public int Speed => speed;
     public int Attack => attack;
@@ -310,7 +310,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     }
 
     /// <summary>
-    /// 정신력 데미지 계산 로직
+    /// 정신력 데미지 계산 로직 / 침잠 등 정신력 관련 데미지를 받았을 때 동작
     /// </summary>
     /// <param name="mDamage"></param>
     public void TakeMDamage(int mDamage)
@@ -322,6 +322,18 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         {
             mentality = -45;
             Panic();
+        }
+    }
+
+    /// <summary>
+    /// 흐트러짐 게이지 계산 로직 / 진동 등 흐트러짐 게이지를 당기는 효과를 받았을 때 호출
+    /// </summary>
+    /// <param name="sDamage"></param>
+    public void TakeSDamage(int sDamage)
+    {
+        for (int i = 0; i < stagger.Count; i++)
+        {
+            stagger[i] += sDamage;
         }
     }
 

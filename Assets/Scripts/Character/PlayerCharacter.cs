@@ -37,10 +37,10 @@ public class PlayerCharacter : CharacterBase
 
         speedRange = data.SyncUpData[sync].attackSpeed;
 
-        groggy.Clear();
+        stagger.Clear();
         foreach (int g in data.Groggy)
         {
-            groggy.Add(Mathf.RoundToInt(maxHp * g / 100));
+            stagger.Add(Mathf.RoundToInt(maxHp * g / 100));
         }
     }
 }

@@ -18,10 +18,10 @@ public class EnemyCharacter : CharacterBase
         defence = data.BaseDefencePoint;
         speedRange = data.SyncUpData[0].attackSpeed;
 
-        groggy.Clear();
+        stagger.Clear();
         foreach (int g in data.Groggy)
         {
-            groggy.Add(Mathf.RoundToInt(maxHp * g / 100));
+            stagger.Add(Mathf.RoundToInt(maxHp * g / 100));
         }
     }
 

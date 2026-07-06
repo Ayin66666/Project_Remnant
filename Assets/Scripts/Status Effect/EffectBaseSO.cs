@@ -41,11 +41,11 @@ public abstract class EffectBaseSO : ScriptableObject
 public enum KeywordType
 {
     None,
-    Bleed, // 작업중
+    Bleed, // 완
     Burn,  // 완
-    Vibration, 
+    Vibration, // 완
     Sinking, // 완 
-    Rupture, 
+    Rupture, // 완
     Poise, // 완 
-    Charge
+    Charge // 완
 }

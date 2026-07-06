@@ -39,7 +39,7 @@ public class CharacterUI : MonoBehaviour
         RectTransform sliderRect = hpSlider.GetComponent<RectTransform>();
         float sliderWidth = sliderRect.rect.width;
 
-        foreach (int gHp in character.Groggy)
+        foreach (int gHp in character.StaggerList)
         {
             GameObject marker = Instantiate(groggyLinePrefab, groggyContainer);
             RectTransform rt = marker.GetComponent<RectTransform>();

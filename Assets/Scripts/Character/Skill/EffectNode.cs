@@ -80,22 +80,24 @@ public class EffectNode
 /// <summary>
 /// 기능의 동작 타이밍 Enum
 /// </summary>
+[System.Flags]
 public enum TriggerType
 {
-    None,
+    None = 0,
 
     // 스킬 사용
-    SkillUse,
-    Hit,
-    SkillEnd,
+    SkillUse = 1 << 0,
+    Attack = 1 << 1,
+    Hit = 1 << 2,
+    SkillEnd = 1 << 3,
 
     // 합
-    ClashWin,
-    ClashLose,
+    ClashWin = 1 << 4,
+    ClashLose = 1 << 5,
 
     // 턴
-    TurnStart,
-    TurnEnd
+    TurnStart = 1 << 6,
+    TurnEnd = 1 << 7
 }
 
 public enum ActionType
