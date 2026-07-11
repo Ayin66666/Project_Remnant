@@ -51,8 +51,8 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
     [Header("---Status Effect---")]
     #region
-    [SerializeField] protected Dictionary<KeywordType, KeywordEffectRuntimeData> keywordEffects;
-    [SerializeField] protected List<StatEffectRuntimeData> statusEffects;
+    [SerializeField] protected Dictionary<KeywordType, EffectRuntimeData> keywordEffects;
+    [SerializeField] protected List<EffectRuntimeData> statusEffects;
     #endregion
 
     [Header("---Component---")]
@@ -97,9 +97,9 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         // 테스트용 입력
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            AddEffect(new KeywordEffectRuntimeData()
+            AddEffect(new EffectRuntimeData()
             {
-                keywordSO = testEffect as KeywordSO,
+                effectSO = testEffect as KeywordSO,
                 power = power,
                 count = count
             });
@@ -109,8 +109,8 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     #region 시작 로직
     private void Awake()
     {
-        keywordEffects = new Dictionary<KeywordType, KeywordEffectRuntimeData>();
-        statusEffects = new List<StatEffectRuntimeData>();
+        keywordEffects = new Dictionary<KeywordType, EffectRuntimeData>();
+        statusEffects = new List<EffectRuntimeData>();
     }
 
     /// <summary>
@@ -371,7 +371,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// </summary>
     public void PanicCount()
     {
-        if(!isPanic) return;
+        if (!isPanic) return;
 
         panicTurn--;
         if (panicTurn <= 0)
@@ -386,7 +386,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// </summary>
     public void StaggerCount()
     {
-        if(!isStagger) return;
+        if (!isStagger) return;
 
         staggerTurn--;
         if (staggerTurn <= 0)
@@ -412,7 +412,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// </summary>
     /// <param name="keyword">값이 필요한 키워드</param>
     /// <returns></returns>
-    public KeywordEffectRuntimeData GetKeyword(KeywordType keyword)
+    public EffectRuntimeData GetKeyword(KeywordType keyword)
     {
         return keywordEffects.ContainsKey(keyword) ? keywordEffects[keyword] : null;
     }
@@ -444,30 +444,34 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// 키워드 데이터 추가 - 기존 데이터가 있다면 합산, 없다면 신규 추가
     /// </summary>
     /// <param name="data"></param>
-    public void AddEffect(KeywordEffectRuntimeData data)
+    public void AddKeyword(EffectRuntimeData data)
     {
-        keywordEffects.TryGetValue(data.keywordSO.Keyword, out var runtimeData);
+        // 일반 키워드는 파생 키워드를 덮어쓰지 못함
+        // 파생 키워드는 이미 부여된 일반 & 파생 키워드가 있다면 해당 키워드를 덮어씀
+
+        keywordEffects.TryGetValue(data.effectSO.Keyword, out var runtimeData);
         if (runtimeData == null)
         {
             // 데이터가 없다면 - 신규 데이터 추가
-            KeywordEffectRuntimeData newData = new KeywordEffectRuntimeData()
+            EffectRuntimeData newData = new EffectRuntimeData()
             {
-                keywordSO = data.keywordSO,
+                effectSO = data.effectSO,
                 power = data.power,
                 count = data.count
             };
 
-            keywordEffects.Add(data.keywordSO.Keyword,newData);
+            keywordEffects.Add(data.effectSO.Keyword, newData);
 
-            Debug.Log("키워드 신규 추가 : " + keywordEffects.ContainsKey(data.keywordSO.Keyword));
+            Debug.Log("키워드 신규 추가 : " + keywordEffects.ContainsKey(data.effectSO.Keyword));
         }
         else
         {
             // 데이터가 있다면 - 데이터 합산
-            if(data.keywordSO.IsDerived)
+            if (data.effectSO is KeywordSO keyword)
             {
                 // 파생 키워드라면 / 추가하려는 파생 키워드로 전환
-                runtimeData.keywordSO = data.keywordSO;
+                if (keyword.IsDerived)
+                    runtimeData.effectSO = data.effectSO;
             }
 
             runtimeData.power += data.power;
@@ -479,18 +483,29 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// 공용 이펙트 데이터 추가 - 무조건 신규 추가
     /// </summary>
     /// <param name="data"></param>
-    public void AddEffect(StatEffectRuntimeData data)
+    public void AddEffect(EffectRuntimeData data)
     {
+        // 이미 생성된 데이터가 오는거라 다시 넣을 필요 X
+        /*
         // 데이터 생성
-        StatEffectRuntimeData newData = new StatEffectRuntimeData()
+        EffectRuntimeData newData = new EffectRuntimeData()
         {
-            statSO = data.statSO,
+            effectSO = data.effectSO,
             power = data.power,
-            turn = data.turn
+            count = data.count
         };
+        */
+
+        // 데이터 무결성 검사 로직 필요
+        // -> 값이 제대로 들어있는지?
+        if (data.effectSO == null)
+        {
+            Debug.LogError($"데이터 추가 실패! / {data}, {data.effectSO} 가 없음!");
+            return;
+        }
 
         // 데이터 추가
-        statusEffects.Add(newData);
+        statusEffects.Add(data);
     }
     #endregion
 }
@@ -501,22 +516,15 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 /// <summary>
 /// 키워드 런타임 데이터
 /// </summary>
-public class KeywordEffectRuntimeData
+public class EffectRuntimeData
 {
     [Header("---Data---")]
-    public KeywordSO keywordSO;
+    public EffectBaseSO effectSO;
     public int power;
-    public int count;
-}
 
-[System.Serializable]
-/// <summary>
-/// 공통 스테이터스 런타임 데이터
-/// </summary>
-public class StatEffectRuntimeData
-{
-    public EffectBaseSO statSO;
-    public int power;
-    public int turn;
+    /// <summary>
+    /// Keyword의 경우 횟수, 공용의 경우 지속 턴
+    /// </summary>
+    public int count;
 }
 #endregion

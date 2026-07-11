@@ -7,7 +7,7 @@ public class BurnSO : KeywordSO
     public override void Use(CharacterBase target)
     {
         // 데이터 받아오기
-        KeywordEffectRuntimeData data = target.GetKeyword(KeywordType.Burn);
+        EffectRuntimeData data = target.GetKeyword(KeywordType.Burn);
         if(data == null) return;
 
         // 데미지 작성

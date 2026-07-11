@@ -9,7 +9,7 @@ public class BleedSO : KeywordSO
     public override void Use(CharacterBase target)
     {
         // 데이터 받아오기
-        KeywordEffectRuntimeData data = target.GetKeyword(KeywordType.Bleed);
+        EffectRuntimeData data = target.GetKeyword(KeywordType.Bleed);
         if (data == null) return;
 
         // 데미지 전달

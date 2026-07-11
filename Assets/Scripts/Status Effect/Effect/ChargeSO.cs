@@ -11,7 +11,7 @@ public class ChargeSO : KeywordSO
 
     public void ChargeUse(CharacterBase target, int useCount)
     {
-        KeywordEffectRuntimeData data = target.GetKeyword(KeywordType.Charge);
+        EffectRuntimeData data = target.GetKeyword(KeywordType.Charge);
         if (data == null)
         {
             Debug.LogError($"충전을 보유하고 있지 않음! {target} / {useCount}");

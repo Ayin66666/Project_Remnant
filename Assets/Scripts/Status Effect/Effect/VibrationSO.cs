@@ -7,7 +7,7 @@ public class VibrationSO : KeywordSO
     public override void Use(CharacterBase target)
     {
         // 데이터 받아오기
-        KeywordEffectRuntimeData data = target.GetKeyword(KeywordType.Vibration);
+        EffectRuntimeData data = target.GetKeyword(KeywordType.Vibration);
         if (data == null) return;
 
         // 흐트러짐 데미지 부여

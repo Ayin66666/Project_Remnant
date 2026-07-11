@@ -7,7 +7,7 @@ public class SinkingSO : KeywordSO
     public override void Use(CharacterBase target)
     {
         // 데이터 받아오기
-        KeywordEffectRuntimeData data = target.GetKeyword(KeywordType.Sinking);
+        EffectRuntimeData data = target.GetKeyword(KeywordType.Sinking);
         if (data == null) return;
 
         // 정신력 감소

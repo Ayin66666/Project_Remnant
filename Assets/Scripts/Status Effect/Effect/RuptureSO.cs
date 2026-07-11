@@ -6,7 +6,7 @@ public class RuptureSO : KeywordSO
     public override void Use(CharacterBase target)
     {
         // 데이터 받아오기
-        KeywordEffectRuntimeData data = target.GetKeyword(KeywordType.Rupture);
+        EffectRuntimeData data = target.GetKeyword(KeywordType.Rupture);
         if (data == null) return;
 
         // 데미지 부여
