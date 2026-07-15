@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using Unity.VisualScripting;
 
 public static class SkillDescriptionBuilder
 {
@@ -7,20 +8,20 @@ public static class SkillDescriptionBuilder
 
     public static string MakeDescription(SkillSO skillSO, int sync)
     {
-        // 사용 시 발동 효과 데이터 텍스트화
+        // 사용 시 발동 효과 텍스트화
         StringBuilder sd = new StringBuilder();
         for (int i = 0; i < skillSO.syncDatas[sync].skillEffects.Count; i++)
         {
             // 조건 텍스트화
             string triggerText = GetTriggerText(skillSO.syncDatas[sync].skillEffects[i].Trigger);
             string conditionText = GetConditionText(skillSO.syncDatas[sync].skillEffects[i]);
-            string actionText = GetActionText(skillSO.syncDatas[sync].skillEffects[i].Actions);
+            string actionText = GetActionText(skillSO.syncDatas[sync].skillEffects[i].Action);
 
             // 데이터 추가
             sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
         }
 
-        // 코인 효과 데이터 텍스트화
+        // 코인 효과 텍스트화
         List<CoinInfoSO> coinInfo = skillSO.syncDatas[sync].coins;
         for (int i = 0; i < coinInfo.Count; i++)
         {
@@ -37,16 +38,15 @@ public static class SkillDescriptionBuilder
                 string conditionText = GetConditionText(coinInfo[i].EffectNodes[j]);
 
                 // 효과 - (체력 50 회복, 실드 25% 획득, 주는 데미지 50% 증가 등등)
-                string actionText = GetActionText(coinInfo[i].EffectNodes[j].Actions);
+                string actionText = GetActionText(coinInfo[i].EffectNodes[j].Action);
 
-                // 텍스트 조립
+                // 텍스트 조립 ([트리거] [조건] [동작])
                 sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
             }
         }
 
         return sd.ToString();
     }
-
 
     /// <summary>
     /// 트리거 조건 텍스트 전환 함수
@@ -81,6 +81,7 @@ public static class SkillDescriptionBuilder
     /// <returns></returns>
     private static string GetConditionText(EffectNode node)
     {
+        /* 구버전 -> 노드 변경 이전 코드
         // 값
         StringBuilder valueText = new StringBuilder();
         for (int i = 0; i < node.Values.Count; i++)
@@ -97,22 +98,26 @@ public static class SkillDescriptionBuilder
 
         // 조합
         string re = $"{valueText.ToString()} {node.ConditionValue} {conditionText}";
-        return re;
-    }
+        */
 
-    /// <summary>
-    /// 이펙트 종류 (위력, 횟수) 텍스트 전환 함수
-    /// </summary>
-    /// <param name="type"></param>
-    /// <returns></returns>
-    private static string GetEffectTypeText(ValueType type)
-    {
-        string re = type switch
+        // 신버전 -> 노드 변경 이후 코드 (26.07.15)
+        // 값
+        StringBuilder valueText = new StringBuilder();
+        for (int i = 0; i < node.Condition.values.Count; i++)
         {
-            ValueType.Power => "위력",
-            ValueType.Count => "횟수",
-            _ => "",
-        };
+            EffectNode.EffectValue val = node.Condition.values[i];
+            valueText.Append($"{val.effect.EffectName} {GetEffectTypeText(val.valueType)}");
+
+            if (i < node.Condition.values.Count - 1)
+                valueText.Append(" + ");
+        }
+        valueText.Append(node.Condition.values.Count == 1 ? "(이)가" : "의 합이");
+
+        // 조건
+        string conditionText = GetConditionText(node.Condition.compareType);
+
+        // 조합
+        string re = $"{valueText.ToString()} {node.Condition.conditionValue} {conditionText}";
         return re;
     }
 
@@ -136,11 +141,28 @@ public static class SkillDescriptionBuilder
     }
 
     /// <summary>
+    /// 이펙트 종류 (위력, 횟수) 텍스트 전환 함수
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    private static string GetEffectTypeText(ValueType type)
+    {
+        string re = type switch
+        {
+            ValueType.Power => "위력",
+            ValueType.Count => "횟수",
+            _ => "",
+        };
+        return re;
+    }
+
+    /// <summary>
     /// 동작 액션 텍스트 전환 함수
     /// </summary>
     /// <returns></returns>
-    private static string GetActionText(List<EffectNode.ActionNode> nodes)
+    private static string GetActionText(EffectNode.ActionNode node)
     {
+        /* 구버전
         StringBuilder sb = new StringBuilder();
 
         string re = string.Empty;
@@ -176,7 +198,49 @@ public static class SkillDescriptionBuilder
 
             sb.Append(re);
 
-            if(i < nodes.Count-1)
+            if (i < nodes.Count - 1)
+            {
+                sb.Append(", ");
+            }
+        }
+        */
+
+        // 신버전
+        StringBuilder sb = new StringBuilder();
+        string re = string.Empty;
+        for (int i = 0; i < node.valueNode.Count; i++)
+        {
+            // 액션 텍스트 작성
+            re = node.actionType switch
+            {
+                // 효과 추가 & 제거
+                ActionType.AddEffect => $"{node.valueNode[i].effect.EffectName} {GetEffectTypeText(node.valueNode[i].valueType)} {node.valueNode[i].value} 부여",
+                ActionType.RemoveEffect => $"{node.valueNode[i].effect.EffectName} {GetEffectTypeText(node.valueNode[i].valueType)} 제거",
+
+                // 회복 & 실드
+                ActionType.HealHp => $"체력 {node.valueNode[i].value} 회복",
+                ActionType.Shield => $"실드 {node.valueNode[i].value} 획득",
+
+                // 속성 데미지 & 퍼센트 데미지
+                ActionType.Damage => $"{node.actionDescription}", // 데이터에서 sin값 제거함! => 오리지널 텍스트로 작성 필요
+                ActionType.DamageRatio => $"최종 피해량의 {node.valueNode[i].value}% 만큼 추가 데미지",
+
+                // 데미지 증가 & 치피 증가
+                ActionType.DamageMultiplier => $"데미지 {node.valueNode[i].value}% 증가",
+                ActionType.CriticalMultiplier => $"치명타 피해량 {node.valueNode[i].value}% 증가",
+
+                // 코인 & 스킬 재사용
+                ActionType.ReuseCoin => "이 코인을 재사용",
+                ActionType.ReuseSkill => "이 스킬을 재사용",
+
+                // 오리지널 액션
+                ActionType.Original => node.actionDescription,
+                _ => "",
+            };
+
+            sb.Append(re);
+            // 호흡, 출혈 같이 위력과 횟수를 한줄에 보여줘야 하는 옵션이라면 , 로 구분
+            if (i < node.valueNode.Count - 1)
             {
                 sb.Append(", ");
             }

@@ -5,25 +5,21 @@ using UnityEngine;
 [System.Serializable]
 public class EffectNode
 {
-    [Header("---Effect Node---")]
+    [Header("---Trigger---")]
     [SerializeField] private TriggerType triggerType;
     [SerializeField] private TargetType targetType;
 
     [Header("---Condition---")]
-    [SerializeField] private CompareType compareType;
-    [SerializeField] private int conditionValue;
-    [SerializeField] private List<ValueNode> values;
+    [SerializeField] private ConditionNode condition;
 
     [Header("---Action---")]
-    [SerializeField] private List<ActionNode> actions;
+    [SerializeField] private ActionNode action;
 
     #region Getter
     public TriggerType Trigger => triggerType;
     public TargetType Target => targetType;
-    public CompareType Compare => compareType;
-    public int ConditionValue => conditionValue;
-    public List<ValueNode> Values => values;
-    public List<ActionNode> Actions => actions;
+    public ConditionNode Condition => condition;
+    public ActionNode Action => action;
     #endregion
 
     #region Enum
@@ -49,26 +45,37 @@ public class EffectNode
     #region 노드 구조체
     [System.Serializable]
     /// <summary>
-    /// 조건 종류 & 조건 타입 노드
+    /// 값 저장 노드
     /// </summary>>
-    public struct ValueNode
+    public struct EffectValue
     {
         [Header("---Value---")]
         public EffectBaseSO effect;
         public ValueType valueType;
+        public int value;
     }
 
     [System.Serializable]
     /// <summary>
-    /// 조건 만족 시 동작할 액션 타입 노드
+    /// 동작 조건 노드
+    /// </summary>
+    public struct ConditionNode
+    {
+        [Header("---Condition---")]
+        public CompareType compareType;
+        public int conditionValue;
+        public List<EffectValue> values;
+    }
+
+    [System.Serializable]
+    /// <summary>
+    /// 동작 액션 종류
     /// </summary>
     public struct ActionNode
     {
         [Header("---Public Action---")]
         public ActionType actionType;
-        public ValueNode valueNode;
-        public SinType sinType;
-        public int actionValue;
+        public List<EffectValue> valueNode;
 
         [Header("---Original Action---")]
         public int actionIndex;
@@ -77,6 +84,8 @@ public class EffectNode
     #endregion
 }
 
+
+#region Public Enum -> 나중에 위치 전환 필요
 /// <summary>
 /// 기능의 동작 타이밍 Enum
 /// </summary>
@@ -131,3 +140,4 @@ public enum ValueType
     Power,
     Count
 }
+#endregion
