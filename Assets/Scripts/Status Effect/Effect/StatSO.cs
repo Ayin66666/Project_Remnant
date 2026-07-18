@@ -14,7 +14,8 @@ public class StatSO : EffectBaseSO
     { 
         None, 
         AttackPoint, 
-        DefensePoint, 
+        DefensePoint,
+        IncreasedDamage,
         FinalDamageDealt, 
         FinalDamageTaken,
     }
@@ -46,6 +47,10 @@ public class StatSO : EffectBaseSO
 
             case CombatEffectType.DefensePoint:
                 // 방어 포인트 + 값
+                break;
+
+            case CombatEffectType.IncreasedDamage:
+                // 데미지 증가 + 값 * 10%
                 break;
 
             case CombatEffectType.FinalDamageDealt:

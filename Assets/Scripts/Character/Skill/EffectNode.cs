@@ -53,6 +53,7 @@ public class EffectNode
         public EffectBaseSO effect;
         public ValueType valueType;
         public int value;
+        public int duration;
     }
 
     [System.Serializable]
