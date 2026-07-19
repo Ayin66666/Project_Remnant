@@ -63,6 +63,7 @@ public class EffectNode
     public struct ConditionNode
     {
         [Header("---Condition---")]
+        public TargetType checkTarget;
         public CompareType compareType;
         public int conditionValue;
         public List<EffectValue> values;
@@ -74,12 +75,12 @@ public class EffectNode
     /// </summary>
     public struct ActionNode
     {
-        [Header("---Public Action---")]
+        [Header("---Action---")]
         public ActionType actionType;
         public List<EffectValue> valueNode;
 
         [Header("---Original Action---")]
-        public int actionIndex;
+        public int originalActionId;
         [TextArea] public string actionDescription;
     }
     #endregion
@@ -112,27 +113,9 @@ public enum TriggerType
 
 public enum ActionType
 {
-    // 버프, 디버프 추가 & 제거
+    None,
     AddEffect,
     RemoveEffect,
-
-    // 회복
-    HealHp,
-    Shield,
-
-    // 데미지
-    Damage,
-    DamageRatio,
-
-    // 데미지 증가
-    DamageMultiplier,
-    CriticalMultiplier,
-
-    // 재사용
-    ReuseCoin,
-    ReuseSkill,
-
-    // 오리지널 효과
     Original
 }
 

@@ -4,8 +4,9 @@ using UnityEngine;
 public abstract class EffectBaseSO : ScriptableObject
 {
     [Header("---Setting---")]
-    [SerializeField] private TriggerType triggerType; // -> 이거 만약 트리거가 다중이면? / List 처리해야하나?
+    [SerializeField] private TriggerType triggerType; // -> 이거 만약 트리거가 다중이면? / List 처리해야하나? / flag 사용했음!
     [SerializeField] private StackType stackType;
+    [SerializeField] private EffectCategory effectCategory;
     [SerializeField] private KeywordType keywordType;
     [SerializeField] private int maxStack;
     /// <summary>
@@ -16,6 +17,12 @@ public abstract class EffectBaseSO : ScriptableObject
         None,
         Stackable
     }
+    public enum EffectCategory
+    {
+        Public,
+        Keyword
+    }
+    public EffectCategory Category => effectCategory;
     public KeywordType Keyword => keywordType;
 
     [Header("---UI---")]

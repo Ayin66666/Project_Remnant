@@ -7,19 +7,27 @@ public class StatSO : EffectBaseSO
     [Header("---Stat Setting---")]
     [SerializeField] private CombatEffectType statType;
 
-    /// <summary>
-    /// 공격 포인트, 방어 포인트, 최종뎀증, 최종뎀감
-    /// </summary>
     public enum CombatEffectType
-    { 
-        None, 
-        AttackPoint, 
-        DefensePoint,
-        IncreasedDamage,
-        FinalDamageDealt, 
-        FinalDamageTaken,
-    }
+    {
+        None,
 
+        // 기본 기능
+        AttackPoint, // 공격 포인트
+        DefensePoint, // 방어 포인트
+        IncreaseDamage, // 데미지 증가
+        FinalDamageTaken, // 받는 데미지 감소
+        IncreaseFinalDamage, // 최종 데미지 증가 (스킬에서 데미지 n% 증가에 사용)
+        VibrationExplosion, // 진동 폭발
+
+        // 속성 데미지 증가
+        IncreaseWrathDamage, // 분노 데미지 증가
+        IncreaseLustDamage, // 색욕 데미지 증가
+        IncreaseSlothDamage, // 나태 데미지 증가
+        IncenseGulaDamage, // 탐식 데미지 증가
+        IncreaseGloomDamage, // 우울 데미지 증가
+        IncreasePrideDamage, // 오만 데미지 증가
+        IncreaseEnvyDamage, // 질투 데미지 증가
+    }
 
 
     public override void Use(CharacterBase target)
@@ -49,16 +57,36 @@ public class StatSO : EffectBaseSO
                 // 방어 포인트 + 값
                 break;
 
-            case CombatEffectType.IncreasedDamage:
+            case CombatEffectType.IncreaseDamage:
                 // 데미지 증가 + 값 * 10%
-                break;
-
-            case CombatEffectType.FinalDamageDealt:
-                // 최종 데미지 증가 + 값
                 break;
 
             case CombatEffectType.FinalDamageTaken:
                 // 받뎀감 + 값
+                break;
+
+            case CombatEffectType.IncreaseFinalDamage:
+                // 최종 데미지 증가 + 값
+                break;
+
+            case CombatEffectType.VibrationExplosion:
+                // 진동 폭발
+                break;
+
+                // 여기 어떻게 할지 고민중
+            case CombatEffectType.IncreaseWrathDamage:
+                break;
+            case CombatEffectType.IncreaseLustDamage:
+                break;
+            case CombatEffectType.IncreaseSlothDamage:
+                break;
+            case CombatEffectType.IncenseGulaDamage:
+                break;
+            case CombatEffectType.IncreaseGloomDamage:
+                break;
+            case CombatEffectType.IncreasePrideDamage:
+                break;
+            case CombatEffectType.IncreaseEnvyDamage:
                 break;
         }
     }

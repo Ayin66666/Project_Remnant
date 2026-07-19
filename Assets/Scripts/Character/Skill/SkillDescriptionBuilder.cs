@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
-using Unity.VisualScripting;
+
 
 public static class SkillDescriptionBuilder
 {
@@ -37,7 +37,7 @@ public static class SkillDescriptionBuilder
                 // 조건 - (n1이 n2 이상이면, n1 + n2 의 합이 n3 이상이면 등등)
                 string conditionText = GetConditionText(coinInfo[i].EffectNodes[j]);
 
-                // 효과 - (체력 50 회복, 실드 25% 획득, 주는 데미지 50% 증가 등등)
+                // 효과 - (누구에게 + 체력 50 회복, 실드 25% 획득, 주는 데미지 50% 증가 등등)
                 string actionText = GetActionText(coinInfo[i].EffectNodes[j].Action);
 
                 // 텍스트 조립 ([트리거] [조건] [동작])
@@ -205,7 +205,7 @@ public static class SkillDescriptionBuilder
         }
         */
 
-        // 신버전
+        /* 신버전 1
         StringBuilder sb = new StringBuilder();
         string re = string.Empty;
         for (int i = 0; i < node.valueNode.Count; i++)
@@ -245,6 +245,55 @@ public static class SkillDescriptionBuilder
                 sb.Append(", ");
             }
         }
+        */
+
+        // 신버전 2 - 데이터 전환 후 로직
+        StringBuilder sb = new StringBuilder();
+        string re = string.Empty;
+
+        // 효과
+        for (int i = 0; i < node.valueNode.Count; i++)
+        {
+            re = string.Empty;
+
+            // 오리지널 효과인지 체크
+            if (node.actionType == ActionType.Original)
+            {
+                re = node.actionDescription;
+            }
+            else
+            {
+                // 여기에 키워드인지, 공용 이펙트인지 체크 필요함!
+                // 키워드는 위력, 횟수로 표시하지만
+                // 공용 이펙트는 붙는 어미가 달라져야함!
+
+                // 공용 버전 : 효과의 이름, 값, 유지 턴 셋팅
+                
+
+
+                // 키워드 버전 : 효과의 이름, 타입, 값 셋팅
+                EffectNode.EffectValue val = node.valueNode[i];
+                re = $"{val.effect.EffectName} {GetEffectTypeText(val.valueType)} {val.value}";
+            }
+
+            sb.Append(re);
+
+            // 호흡, 출혈 같이 위력과 횟수를 한줄에 보여줘야 하는 옵션이라면 , 로 구분
+            if (i < node.valueNode.Count - 1)
+            {
+                sb.Append(", ");
+            }
+        }
+
+        // 종결 어미
+        sb.Append(node.actionType switch
+        {
+            ActionType.None => "",
+            ActionType.AddEffect => "를 부여",
+            ActionType.RemoveEffect => "를 제거",
+            ActionType.Original => "",
+            _ => ""
+        });
 
         return sb.ToString();
     }
