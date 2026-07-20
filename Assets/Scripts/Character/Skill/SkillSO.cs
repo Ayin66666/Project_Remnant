@@ -23,6 +23,10 @@ public class SkillSO : ScriptableObject
     /// </summary>
     public SkillVariantType skillVariantType;
     /// <summary>
+    /// 공격 타입 (일반, 광역, 광역 난사 3종)
+    /// </summary>
+    public AttackRange attackRange;
+    /// <summary>
     /// 공격 가중치 (1 ~ 9)
     /// </summary>
     public int targetCount;
@@ -31,6 +35,7 @@ public class SkillSO : ScriptableObject
     /// </summary>
     public List<SyncData> syncDatas;
     public enum SkillVariantType { Base = 0, Enhanced = 1 }
+    public enum AttackRange { single, Multiple, Rampage }
 
     [Header("---UI---")]
     /// <summary>
