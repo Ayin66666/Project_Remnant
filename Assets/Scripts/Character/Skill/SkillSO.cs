@@ -15,6 +15,10 @@ public class SkillSO : ScriptableObject
     /// </summary>
     public SkillType skillType;
     /// <summary>
+    /// 방어 스킬의 타입 - 가드, 회피, 반격, 합 가능 반격
+    /// </summary>
+    public GuardType guardType;
+    /// <summary>
     /// 참관타
     /// </summary>
     public AttackType attackType;
@@ -34,8 +38,11 @@ public class SkillSO : ScriptableObject
     /// 동기화 별 스킬 데이터
     /// </summary>
     public List<SyncData> syncDatas;
+
     public enum SkillVariantType { Base = 0, Enhanced = 1 }
     public enum AttackRange { single, Multiple, Rampage }
+    public enum GuardType { None, Guard, Dodge, Counter, CrashCounter }
+
 
     [Header("---UI---")]
     /// <summary>
@@ -46,7 +53,6 @@ public class SkillSO : ScriptableObject
     /// 스킬 아이콘 - UI 및 전투 표시용
     /// </summary>
     [SerializeField] private Sprite icon;
-
     public string SkillName => skillName;
     public Sprite Icon => icon;
 
