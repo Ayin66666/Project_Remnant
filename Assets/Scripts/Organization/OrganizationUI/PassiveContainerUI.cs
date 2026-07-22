@@ -14,10 +14,10 @@ public class PassiveContainerUI : MonoBehaviour
     [SerializeField] private Image borderImage;
     [SerializeField] private Sprite[] borderSprites;
 
-    public void SetUp(PassiveUIData data)
+    public void SetUp(PassiveData data)
     {
-        nameText.text = data.passiveName;
-        descriptionText.text = data.passiveDescription;
+        nameText.text = data.PassiveName;
+        descriptionText.text = data.PassiveDescription;
 
         LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);
     }

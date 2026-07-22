@@ -41,7 +41,7 @@ namespace Game.Character
         /// <summary>
         /// 패시브 데이터를 모아둔 리스트
         /// </summary>
-        public List<PassiveUIData> passiveUIData;
+        public List<PassiveData> passiveUIData;
 
         // 정신력 데이터
         /// <summary>

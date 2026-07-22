@@ -3,7 +3,7 @@ using UnityEngine;
 using Game.Character;
 
 
-[CustomPropertyDrawer(typeof(PassiveUIData))]
+[CustomPropertyDrawer(typeof(PassiveData))]
 public class PassiveUIDataDrawer : PropertyDrawer
 {
     private const float LineHeight = 18f;

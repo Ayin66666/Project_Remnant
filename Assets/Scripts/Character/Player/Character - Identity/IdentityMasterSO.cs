@@ -45,7 +45,7 @@ namespace Game.Character
         /// <summary>
         /// 패시브 데이터를 모아둔 리스트
         /// </summary>
-        public List<PassiveUIData> passiveUIData;
+        public List<PassiveData> passiveUIData;
 
         // 정신력 데이터
         /// <summary>
@@ -64,10 +64,19 @@ namespace Game.Character
 
 
     [System.Serializable]
-    public class PassiveUIData
+    public class PassiveData
     {
-        public string passiveName;
-        [TextArea] public string passiveDescription;
+        [Header("---UI---")]
+        [SerializeField] private string passiveName;
+        [SerializeField, TextArea] private string passiveDescription;
+        public string PassiveName => passiveName;
+        public string PassiveDescription => passiveDescription;
+
+        // [Header("---Effect---")]
+        // 패시브는 어디에 위치해야하나?
+        // 별개의 SO로 빼서 작업해야하나?
+        // PlayerCharacter 하나로 플레이어블 캐릭터를 퉁치는게 아니라
+        // 각각의 캐릭터마다 스크립트를 작성해주는게 맞나?
     }
 
 
@@ -77,6 +86,7 @@ namespace Game.Character
         public CharacterId sinner;
         public List<IdentityData> info;
     }
+
 
     public enum CharacterId
     {

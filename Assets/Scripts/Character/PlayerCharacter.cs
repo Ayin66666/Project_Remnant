@@ -15,6 +15,7 @@ public class PlayerCharacter : CharacterBase
         SetFacing(Facing.Right);
     }
 
+    // 모든 캐릭터가 CharacterBase 기반으로 구현된다면 SetUp() 선언 위치는?
     /// <summary>
     /// 플레이어 - 동기화 기반 스테이터스 세팅 기능
     /// </summary>

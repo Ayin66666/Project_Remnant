@@ -18,7 +18,6 @@ public class DamageModifierSO : EffectBaseSO
 
         // 데미지 감소
         DamageReduction,
-        SinDamageReduction,
 
         // 코인
         SkillBasePower,
@@ -40,9 +39,6 @@ public class DamageModifierSO : EffectBaseSO
                 break;
 
             case DamageEffectType.DamageReduction:
-                break;
-
-            case DamageEffectType.SinDamageReduction:
                 break;
 
             case DamageEffectType.SkillBasePower:
