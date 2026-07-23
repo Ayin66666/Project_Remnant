@@ -14,7 +14,7 @@ public class PassiveContainerUI : MonoBehaviour
     [SerializeField] private Image borderImage;
     [SerializeField] private Sprite[] borderSprites;
 
-    public void SetUp(PassiveData data)
+    public void SetUp(PassiveSO data)
     {
         nameText.text = data.PassiveName;
         descriptionText.text = data.PassiveDescription;

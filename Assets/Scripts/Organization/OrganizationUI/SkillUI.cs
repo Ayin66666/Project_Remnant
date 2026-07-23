@@ -36,11 +36,11 @@ public class SkillUI : MonoBehaviour
         }
 
         // ÆÐ½Ãºê UI
-        for (int i = 0; i < data.master.passiveUIData.Count; i++)
+        for (int i = 0; i < data.master.passiveList.Count; i++)
         {
             GameObject obj = Instantiate(passiveContaninerUIPrefab, skillRect);
             PassiveContainerUI contaninerUI = obj.GetComponent<PassiveContainerUI>();
-            contaninerUI.SetUp(data.master.passiveUIData[i]);
+            contaninerUI.SetUp(data.master.passiveList[i]);
             obj.SetActive(false);
 
             passive.Add(contaninerUI);

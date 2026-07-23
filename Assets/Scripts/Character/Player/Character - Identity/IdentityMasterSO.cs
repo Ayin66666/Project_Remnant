@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Game.Character;
 
 namespace Game.Character
 {
@@ -45,7 +44,7 @@ namespace Game.Character
         /// <summary>
         /// 패시브 데이터를 모아둔 리스트
         /// </summary>
-        public List<PassiveData> passiveUIData;
+        public List<PassiveSO> passiveList;
 
         // 정신력 데이터
         /// <summary>
@@ -60,23 +59,6 @@ namespace Game.Character
         /// 정신력 설명
         /// </summary>
         [TextArea] public string mentalityDescription;
-    }
-
-
-    [System.Serializable]
-    public class PassiveData
-    {
-        [Header("---UI---")]
-        [SerializeField] private string passiveName;
-        [SerializeField, TextArea] private string passiveDescription;
-        public string PassiveName => passiveName;
-        public string PassiveDescription => passiveDescription;
-
-        // [Header("---Effect---")]
-        // 패시브는 어디에 위치해야하나?
-        // 별개의 SO로 빼서 작업해야하나?
-        // PlayerCharacter 하나로 플레이어블 캐릭터를 퉁치는게 아니라
-        // 각각의 캐릭터마다 스크립트를 작성해주는게 맞나?
     }
 
 

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "Skill_SkillName", menuName = "Skill/SkillSO", order = int.MaxValue)]
+[CreateAssetMenu(fileName = "Skill_SkillName", menuName = "Character/Skill/SkillSO", order = int.MaxValue)]
 public class SkillSO : ScriptableObject
 {
     [Header("---Skill Data---")]

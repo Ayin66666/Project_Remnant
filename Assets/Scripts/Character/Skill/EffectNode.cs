@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static EffectNode;
 
 
 [System.Serializable]
@@ -68,24 +69,24 @@ public class EffectNode
         public int conditionValue;
         public List<EffectValue> values;
     }
-
-    [System.Serializable]
-    /// <summary>
-    /// 동작 액션 종류
-    /// </summary>
-    public struct ActionNode
-    {
-        [Header("---Action---")]
-        public ActionType actionType;
-        public List<EffectValue> valueNode;
-
-        [Header("---Original Action---")]
-        public int originalActionId;
-        [TextArea] public string actionDescription;
-    }
     #endregion
 }
 
+[System.Serializable]
+/// <summary>
+/// 동작 액션 종류
+/// 26.07.23 Public으로 전환함! => 사유 : passive 및 ego에서도 재사용
+/// </summary>
+public struct ActionNode
+{
+    [Header("---Action---")]
+    public ActionType actionType;
+    public List<EffectValue> valueNode;
+
+    [Header("---Original Action---")]
+    public int originalActionId;
+    [TextArea] public string actionDescription;
+}
 
 #region Public Enum -> 나중에 위치 전환 필요
 /// <summary>

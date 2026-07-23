@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "CoinInfoSO", menuName = "Skill/CoinInfo", order = int.MaxValue)]
+[CreateAssetMenu(fileName = "CoinInfoSO", menuName = "Character/Skill/CoinInfo", order = int.MaxValue)]
 public class CoinInfoSO : ScriptableObject
 {
     // 이거 전체 motionValue는 skillso에만 있고,

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Game.Character
 {
-    [CreateAssetMenu(fileName = "EGO_CharacterName_Rank_EgoName", menuName = "EGO/EGOMaster", order = int.MaxValue)]
+    [CreateAssetMenu(fileName = "EGO_CharacterName_Rank_EgoName", menuName = "Character/EGO/EGOMaster", order = int.MaxValue)]
     public class EgoMasterSO : ScriptableObject
     {
         [Header("---Data---")]

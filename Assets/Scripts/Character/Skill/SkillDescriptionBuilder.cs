@@ -160,7 +160,7 @@ public static class SkillDescriptionBuilder
     /// 동작 액션 텍스트 전환 함수
     /// </summary>
     /// <returns></returns>
-    private static string GetActionText(EffectNode.ActionNode node)
+    private static string GetActionText(ActionNode node)
     {
         /* 구버전
         StringBuilder sb = new StringBuilder();

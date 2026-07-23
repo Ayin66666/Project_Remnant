@@ -10,13 +10,6 @@ using UnityEngine;
 
 public abstract class CharacterBase : MonoBehaviour, IDamageable
 {
-    [Header("---Test---")]
-    #region
-    [SerializeField] private EffectBaseSO testEffect;
-    [SerializeField] private int power;
-    [SerializeField] private int count;
-    #endregion
-
     [Header("---State---")]
     #region
     [SerializeField] private bool isPanic;
@@ -46,9 +39,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     public int Sync => sync;
     #endregion
 
-    [Header("---Slot---")]
-    [SerializeField] protected SkillSlot[] attackSlots;
-
     [Header("---Status Effect---")]
     #region
     [SerializeField] protected Dictionary<KeywordType, EffectRuntimeData> keywordEffects;
@@ -61,6 +51,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] protected Rigidbody2D rigid;
     [SerializeField] protected Animator anim;
     [SerializeField] protected CharacterUI characterUI;
+    [SerializeField] protected SkillSlot[] attackSlots;
     #endregion
 
     [Header("---Movement---")]
@@ -91,20 +82,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     }
     #endregion
 
-
-    private void Update()
-    {
-        // 테스트용 입력
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            AddEffect(new EffectRuntimeData()
-            {
-                effectSO = testEffect as KeywordSO,
-                power = power,
-                count = count
-            });
-        }
-    }
 
     #region 시작 로직
     private void Awake()
