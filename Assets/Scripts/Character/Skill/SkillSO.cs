@@ -66,6 +66,10 @@ public class SkillSO : ScriptableObject
     {
         [Header("---동기화 별 스킬 기본 데이터---")]
         /// <summary>
+        /// 해당 스킬의 데미지 값
+        /// </summary>
+        public int motionValue;
+        /// <summary>
         /// 스킬의 기본 위력
         /// </summary>
         public int originalPower;

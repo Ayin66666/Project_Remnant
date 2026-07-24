@@ -43,7 +43,7 @@ public class DescriptionUI : MonoBehaviour
         descriptionText.text = SkillDescriptionBuilder.MakeDescription(skillSO, identity.sync);
 
         // 코인 개수
-        StringBuilder sb = new StringBuilder(skillSO.syncDatas[0].coins.Count);
+        StringBuilder sb = new StringBuilder(skillSO.syncDatas[identity.sync].coins.Count);
         for (int i = 0; i < skillSO.syncDatas[0].coins.Count; i++)
         {
             sb.Append("<sprite=0>");
@@ -51,13 +51,10 @@ public class DescriptionUI : MonoBehaviour
         coinText.text = sb.ToString();
 
         // 위력
-        sb = new StringBuilder(skillSO.syncDatas[0].coins.Count * 6);
-        for (int i = 0; i < skillSO.syncDatas[0].coins.Count; i++)
-        {
-            Vector2 value = skillSO.syncDatas[0].coins[i].MotionValue;
-            sb.Append(value.ToString("0.0"));
-            if (i < skillSO.syncDatas[0].coins.Count - 1) sb.Append(" / ");
-        }
+        sb = new StringBuilder();
+        int value = skillSO.syncDatas[identity.sync].motionValue;
+        sb.Append("스킬 배율 : " + value);
+
         valueText.text = sb.ToString();
 
         // 가중치

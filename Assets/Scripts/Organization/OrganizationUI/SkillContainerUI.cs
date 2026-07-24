@@ -2,14 +2,13 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Game.Character;
 
 
 public class SkillContainerUI : MonoBehaviour
 {
     [Header("---Setting---")]
     [SerializeField] private SkillSO skill;
-    public SkillSO Skill {  get { return skill; } }
+    public SkillSO Skill { get { return skill; } }
 
     [Header("---UI---")]
     [SerializeField] private Image skillIcon;
@@ -29,7 +28,7 @@ public class SkillContainerUI : MonoBehaviour
     {
         // 초기화
         Clear();
-        
+
         // 데이터 설정
         this.skill = skillSO;
 
@@ -41,7 +40,7 @@ public class SkillContainerUI : MonoBehaviour
 
         // 코인 개수
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < skillSO.syncDatas[0].coins.Count; i++)
+        for (int i = 0; i < skillSO.syncDatas[identity.sync].coins.Count; i++)
         {
             sb.Append("<sprite=1>");
         }
@@ -52,16 +51,12 @@ public class SkillContainerUI : MonoBehaviour
 
         // 데미지
         sb = new StringBuilder();
-        for(int i = 0; i < skillSO.syncDatas[0].coins.Count; i++)
-        {
-            sb.Append(skillSO.syncDatas[0].coins[i].MotionValue);
-            if (i < skillSO.syncDatas[0].coins.Count - 1) sb.Append(" / ");
-        }
+        sb.Append("스킬 배율 : " + skillSO.syncDatas[identity.sync].motionValue);
         damageText.text = sb.ToString();
 
         // 가중치
         sb = new StringBuilder(skillSO.targetCount);
-        for(int i = 0; i < skillSO.targetCount; i++)
+        for (int i = 0; i < skillSO.targetCount; i++)
         {
             sb.Append("<sprite=1>");
         }

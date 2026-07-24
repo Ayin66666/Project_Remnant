@@ -36,10 +36,7 @@ public abstract class SkillBase : MonoBehaviour
             sinType = skillSO.sinType,
             attackType = skillSO.attackType,
             attackPoint = character.Attack,
-            motionValue = isFront ? 
-            skillSO.syncDatas[character.Sync].coins[coinIndex].MotionValue.x : 
-            skillSO.syncDatas[character.Sync].coins[coinIndex].MotionValue.y,
-
+            motionValue = isFront ? 0.65f : 1f,
             isCritical = PoiseSO.IsCritical(character),
             critMultiplier = 1.5f,
         };

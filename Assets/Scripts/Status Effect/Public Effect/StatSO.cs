@@ -11,9 +11,10 @@ public class StatSO : EffectBaseSO
     {
         None,
 
-        // 기본 기능
         AttackPoint, // 공격 포인트
         DefensePoint, // 방어 포인트
+        HpHealing, // 체력 회복
+        MentallyHealing, // 정신력 회복
     }
 
 
@@ -42,6 +43,14 @@ public class StatSO : EffectBaseSO
 
             case CombatEffectType.DefensePoint:
                 // 방어 포인트 + 값
+                break;
+
+            case CombatEffectType.HpHealing:
+                // 체력 + 값
+                break;
+
+            case CombatEffectType.MentallyHealing:
+                // 정신력 + 값
                 break;
         }
     }

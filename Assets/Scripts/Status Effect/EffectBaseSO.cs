@@ -20,7 +20,8 @@ public abstract class EffectBaseSO : ScriptableObject
     public enum EffectCategory
     {
         Public,
-        Keyword
+        Keyword,
+        Original
     }
     public EffectCategory Category => effectCategory;
     public KeywordType Keyword => keywordType;
