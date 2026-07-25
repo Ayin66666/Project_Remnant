@@ -574,6 +574,25 @@ public class BattleManager : MonoBehaviour
     #endregion
 
 
+    /// <summary>
+    /// 임시 작성 - 필드 이펙트 구현 후 정식 작성 필요
+    /// </summary>
+    /// <param name="effectSO"></param>
+    /// <returns></returns>
+    public bool GetfieldEffect(GameObject effectSO)
+    {
+        return true;
+    }
+
+    /// <summary>
+    /// 임시 작성 - 필드 이펙트 구현 후 정식 작성 필요
+    /// </summary>
+    /// <param name="effectSO"></param>
+    public void SetFieldEffect(GameObject effectSO)
+    {
+
+    }
+
     #region 데이터 클래스
     [System.Serializable]
     public class WaveRuntimeData

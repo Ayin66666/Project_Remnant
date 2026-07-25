@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // 플레이어 & 몬스터의 공용 기능
@@ -385,13 +386,24 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
     #region 버프 & 디버프 로직
     /// <summary>
-    /// 필요한 키워드의 보유 값 전달 / 없을 경우 null 반환
+    /// 필요한 키워드의 보유 값 전달 / 없을 경우 Null 반환
     /// </summary>
     /// <param name="keyword">값이 필요한 키워드</param>
     /// <returns></returns>
     public EffectRuntimeData GetKeyword(KeywordType keyword)
     {
         return keywordEffects.ContainsKey(keyword) ? keywordEffects[keyword] : null;
+    }
+
+    /// <summary>
+    /// 필요한 버프 & 디버프의 보유 값 전달 / 없을 경우 Null 반환
+    /// </summary>
+    /// <param name="so"></param>
+    /// <returns></returns>
+    public EffectRuntimeData GetEffect(EffectBaseSO so)
+    {
+        EffectRuntimeData data = statusEffects.Where(x => x.effectSO == so).FirstOrDefault();
+        return data;
     }
 
     /// <summary>

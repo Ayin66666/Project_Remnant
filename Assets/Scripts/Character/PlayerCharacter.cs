@@ -9,16 +9,18 @@ public class PlayerCharacter : CharacterBase
     public IdentityMasterSO IdentityMasterSO => identityMasterSO;
 
 
+    #region Start Logic
     private void Start()
     {
-        // 전투 시작 시 보정 -> 일단 여기에 넣었지만 나중에 BattleManager에서 SetUp() 과정에서 관리할것
+        // 전투 시작 시 보정
+        // -> 일단 여기에 넣었지만 나중에 BattleManager에서 SetUp() 과정에서 관리할것
+        // -> 이게 Player character의 부모 클래스 역할을 한다면 그대로 둬도 ㄱㅊ지 않나?
+
         SetFacing(Facing.Right);
     }
 
-    // 모든 캐릭터가 CharacterBase 기반으로 구현된다면 SetUp() 선언 위치는?
-    // 
     /// <summary>
-    /// 플레이어 - 동기화 기반 스테이터스 세팅 기능
+    /// 플레이어 - 스테이터스 세팅 기능
     /// </summary>
     /// <param name="data"></param>
     protected override void SetupStatus(StatusDataSO data)
@@ -45,5 +47,5 @@ public class PlayerCharacter : CharacterBase
             stagger.Add(Mathf.RoundToInt(maxHp * g / 100));
         }
     }
+    #endregion
 }
-    

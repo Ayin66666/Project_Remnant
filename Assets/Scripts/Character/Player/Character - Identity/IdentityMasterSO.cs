@@ -44,7 +44,7 @@ namespace Game.Character
         /// <summary>
         /// 패시브 데이터를 모아둔 리스트
         /// </summary>
-        public List<PassiveSO> passiveList;
+        public List<PassiveUIData> passiveList;
 
         // 정신력 데이터
         /// <summary>
@@ -59,6 +59,9 @@ namespace Game.Character
         /// 정신력 설명
         /// </summary>
         [TextArea] public string mentalityDescription;
+
+
+
     }
 
 
@@ -69,6 +72,15 @@ namespace Game.Character
         public List<IdentityData> info;
     }
 
+    [System.Serializable]
+    public struct PassiveUIData
+    {
+        [SerializeField] private string passiveName;
+        [SerializeField, TextArea] private string passiveDescription;
+
+        public string PassiveName => passiveName;
+        public string PassiveDescription => passiveDescription;
+    }
 
     public enum CharacterId
     {

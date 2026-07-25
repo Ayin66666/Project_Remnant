@@ -25,7 +25,7 @@ namespace Game.Character
         /// <summary>
         /// 패시브 데이터를 모아둔 리스트
         /// </summary>
-        public List<PassiveSO> passiveList;
+        public List<PassiveUIData> passiveList;
 
         // 정신력 데이터
         public Sprite mentalityIcon;

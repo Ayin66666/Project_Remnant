@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using Game.Character;
 
 
-public class PassiveContainerUI : MonoBehaviour
+public class CharacterPassiveUI : MonoBehaviour
 {
     [Header("---UI---")]
     [SerializeField] private TextMeshProUGUI nameText;
@@ -14,7 +14,7 @@ public class PassiveContainerUI : MonoBehaviour
     [SerializeField] private Image borderImage;
     [SerializeField] private Sprite[] borderSprites;
 
-    public void SetUp(PassiveSO data)
+    public void SetUp(PassiveUIData data)
     {
         nameText.text = data.PassiveName;
         descriptionText.text = data.PassiveDescription;

@@ -109,7 +109,11 @@ public enum TriggerType
 
     // 턴
     TurnStart = 1 << 6,
-    TurnEnd = 1 << 7
+    TurnEnd = 1 << 7,
+
+    // 키워드
+    KeywordAdded = 1 << 8,
+    KeywordConsumed = 1 << 9,
 }
 
 public enum ActionType

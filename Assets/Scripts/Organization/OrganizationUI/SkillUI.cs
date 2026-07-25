@@ -7,7 +7,7 @@ public class SkillUI : MonoBehaviour
 {
     [Header("---Setting---")]
     [SerializeField] private List<SkillContainerUI> skill;
-    [SerializeField] private List<PassiveContainerUI> passive;
+    [SerializeField] private List<CharacterPassiveUI> passive;
 
     [Header("---UI---")]
     [SerializeField] private GameObject passiveUI;
@@ -39,7 +39,7 @@ public class SkillUI : MonoBehaviour
         for (int i = 0; i < data.master.passiveList.Count; i++)
         {
             GameObject obj = Instantiate(passiveContaninerUIPrefab, skillRect);
-            PassiveContainerUI contaninerUI = obj.GetComponent<PassiveContainerUI>();
+            CharacterPassiveUI contaninerUI = obj.GetComponent<CharacterPassiveUI>();
             contaninerUI.SetUp(data.master.passiveList[i]);
             obj.SetActive(false);
 
@@ -55,7 +55,7 @@ public class SkillUI : MonoBehaviour
     public void ClickSkillButton(int skillIndex)
     {
         // 패시브 Off
-        foreach (PassiveContainerUI pa in passive)
+        foreach (CharacterPassiveUI pa in passive)
         {
             pa.gameObject.SetActive(false);
         }
@@ -80,7 +80,7 @@ public class SkillUI : MonoBehaviour
         }
 
         // 패시브 On
-        foreach(PassiveContainerUI pa in passive)
+        foreach(CharacterPassiveUI pa in passive)
         {
             pa.gameObject.SetActive(true);   
         }
