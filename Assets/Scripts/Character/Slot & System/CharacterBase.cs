@@ -279,6 +279,10 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         // 2. info 기반 데미지 계산 후 반환
         // 3. 반환 데미지를 target의 takeDamage에 전달
 
+        // 이벤트
+        OnHit();
+
+        // 데미지 계산
         curHp -= damage;
         if (curHp <= 0)
         {
@@ -420,6 +424,9 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
             return;
         }
 
+        // 이벤트
+        OnStatusEffectActivate(type);
+
         // 키워드 감소
         keyword.count -= consumeCount;
         if (keyword.count <= 0)
@@ -497,6 +504,59 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         statusEffects.Add(data);
     }
     #endregion
+
+
+    #region 트리거 로직
+    /// <summary>
+    /// 턴 시작 시 호출
+    /// </summary>
+    public virtual void OnTurnStart()
+    {
+
+    }
+
+    /// <summary>
+    /// 턴 종료 시 호출
+    /// </summary>
+    public virtual void OnTurnEnd()
+    {
+
+    }
+
+    /// <summary>
+    /// 합 결과 발생 시 호출
+    /// </summary>
+    /// <param name="isWin"></param>
+    public virtual void OnCrush(bool isWin)
+    {
+
+    }
+
+    /// <summary>
+    /// 공격 시 호출
+    /// </summary>
+    public virtual void OnAttack()
+    {
+
+    }
+
+    /// <summary>
+    /// 피격 시 호출
+    /// </summary>
+    public virtual void OnHit()
+    {
+
+    }
+
+    /// <summary>
+    /// 7대 키워드 동작 (호침진파충출화)
+    /// </summary>
+    /// <param name="type"></param>
+    public virtual void OnStatusEffectActivate(KeywordType type)
+    {
+
+    }
+    #endregion
 }
 
 
@@ -514,6 +574,6 @@ public class EffectRuntimeData
     /// <summary>
     /// Keyword의 경우 횟수, 공용의 경우 지속 턴
     /// </summary>
-    public int count;
+    public int count; // -1의 경우 무한유지
 }
 #endregion
