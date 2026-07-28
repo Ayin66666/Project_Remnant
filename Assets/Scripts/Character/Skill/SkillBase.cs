@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -10,10 +11,10 @@ using UnityEngine;
 public abstract class SkillBase : MonoBehaviour
 {
     [Header("---Component---")]
-    [SerializeField] private SkillSO skillSO;
-    [SerializeField] private CharacterBase character;
-    [SerializeField] private Animator anim;
-    private Coroutine useCoroutine;
+    [SerializeField] protected SkillSO skillSO;
+    [SerializeField] protected CharacterBase character;
+    [SerializeField] protected Animator anim;
+    protected Coroutine useCoroutine;
     public SkillSO SkillSO => skillSO;
 
 
@@ -24,7 +25,7 @@ public abstract class SkillBase : MonoBehaviour
     /// <param name="isFront"></param>
     /// <param name="coinIndex"></param>
     /// <returns></returns>
-    protected virtual AttackInfo CreateInfo(bool isFront, int coinIndex)
+    protected virtual AttackInfo CreateInfo()
     {
         // Info는 코인 공격 시작 시 생성해야 함
         // 생성 후 타겟에게 데이터를 넘겨주고 계산된 최종 데미지 값을 반환받음
@@ -36,7 +37,7 @@ public abstract class SkillBase : MonoBehaviour
             sinType = skillSO.sinType,
             attackType = skillSO.attackType,
             attackPoint = character.Attack,
-            motionValue = isFront ? 0.65f : 1f,
+            motionValue = skillSO.syncDatas[character.Sync].motionValue,
             isCritical = PoiseSO.IsCritical(character),
             critMultiplier = 1.5f,
         };
@@ -45,22 +46,141 @@ public abstract class SkillBase : MonoBehaviour
     }
 
     /// <summary>
+    /// 합 결과 남은 공격 가능 코인이 몇개인지 체크 후 데이터 전달
+    /// -> 제작중
+    /// </summary>
+    protected void CoinCheck(SkillUseData data)
+    {
+        // 총 코인 개수
+        int coinCount = skillSO.syncDatas[character.Sync].coins.Count;
+
+        // 파괴된 코인과 SO를 대조
+
+        // 데이터 반환
+    }
+
+    /// <summary>
+    /// 코인 앞뒷면 표시
+    /// -> 1차 제작 완료 / UI 이벤트 필요
+    /// </summary>
+    /// <returns></returns>
+    protected bool CoinToss()
+    {
+        // 정신력 0 기준 기본확률은 50%,
+        // 45 기준 95%,
+        // -45 기준 5% 확률로 앞면이 나옴
+
+        // 연출 부분은 어디에 둘지 고민중
+
+        int chance = 50 + character.Mentality;
+        return Random.Range(0, 100) < chance;
+    }
+
+    protected void ApplyCoinEffects(int coinIndex, SkillUseData data)
+    {
+        foreach (var effect in skillSO.syncDatas[character.Sync].coins[coinIndex].EffectNodes)
+        {
+            // 대상 체크
+            List<CharacterBase> effectTargets = new List<CharacterBase>();
+            switch (effect.Target)
+            {
+                case EffectNode.TargetType.Self:
+                    effectTargets.Add(character);
+                    break;
+
+                case EffectNode.TargetType.Target:
+                    effectTargets = data.targets;
+                    break;
+
+                case EffectNode.TargetType.Both:
+                    effectTargets.Add(character);
+                    effectTargets.AddRange(data.targets);
+                    break;
+
+                case EffectNode.TargetType.AllEnemies:
+                    // effectTargets = BattleManager.instance.GetAllEnemies(); 
+                    break;
+
+                case EffectNode.TargetType.AllAllies:
+                    // effectTargets = BattleManager.instance.GetAllPlayer();
+                    break;
+
+                case EffectNode.TargetType.Everyone:
+                    // effectTargets.AddRange(BattleManager.instance.GetAllEnemies());
+                    // effectTargets.AddRange(BattleManager.instance.GetAllPlayer());
+                    break;
+            }
+
+            // 대상에게 ValueNode의 값을 아래의 효과로 적용
+            switch (effect.Action.actionType)
+            {
+                case ActionType.None:
+                    break;
+
+                case ActionType.AddEffect:
+                    /*
+                    public EffectBaseSO effect;
+                    public ValueType valueType;
+                    public int value;
+                    public int duration;
+                     */
+
+                    // 데이터 생성
+                    foreach (var val in effect.Action.valueNode)
+                    {
+                        EffectRuntimeData d = new EffectRuntimeData()
+                        {
+                            effectSO = val.effect,
+                            power = val.value,
+                            count = val.duration,
+                        };
+                    }
+
+
+                    foreach (var t in effectTargets)
+                    {
+                        // t.AddEffect();
+                    }
+
+                    break;
+
+                case ActionType.RemoveEffect:
+                    break;
+
+                case ActionType.Original:
+                    break;
+            }
+        }
+    }
+
+    /// <summary>
     /// 스킬 동작 호출 함수
     /// </summary>
-    public virtual void Use()
+    public virtual void Use(SkillUseData useData)
     {
         if (useCoroutine != null) StopCoroutine(useCoroutine);
-        useCoroutine = StartCoroutine(SkillAction());
+        useCoroutine = StartCoroutine(SkillAction(useData));
+    }
+
+    /// <summary>
+    /// 동작 초기화 - 혹시 모를 상황 대비
+    /// </summary>
+    public virtual void Reset()
+    {
+
     }
 
     /// <summary>
     /// 기능 동작 코루틴
     /// </summary>
-    protected abstract IEnumerator SkillAction();
-
-    /// <summary>
-    /// 동작 초기화 - 혹시 모를 상황 대비
-    /// </summary>
-    public abstract void Reset();
+    protected abstract IEnumerator SkillAction(SkillUseData useData);
     #endregion
+}
+
+
+[System.Serializable]
+public struct SkillUseData
+{
+    public List<CharacterBase> targets;
+    public int destroyedCoinCount;
 }

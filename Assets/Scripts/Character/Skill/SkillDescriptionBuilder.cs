@@ -81,33 +81,14 @@ public static class SkillDescriptionBuilder
     /// <returns></returns>
     private static string GetConditionText(EffectNode node)
     {
-        /* 구버전 -> 노드 변경 이전 코드
-        // 값
-        StringBuilder valueText = new StringBuilder();
-        for (int i = 0; i < node.Values.Count; i++)
-        {
-            valueText.Append($"{node.Values[i].effect.EffectName} {GetEffectTypeText(node.Values[i].valueType)}");
-
-            if (i < node.Values.Count - 1)
-                valueText.Append(" + ");
-        }
-        valueText.Append(node.Values.Count == 1 ? "(이)가" : "의 합이");
-
-        // 조건 
-        string conditionText = GetConditionText(node.Compare);
-
-        // 조합
-        string re = $"{valueText.ToString()} {node.ConditionValue} {conditionText}";
-        */
-
         // 신버전 -> 노드 변경 이후 코드 (26.07.15)
+        // 신버전2 -> 노드 데이터 입력 방식 변경 후 valueText 작성방식 변경 (value = 위력, duration = 횟수 or 지속시간)
         // 값
         StringBuilder valueText = new StringBuilder();
         for (int i = 0; i < node.Condition.values.Count; i++)
         {
-            EffectNode.EffectValue val = node.Condition.values[i];
+            EffectValue val = node.Condition.values[i];
             valueText.Append($"{val.effect.EffectName} {GetEffectTypeText(val.valueType)}");
-
             if (i < node.Condition.values.Count - 1)
                 valueText.Append(" + ");
         }
@@ -267,30 +248,36 @@ public static class SkillDescriptionBuilder
                 // 키워드는 위력, 횟수로 표시하지만
                 // 공용 이펙트는 붙는 어미가 달라져야함!
 
-                // 공용 버전 : 효과의 이름, 값, 유지 턴 셋팅
-                
-
-
-                // 키워드 버전 : 효과의 이름, 타입, 값 셋팅
-                EffectNode.EffectValue val = node.valueNode[i];
-                re = $"{val.effect.EffectName} {GetEffectTypeText(val.valueType)} {val.value}";
+                EffectValue val = node.valueNode[i];
+                if (node.valueNode[i].effect.Category == EffectBaseSO.EffectCategory.Public)
+                {
+                    // 공용 버전 : 효과의 이름, 값, 유지 턴 세팅
+                    re = $"{val.effect.EffectName} {val.value}을 {val.duration}턴";
+                }
+                else
+                {
+                    // 키워드 버전 : 효과의 이름, 타입, 값 세팅
+                    re = $"{val.effect.EffectName} 위력 {val.value} {val.effect.EffectName} 횟수 {val.duration}";
+                }
             }
 
             sb.Append(re);
 
+            /* 해당 로직은 위력과 횟수를 각기 다른 valueNode에 담았을 때 필요했으나 이젠 불필요
             // 호흡, 출혈 같이 위력과 횟수를 한줄에 보여줘야 하는 옵션이라면 , 로 구분
             if (i < node.valueNode.Count - 1)
             {
                 sb.Append(", ");
             }
+            */
         }
 
         // 종결 어미
         sb.Append(node.actionType switch
         {
             ActionType.None => "",
-            ActionType.AddEffect => "를 부여",
-            ActionType.RemoveEffect => "를 제거",
+            ActionType.AddEffect => "을(를) 부여",
+            ActionType.RemoveEffect => "을(를) 제거",
             ActionType.Original => "",
             _ => ""
         });

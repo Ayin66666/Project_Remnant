@@ -13,10 +13,13 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 {
     [Header("---State---")]
     #region
+    [SerializeField] private bool isAttack;
     [SerializeField] private bool isPanic;
     [SerializeField] private int panicTurn;
     [SerializeField] private bool isStagger;
     [SerializeField] private int staggerTurn;
+
+    public bool IsAttack => isAttack;
     #endregion
 
     [Header("---Status---")]
@@ -154,7 +157,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         }
     }
 
-
     /// <summary>
     /// 캐릭터 이동 로직 호출부
     /// </summary>
@@ -194,7 +196,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         isMove = false;
         movementCoroutine = null;
     }
-
 
     /// <summary>
     /// 캐릭터 합 밀림 로직 호출부
@@ -242,6 +243,16 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
         movementCoroutine = null;
         isMove = false;
+    }
+
+
+    /// <summary>
+    /// 현제 공격중인지 체크하는 함수
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetAttackState(bool value)
+    {
+        isAttack = value;
     }
     #endregion
 

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using static EffectNode;
 
 
 [System.Serializable]
@@ -46,19 +45,6 @@ public class EffectNode
     #region 노드 구조체
     [System.Serializable]
     /// <summary>
-    /// 값 저장 노드
-    /// </summary>>
-    public struct EffectValue
-    {
-        [Header("---Value---")]
-        public EffectBaseSO effect;
-        public ValueType valueType;
-        public int value;
-        public int duration;
-    }
-
-    [System.Serializable]
-    /// <summary>
     /// 동작 조건 노드
     /// </summary>
     public struct ConditionNode
@@ -70,6 +56,24 @@ public class EffectNode
         public List<EffectValue> values;
     }
     #endregion
+}
+
+[System.Serializable]
+/// <summary>
+/// 값 저장 노드
+/// </summary>>
+public struct EffectValue
+{
+    // 이거 power랑 count 를 나눌 필요 있나?
+    // 어차피 value & duration 다 있으니
+    // keyword는 value가 위력, duration이 횟수로,
+    // public은 value가 위력, duration이 지속 턴으로 하면 되는게?
+
+    [Header("---Value---")]
+    public EffectBaseSO effect;
+    public ValueType valueType; // 이거 필요하긴 함 -> 조건 체크에서 필요
+    public int value;
+    public int duration;
 }
 
 [System.Serializable]
@@ -87,6 +91,7 @@ public struct ActionNode
     public int originalActionId;
     [TextArea] public string actionDescription;
 }
+
 
 #region Public Enum -> 나중에 위치 전환 필요
 /// <summary>

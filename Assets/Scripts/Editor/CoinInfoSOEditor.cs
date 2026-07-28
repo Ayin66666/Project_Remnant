@@ -4,14 +4,10 @@ using UnityEngine;
 [CustomEditor(typeof(CoinInfoSO))]
 public class CoinInfoSOEditor : Editor
 {
-    SerializedProperty motionValue;
-    SerializedProperty hitDatas;
     SerializedProperty effectNodes;
 
     private void OnEnable()
     {
-        motionValue = serializedObject.FindProperty("motionValue");
-        hitDatas = serializedObject.FindProperty("hitDatas");
         effectNodes = serializedObject.FindProperty("effectNodes");
     }
 
@@ -30,7 +26,6 @@ public class CoinInfoSOEditor : Editor
     void DrawMotion()
     {
         EditorGUILayout.LabelField("Motion Value", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(motionValue);
     }
 
     void DrawEffectNodes()
