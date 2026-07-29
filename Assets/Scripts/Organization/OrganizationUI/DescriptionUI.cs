@@ -52,7 +52,7 @@ public class DescriptionUI : MonoBehaviour
 
         // 위력
         sb = new StringBuilder();
-        int value = skillSO.syncDatas[identity.sync].motionValue;
+        float value = skillSO.syncDatas[identity.sync].motionValue;
         sb.Append("스킬 배율 : " + value);
 
         valueText.text = sb.ToString();

@@ -35,15 +35,4 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
         // 공격 종료
         character.SetAttackState(false);
     }
-
-
-    public void Coin1_Normal()
-    {
-
-    }
-
-    public void Coin2_Normal()
-    {
-
-    }
 }

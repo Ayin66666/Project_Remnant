@@ -68,7 +68,7 @@ public class SkillSO : ScriptableObject
         /// <summary>
         /// 해당 스킬의 데미지 값
         /// </summary>
-        public int motionValue;
+        public float motionValue;
         /// <summary>
         /// 스킬의 기본 위력
         /// </summary>

@@ -233,44 +233,35 @@ public static class SkillDescriptionBuilder
         string re = string.Empty;
 
         // 효과
-        for (int i = 0; i < node.valueNode.Count; i++)
-        {
-            re = string.Empty;
+        // -> 26.07.29 : 데이터가 List에서 단일 데이터로 전환됨에 따라 for문 삭제함!
+        re = string.Empty;
 
-            // 오리지널 효과인지 체크
-            if (node.actionType == ActionType.Original)
+        // 오리지널 효과인지 체크
+        if (node.actionType == ActionType.Original)
+        {
+            re = node.actionDescription;
+        }
+        else
+        {
+            // 여기에 키워드인지, 공용 이펙트인지 체크 필요함!
+            // 키워드는 위력, 횟수로 표시하지만
+            // 공용 이펙트는 붙는 어미가 달라져야함!
+
+            EffectValue val = node.valueNode;
+            if (node.valueNode.effect.Category == EffectBaseSO.EffectCategory.Public)
             {
-                re = node.actionDescription;
+                // 공용 버전 : 효과의 이름, 값, 유지 턴 세팅
+                re = $"{val.effect.EffectName} {val.value}을 {val.duration}턴";
             }
             else
             {
-                // 여기에 키워드인지, 공용 이펙트인지 체크 필요함!
-                // 키워드는 위력, 횟수로 표시하지만
-                // 공용 이펙트는 붙는 어미가 달라져야함!
-
-                EffectValue val = node.valueNode[i];
-                if (node.valueNode[i].effect.Category == EffectBaseSO.EffectCategory.Public)
-                {
-                    // 공용 버전 : 효과의 이름, 값, 유지 턴 세팅
-                    re = $"{val.effect.EffectName} {val.value}을 {val.duration}턴";
-                }
-                else
-                {
-                    // 키워드 버전 : 효과의 이름, 타입, 값 세팅
-                    re = $"{val.effect.EffectName} 위력 {val.value} {val.effect.EffectName} 횟수 {val.duration}";
-                }
+                // 키워드 버전 : 효과의 이름, 타입, 값 세팅
+                re = $"{val.effect.EffectName} 위력 {val.value} {val.effect.EffectName} 횟수 {val.duration}";
             }
-
-            sb.Append(re);
-
-            /* 해당 로직은 위력과 횟수를 각기 다른 valueNode에 담았을 때 필요했으나 이젠 불필요
-            // 호흡, 출혈 같이 위력과 횟수를 한줄에 보여줘야 하는 옵션이라면 , 로 구분
-            if (i < node.valueNode.Count - 1)
-            {
-                sb.Append(", ");
-            }
-            */
         }
+
+        sb.Append(re);
+
 
         // 종결 어미
         sb.Append(node.actionType switch

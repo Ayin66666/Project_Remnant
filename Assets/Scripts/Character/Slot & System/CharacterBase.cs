@@ -451,68 +451,72 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// 키워드 데이터 추가 - 기존 데이터가 있다면 합산, 없다면 신규 추가
     /// </summary>
     /// <param name="data"></param>
-    public void AddKeyword(EffectRuntimeData data)
+    public void AddEffect(EffectRuntimeData data)
     {
-        // 일반 키워드는 파생 키워드를 덮어쓰지 못함
-        // 파생 키워드는 이미 부여된 일반 & 파생 키워드가 있다면 해당 키워드를 덮어씀
-
-        keywordEffects.TryGetValue(data.effectSO.Keyword, out var runtimeData);
-        if (runtimeData == null)
+        // 이펙트 데이터 체크
+        if(data.effectSO.Category == EffectBaseSO.EffectCategory.Public)
         {
-            // 데이터가 없다면 - 신규 데이터 추가
-            EffectRuntimeData newData = new EffectRuntimeData()
+            // 공용 이펙트
+            if (data.effectSO == null)
             {
-                effectSO = data.effectSO,
-                power = data.power,
-                count = data.count
-            };
+                Debug.LogError($"데이터 추가 실패! / {data}, {data.effectSO} 가 없음!");
+                return;
+            }
 
-            keywordEffects.Add(data.effectSO.Keyword, newData);
-
-            Debug.Log("키워드 신규 추가 : " + keywordEffects.ContainsKey(data.effectSO.Keyword));
+            // 데이터 추가
+            statusEffects.Add(data);
         }
         else
         {
-            // 데이터가 있다면 - 데이터 합산
-            if (data.effectSO is KeywordSO keyword)
+            // 키워드
+            // 일반 키워드는 파생 키워드를 덮어쓰지 못함
+            // 파생 키워드는 이미 부여된 일반 & 파생 키워드가 있다면 해당 키워드를 덮어씀
+            keywordEffects.TryGetValue(data.effectSO.Keyword, out var runtimeData);
+            if (runtimeData == null)
             {
-                // 파생 키워드라면 / 추가하려는 파생 키워드로 전환
-                if (keyword.IsDerived)
-                    runtimeData.effectSO = data.effectSO;
-            }
+                // 데이터가 없다면 - 신규 데이터 추가
+                EffectRuntimeData newData = new EffectRuntimeData()
+                {
+                    effectSO = data.effectSO,
+                    power = data.power,
+                    count = data.count
+                };
 
-            runtimeData.power += data.power;
-            runtimeData.count += data.count;
+                keywordEffects.Add(data.effectSO.Keyword, newData);
+
+                Debug.Log("키워드 신규 추가 : " + keywordEffects.ContainsKey(data.effectSO.Keyword));
+            }
+            else
+            {
+                // 데이터가 있다면 - 데이터 합산
+                if (data.effectSO is KeywordSO keyword)
+                {
+                    // 파생 키워드라면 / 추가하려는 파생 키워드로 전환
+                    if (keyword.IsDerived)
+                        runtimeData.effectSO = data.effectSO;
+                }
+
+                runtimeData.power += data.power;
+                runtimeData.count += data.count;
+            }
         }
     }
 
     /// <summary>
-    /// 공용 이펙트 데이터 추가 - 무조건 신규 추가
+    /// 이펙트 제거
     /// </summary>
     /// <param name="data"></param>
-    public void AddEffect(EffectRuntimeData data)
+    public void RemoveEffect(EffectRuntimeData data)
     {
-        // 이미 생성된 데이터가 오는거라 다시 넣을 필요 X
-        /*
-        // 데이터 생성
-        EffectRuntimeData newData = new EffectRuntimeData()
+        // 구현 필요
+        if (data.effectSO.Category == EffectBaseSO.EffectCategory.Public)
         {
-            effectSO = data.effectSO,
-            power = data.power,
-            count = data.count
-        };
-        */
-
-        // 데이터 무결성 검사 로직 필요
-        // -> 값이 제대로 들어있는지?
-        if (data.effectSO == null)
-        {
-            Debug.LogError($"데이터 추가 실패! / {data}, {data.effectSO} 가 없음!");
-            return;
+            // 공용 이펙트
         }
-
-        // 데이터 추가
-        statusEffects.Add(data);
+        else
+        {
+            // 키워드
+        }
     }
     #endregion
 

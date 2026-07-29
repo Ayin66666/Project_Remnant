@@ -76,8 +76,15 @@ public abstract class SkillBase : MonoBehaviour
         return Random.Range(0, 100) < chance;
     }
 
-    protected void ApplyCoinEffects(int coinIndex, SkillUseData data)
+    /// <summary>
+    /// 코인 이펙트 적용 함수
+    /// </summary>
+    /// <param name="coinIndex"></param>
+    /// <param name="isBrokenCoin"></param>
+    /// <param name="targets"></param>
+    protected void ApplyCoinEffects(int coinIndex, bool isBrokenCoin, List<CharacterBase> targets)
     {
+        // 이펙트의 개수만큼 동작
         foreach (var effect in skillSO.syncDatas[character.Sync].coins[coinIndex].EffectNodes)
         {
             // 대상 체크
@@ -89,12 +96,12 @@ public abstract class SkillBase : MonoBehaviour
                     break;
 
                 case EffectNode.TargetType.Target:
-                    effectTargets = data.targets;
+                    effectTargets = targets;
                     break;
 
                 case EffectNode.TargetType.Both:
                     effectTargets.Add(character);
-                    effectTargets.AddRange(data.targets);
+                    effectTargets.AddRange(targets);
                     break;
 
                 case EffectNode.TargetType.AllEnemies:
@@ -111,44 +118,36 @@ public abstract class SkillBase : MonoBehaviour
                     break;
             }
 
-            // 대상에게 ValueNode의 값을 아래의 효과로 적용
-            switch (effect.Action.actionType)
+            // 대상에게 데이터 값을 아래 효과로 적용
+            foreach (var tar in effectTargets)
             {
-                case ActionType.None:
-                    break;
-
-                case ActionType.AddEffect:
-                    /*
-                    public EffectBaseSO effect;
-                    public ValueType valueType;
-                    public int value;
-                    public int duration;
-                     */
-
-                    // 데이터 생성
-                    foreach (var val in effect.Action.valueNode)
-                    {
-                        EffectRuntimeData d = new EffectRuntimeData()
-                        {
-                            effectSO = val.effect,
-                            power = val.value,
-                            count = val.duration,
-                        };
-                    }
+                // 적용을 위한 데이터 생성
+                // -> 해당 기능은 일단 이곳에 있으나, characterbase로 이전도 고민해볼것!
+                EffectRuntimeData addEffect = new EffectRuntimeData()
+                {
+                    effectSO = effect.Action.valueNode.effect,
+                    power = effect.Action.valueNode.value,
+                    count = effect.Action.valueNode.duration,
+                };
 
 
-                    foreach (var t in effectTargets)
-                    {
-                        // t.AddEffect();
-                    }
+                switch (effect.Action.actionType)
+                {
+                    case ActionType.AddEffect:
+                        tar.AddEffect(addEffect);
+                        break;
 
-                    break;
+                    case ActionType.RemoveEffect:
+                        tar.RemoveEffect(addEffect);
+                        break;
 
-                case ActionType.RemoveEffect:
-                    break;
-
-                case ActionType.Original:
-                    break;
+                    case ActionType.Original:
+                        // 오리지널은 어떻게?
+                        // characterbase에 오리지널 액션을 부르는 통합 함수를 만들어두고,
+                        // 해당 함수를 characterbase를 상속받은 스크립트에서 내부 기능을 채우는 방식은?
+                        // 인자값은 index를 받는 식이면 충분할거 같은데
+                        break;
+                }
             }
         }
     }

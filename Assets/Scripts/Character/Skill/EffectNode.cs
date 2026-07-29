@@ -85,7 +85,7 @@ public struct ActionNode
 {
     [Header("---Action---")]
     public ActionType actionType;
-    public List<EffectValue> valueNode;
+    public EffectValue valueNode;
 
     [Header("---Original Action---")]
     public int originalActionId;
@@ -131,6 +131,7 @@ public enum ActionType
 
 public enum ValueType
 {
+    None,
     Power,
     Count
 }
