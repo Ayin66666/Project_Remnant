@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,11 +11,15 @@ using UnityEngine;
 
 public abstract class SkillBase : MonoBehaviour
 {
+    [Header("---Setting---")]
+    [SerializeField] protected int totalDamage;
+    protected Coroutine useCoroutine;
+
     [Header("---Component---")]
+    [SerializeField] protected Animator anim;
     [SerializeField] protected SkillSO skillSO;
     [SerializeField] protected CharacterBase character;
-    [SerializeField] protected Animator anim;
-    protected Coroutine useCoroutine;
+    protected List<Action> originalActions;
     public SkillSO SkillSO => skillSO;
 
 
@@ -48,6 +53,7 @@ public abstract class SkillBase : MonoBehaviour
     /// <summary>
     /// 합 결과 남은 공격 가능 코인이 몇개인지 체크 후 데이터 전달
     /// -> 제작중
+    /// -> 필요한가?
     /// </summary>
     protected void CoinCheck(SkillUseData data)
     {
@@ -71,9 +77,8 @@ public abstract class SkillBase : MonoBehaviour
         // -45 기준 5% 확률로 앞면이 나옴
 
         // 연출 부분은 어디에 둘지 고민중
-
         int chance = 50 + character.Mentality;
-        return Random.Range(0, 100) < chance;
+        return UnityEngine.Random.Range(0, 100) < chance;
     }
 
     /// <summary>
@@ -146,10 +151,23 @@ public abstract class SkillBase : MonoBehaviour
                         // characterbase에 오리지널 액션을 부르는 통합 함수를 만들어두고,
                         // 해당 함수를 characterbase를 상속받은 스크립트에서 내부 기능을 채우는 방식은?
                         // 인자값은 index를 받는 식이면 충분할거 같은데
+                        OriginalEffect(skillSO.syncDatas[character.Sync].skillEffects[coinIndex].Action.originalActionId);
                         break;
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 오리지널 액션을 호출하는 함수
+    /// </summary>
+    /// <param name="index"></param>
+    protected void OriginalEffect(int index)
+    {
+        if (originalActions.Count < index || index < 0)
+            return;
+
+        originalActions[index]?.Invoke();
     }
 
     /// <summary>
@@ -162,17 +180,17 @@ public abstract class SkillBase : MonoBehaviour
     }
 
     /// <summary>
+    /// 기능 동작 코루틴
+    /// </summary>
+    protected abstract IEnumerator SkillAction(SkillUseData useData);
+
+    /// <summary>
     /// 동작 초기화 - 혹시 모를 상황 대비
     /// </summary>
     public virtual void Reset()
     {
 
     }
-
-    /// <summary>
-    /// 기능 동작 코루틴
-    /// </summary>
-    protected abstract IEnumerator SkillAction(SkillUseData useData);
     #endregion
 }
 

@@ -248,7 +248,7 @@ public class BattleManager : MonoBehaviour
     #endregion
 
 
-    #region 전투 로직
+    #region 공격 선택 로직
     /// <summary>
     /// 전투 시작 시 최초 1회 호출
     /// 전투 종료까지 계속 돌아가는 배틀 시스템 코루틴
@@ -444,6 +444,18 @@ public class BattleManager : MonoBehaviour
         };
 
         return data;
+    }
+    #endregion
+
+
+    #region 전투 로직
+    /// <summary>
+    /// 요청받은 캐릭터를 지정된 위치로 이동
+    /// </summary>
+    /// <param name="targets"></param>
+    public void SetTargetPos(List<CharacterBase> targets, Transform targetPos)
+    {
+
     }
     #endregion
 
