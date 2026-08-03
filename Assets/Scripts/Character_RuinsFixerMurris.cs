@@ -70,12 +70,6 @@ public class Character_RuinsFixerMurris : PlayerCharacter
 
         AddEffect(data);
     }
-
-    public void SkillUpgrade()
-    {
-        // 흑수가 10 이상 있을 경우 동작
-        // -> 이건 여기 말고 skill에서 하는게 맞을듯?
-    }
     #endregion
 
 

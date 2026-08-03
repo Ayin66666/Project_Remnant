@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 
@@ -43,26 +44,9 @@ public abstract class SkillBase : MonoBehaviour
             attackType = skillSO.attackType,
             attackPoint = character.Attack,
             motionValue = skillSO.syncDatas[character.Sync].motionValue,
-            isCritical = PoiseSO.IsCritical(character),
-            critMultiplier = 1.5f,
         };
 
         return info;
-    }
-
-    /// <summary>
-    /// 합 결과 남은 공격 가능 코인이 몇개인지 체크 후 데이터 전달
-    /// -> 제작중
-    /// -> 필요한가?
-    /// </summary>
-    protected void CoinCheck(SkillUseData data)
-    {
-        // 총 코인 개수
-        int coinCount = skillSO.syncDatas[character.Sync].coins.Count;
-
-        // 파괴된 코인과 SO를 대조
-
-        // 데이터 반환
     }
 
     /// <summary>
@@ -79,6 +63,14 @@ public abstract class SkillBase : MonoBehaviour
         // 연출 부분은 어디에 둘지 고민중
         int chance = 50 + character.Mentality;
         return UnityEngine.Random.Range(0, 100) < chance;
+    }
+
+    /// <summary>
+    /// 스킬 사용 시 발동되는 효과 적용 함수
+    /// </summary>
+    protected void ApplySkillEffect()
+    {
+
     }
 
     /// <summary>
@@ -185,6 +177,15 @@ public abstract class SkillBase : MonoBehaviour
     protected abstract IEnumerator SkillAction(SkillUseData useData);
 
     /// <summary>
+    /// 스킬 동작으로 인한 캐릭터 이동 호출 함수
+    /// </summary>
+    /// <param name="index"></param>
+    public virtual void Movement(int index)
+    {
+        // 세부 구현은 상속받은 스크립트에서 구현
+    }
+
+    /// <summary>
     /// 동작 초기화 - 혹시 모를 상황 대비
     /// </summary>
     public virtual void Reset()
@@ -198,6 +199,7 @@ public abstract class SkillBase : MonoBehaviour
 [System.Serializable]
 public struct SkillUseData
 {
+    [Header("---Use Data---")]
     public List<CharacterBase> targets;
-    public int destroyedCoinCount;
+    public List<bool> isCoinDestroy;
 }

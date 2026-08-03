@@ -4,10 +4,14 @@ using UnityEngine;
 [CustomEditor(typeof(CoinInfoSO))]
 public class CoinInfoSOEditor : Editor
 {
+    SerializedProperty coinType;
+    SerializedProperty damagePercent;
     SerializedProperty effectNodes;
 
     private void OnEnable()
     {
+        coinType = serializedObject.FindProperty("coinType");
+        damagePercent = serializedObject.FindProperty("damagePercent");
         effectNodes = serializedObject.FindProperty("effectNodes");
     }
 
@@ -15,7 +19,7 @@ public class CoinInfoSOEditor : Editor
     {
         serializedObject.Update();
 
-        DrawMotion();
+        DrawCoinSetting();
         EditorGUILayout.Space(15);
 
         DrawEffectNodes();
@@ -23,9 +27,12 @@ public class CoinInfoSOEditor : Editor
         serializedObject.ApplyModifiedProperties();
     }
 
-    void DrawMotion()
+    void DrawCoinSetting()
     {
-        EditorGUILayout.LabelField("Motion Value", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Coin Setting", EditorStyles.boldLabel);
+
+        EditorGUILayout.PropertyField(coinType, new GUIContent("Coin Type"));
+        EditorGUILayout.PropertyField(damagePercent, new GUIContent("Damage (%)"));
     }
 
     void DrawEffectNodes()
@@ -34,12 +41,11 @@ public class CoinInfoSOEditor : Editor
 
         for (int i = 0; i < effectNodes.arraySize; i++)
         {
-            SerializedProperty node =
-                effectNodes.GetArrayElementAtIndex(i);
+            SerializedProperty node = effectNodes.GetArrayElementAtIndex(i);
 
             EditorGUILayout.BeginVertical("box");
 
-            EditorGUILayout.LabelField($"Effect {i}", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField($"Effect {i + 1}", EditorStyles.boldLabel);
 
             EditorGUILayout.PropertyField(node, true);
 
@@ -53,7 +59,6 @@ public class CoinInfoSOEditor : Editor
 
             EditorGUILayout.EndVertical();
 
-            // ★ Effect끼리 여백 크게
             EditorGUILayout.Space(15);
         }
 

@@ -260,17 +260,24 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     #region 데미지 로직
     /// <summary>
     /// 데미지 계산식을 활용한 일반 데미지 계산
+    /// 단, 크리티컬 데미지는 계산되어 있지 않음
     /// </summary>
     /// <param name="info"></param>
     /// <returns></returns>
     public int CalDamage(AttackInfo info)
     {
         // 데미지 공식
-        // (공격 포인트 * 모션 배율 * 치명타 배율[1.5]) * step
+        // ((공격 포인트 * 모션 배율) * step) * 치명타 배율[1.5]
         // step = 공격자의 공격 포인트 - 방어 포인트 했을 때, 얼마나 차이 나는지
         // (3 차이 날 때마다 데미지 10% 증감)
 
-        float damage = info.attackPoint * info.motionValue * (info.isCritical ? info.critMultiplier : 1);
+        // 크리티컬의 경우 공격 시 poise 값을 별도로 체크해서 크리티컬 체크를 해줘야 함!
+
+        // 크리티컬은 호흡에 영향을 받기 때문에
+        // 크리티컬 데미지의 경우 즉시 계산이 아닌 코인 회전 시 계산이 맞음
+        //float damage = info.attackPoint * info.motionValue * (info.isCritical ? info.critMultiplier : 1);
+
+        float damage = info.attackPoint * info.motionValue;
         int diff = info.attackPoint - defence;
         int step = diff / 3;
         damage *= 1 + step * 0.1f;

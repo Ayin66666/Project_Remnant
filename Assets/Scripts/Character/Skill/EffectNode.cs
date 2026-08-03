@@ -119,6 +119,9 @@ public enum TriggerType
     // 키워드
     KeywordAdded = 1 << 8,
     KeywordConsumed = 1 << 9,
+
+    // 회피
+    DodgeSuccess = 1 << 10,
 }
 
 public enum ActionType
@@ -126,6 +129,7 @@ public enum ActionType
     None,
     AddEffect,
     RemoveEffect,
+    SkillEffect,
     Original
 }
 

@@ -12,7 +12,8 @@ public class CoinInfoSO : ScriptableObject
     // 26.07.24 : motionValue 제거함! => 해당 값은 SkillSO로 이동했고,
     // 대신 해당 코인이 총 데미지에서 몇 %의 데미지를 줄지 세팅하는 값으로 교체함
 
-    [Header("---Setting---")]
+    [Header("---Coin Setting---")]
+    [SerializeField] private CoinType coinType;
     /// <summary>
     /// 해당 코인이 전체 데미지 중 몇 %의 데미지를 주는지
     /// </summary>
@@ -22,8 +23,11 @@ public class CoinInfoSO : ScriptableObject
     /// </summary>
     [SerializeField] private List<EffectNode> effectNodes;
 
+    public CoinType Coin => coinType;
     public int DamagePercent => damagePercent;
     public List<EffectNode> EffectNodes => effectNodes;
 }
+
+public enum CoinType { Normal, Unbroken }
 
 
