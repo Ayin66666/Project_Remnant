@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 
@@ -70,7 +69,138 @@ public abstract class SkillBase : MonoBehaviour
     /// </summary>
     protected void ApplySkillEffect()
     {
+        foreach (var effectNode in skillSO.syncDatas[character.Sync].skillEffects)
+        {
+            // 동작 대상 체크
+            List<CharacterBase> targets = GetTargets(effectNode.Target);
 
+            // 동작 조건 체크
+            if (!ConditionCheck(effectNode.Condition, targets[0])) 
+                continue;
+
+            // 동작 값 제작
+            EffectRuntimeData effectData = new EffectRuntimeData()
+            {
+                effectSO = effectNode.Action.valueNode.effect,
+                power = effectNode.Action.valueNode.value,
+                count = effectNode.Action.valueNode.duration,
+            };
+
+            // 동작 대상에게 적용
+            foreach (var target in targets)
+            {
+                // 동작 타입 체크
+                switch (effectNode.Action.actionType)
+                {
+                    case ActionType.None:
+                        break;
+
+                    case ActionType.AddEffect:
+                        target.AddEffect(effectData);
+                        break;
+
+                    case ActionType.RemoveEffect:
+                        target.RemoveEffect(effectData);
+                        break;
+
+                    case ActionType.SkillEffect:
+                        // 스킬 버프는 어떻게?
+                        // 함수를 하나 만들어 두고 index 형태로 호출해야하나?
+                        // ㅇㅇ 버프 동작 이렇게?
+                        break;
+
+                    case ActionType.Original:
+                        // 오리지널 이펙트는 어떻게?
+                        originalActions[0]?.Invoke();
+                        break;
+                }
+            }
+        }
+    }
+
+    protected void SkillEffect(int index, List<CharacterBase> target)
+    {
+        // 타겟 확인
+        List<CharacterBase> targets = GetTargets(EffectNode.TargetType.Target);
+    }
+
+    /// <summary>
+    /// 동작 대상을 지정하는 함수
+    /// </summary>
+    /// <returns></returns>
+    private List<CharacterBase> GetTargets(EffectNode.TargetType type)
+    {
+        List<CharacterBase> targetList = new List<CharacterBase>();
+
+        switch (type)
+        {
+            case EffectNode.TargetType.Self:
+                targetList.Add(character);
+                break;
+
+            case EffectNode.TargetType.Target:
+                // targetList.Add(mainTarget);
+                break;
+
+            case EffectNode.TargetType.Both:
+                break;
+
+            case EffectNode.TargetType.AllEnemies:
+                break;
+
+            case EffectNode.TargetType.AllAllies:
+                break;
+
+            case EffectNode.TargetType.Everyone:
+                break;
+        }
+        return targetList;
+    }
+
+    /// <summary>
+    /// 동작 조건 체크 로직 (조건에 부합하다면 True, 부합하지 않다면 False 반환)
+    /// </summary>
+    /// <param name="condition"></param>
+    /// <returns></returns>
+    private bool ConditionCheck(EffectNode.ConditionNode condition, CharacterBase checkTarget)
+    {
+        // 조건이 없다면 즉시 True 반환
+        if (condition.compareType == EffectNode.CompareType.None)
+            return true;
+
+        // 조건 값 체크
+        bool canUse = false;
+        int total = 0;
+        for (int i = 0; i < condition.values.Count; i++)
+        {
+            EffectRuntimeData data = checkTarget.GetEffect(condition.values[i].effect);
+            if (data == null) continue;
+
+            int val = condition.values[i].valueType == ValueType.Power ? data.power : data.count;
+            total += val;
+        }
+
+        // 조건 확인
+        switch (condition.compareType)
+        {
+            case EffectNode.CompareType.LessEqual:
+                // 체크 값이 조건보다 작거나 같다면
+                canUse = total <= condition.conditionValue;
+                break;
+
+            case EffectNode.CompareType.Equal:
+                // 체크 값이 조건과 같다면
+                canUse = total == condition.conditionValue;
+                break;
+
+            case EffectNode.CompareType.GreaterEqual:
+                // 체크 값이 조건보다 크거나 같다면
+                canUse = total >= condition.conditionValue;
+                break;
+        }
+
+        // 결과값 반환
+        return canUse;
     }
 
     /// <summary>
@@ -143,7 +273,7 @@ public abstract class SkillBase : MonoBehaviour
                         // characterbase에 오리지널 액션을 부르는 통합 함수를 만들어두고,
                         // 해당 함수를 characterbase를 상속받은 스크립트에서 내부 기능을 채우는 방식은?
                         // 인자값은 index를 받는 식이면 충분할거 같은데
-                        OriginalEffect(skillSO.syncDatas[character.Sync].skillEffects[coinIndex].Action.originalActionId);
+                        UseOriginalEffect(skillSO.syncDatas[character.Sync].skillEffects[coinIndex].Action.originalActionId);
                         break;
                 }
             }
@@ -154,7 +284,7 @@ public abstract class SkillBase : MonoBehaviour
     /// 오리지널 액션을 호출하는 함수
     /// </summary>
     /// <param name="index"></param>
-    protected void OriginalEffect(int index)
+    protected void UseOriginalEffect(int index)
     {
         if (originalActions.Count < index || index < 0)
             return;

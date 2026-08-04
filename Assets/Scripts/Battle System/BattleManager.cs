@@ -296,7 +296,7 @@ public class BattleManager : MonoBehaviour
             x.attacker.slot == request.targetSlot);
 
         // 타겟 데이터 세팅
-        List<CharacterBase> targetList = GetTargets(request);
+        List<CharacterBase> targetList = SetTargets(request);
 
         // 해당 슬롯이 공격 행동이 없는 빈 슬롯이라면
         if (targetAction == null)
@@ -343,9 +343,9 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 공격할 대상 서칭 후 반환
+    /// 공격 세팅 시 공격 대상 서칭 후 반환
     /// </summary>
-    private List<CharacterBase> GetTargets(AttackRequest request)
+    private List<CharacterBase> SetTargets(AttackRequest request)
     {
         int attackCount = request.ownerSlot.Skill.SkillSO.targetCount;
         List<CharacterBase> targets = new List<CharacterBase>(attackCount);
@@ -379,6 +379,15 @@ public class BattleManager : MonoBehaviour
 
         // 데이터 반환
         return targets;
+    }
+
+    /// <summary>
+    /// 외부에서 효과 적용 대상을 지정할때 호출하는 함수
+    /// </summary>
+    /// <returns></returns>
+    public List<CharacterBase> GetTargets(EffectNode.TargetType type)
+    {
+        return null;
     }
 
     // 생성 조건이 2종류 필요해서 오버로딩 구현

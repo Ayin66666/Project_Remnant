@@ -6,7 +6,6 @@ using UnityEngine;
 public class Skill_BlackwaterArt_Undertow : SkillBase
 {
     // 1스킬 (강화)
-
     [Header("---Skill Setting---")]
     [SerializeField] private List<Transform> targetMovePos;
     [SerializeField] private List<GameObject> effects;
