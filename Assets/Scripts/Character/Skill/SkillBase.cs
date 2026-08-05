@@ -12,8 +12,16 @@ using UnityEngine;
 public abstract class SkillBase : MonoBehaviour
 {
     [Header("---Setting---")]
-    [SerializeField] protected int totalDamage;
     protected Coroutine useCoroutine;
+
+    [Header("---Runtime Data---")]
+    [SerializeField] protected int totalDamage;
+    [SerializeField] protected List<SkillEffectRuntimeData> effectRuintimeList;
+    public enum EffectRange
+    {
+        Skill,
+        Coin
+    }
 
     [Header("---Component---")]
     [SerializeField] protected Animator anim;
@@ -64,97 +72,71 @@ public abstract class SkillBase : MonoBehaviour
         return UnityEngine.Random.Range(0, 100) < chance;
     }
 
+
     /// <summary>
-    /// 스킬 사용 시 발동되는 효과 적용 함수
+    /// 스킬 효과 발동 함수
     /// </summary>
-    protected void ApplySkillEffect()
+    protected void ApplyEffect(EffectNode effectNode, List<CharacterBase> targets)
     {
-        foreach (var effectNode in skillSO.syncDatas[character.Sync].skillEffects)
+        // 동작 조건 체크 -> Targets 의 0번은 메인 타겟 고정
+        CharacterBase checkTarget = effectNode.Condition.checkTarget ==
+            EffectNode.TargetType.Self ? character : targets[0];
+
+        if (!ConditionCheck(effectNode.Condition, checkTarget))
+            return;
+
+        // 적용할 값 데이터 생성
+        EffectRuntimeData effectData = new EffectRuntimeData()
         {
-            // 동작 대상 체크
-            List<CharacterBase> targets = GetTargets(effectNode.Target);
+            effectSO = effectNode.Action.valueNode.effect,
+            power = effectNode.Action.valueNode.value,
+            count = effectNode.Action.valueNode.duration,
+        };
 
-            // 동작 조건 체크
-            if (!ConditionCheck(effectNode.Condition, targets[0])) 
-                continue;
-
-            // 동작 값 제작
-            EffectRuntimeData effectData = new EffectRuntimeData()
+        // 동작 대상에게 적용
+        foreach (var target in targets)
+        {
+            // 동작 타입 체크
+            switch (effectNode.Action.actionType)
             {
-                effectSO = effectNode.Action.valueNode.effect,
-                power = effectNode.Action.valueNode.value,
-                count = effectNode.Action.valueNode.duration,
-            };
+                case ActionType.None:
+                    break;
 
-            // 동작 대상에게 적용
-            foreach (var target in targets)
-            {
-                // 동작 타입 체크
-                switch (effectNode.Action.actionType)
-                {
-                    case ActionType.None:
-                        break;
+                case ActionType.AddEffect:
+                    target.AddEffect(effectData);
+                    break;
 
-                    case ActionType.AddEffect:
-                        target.AddEffect(effectData);
-                        break;
+                case ActionType.RemoveEffect:
+                    target.RemoveEffect(effectData);
+                    break;
 
-                    case ActionType.RemoveEffect:
-                        target.RemoveEffect(effectData);
-                        break;
+                case ActionType.SkillEffect:
+                    // 스킬 버프는 어떻게?
+                    // 함수를 하나 만들어 두고 index 형태로 호출해야하나?
+                    // ㅇㅇ 버프 동작 이렇게?
 
-                    case ActionType.SkillEffect:
-                        // 스킬 버프는 어떻게?
-                        // 함수를 하나 만들어 두고 index 형태로 호출해야하나?
-                        // ㅇㅇ 버프 동작 이렇게?
-                        break;
+                    // 26.08.05
+                    // 조건 만족 시 런타임 데이터를 제작해서 List에 넣고,
+                    // 스킬 데미지 계산 시 해당 List를 확인 후, 데미지 계산에 적용하는 방식으로
 
-                    case ActionType.Original:
-                        // 오리지널 이펙트는 어떻게?
-                        originalActions[0]?.Invoke();
-                        break;
-                }
+                    // 데이터 생성
+                    SkillEffectRuntimeData runtimeData = new SkillEffectRuntimeData
+                        (
+                        (SkillEffectSO)effectNode.Action.valueNode.effect,
+                        EffectRange.Skill,
+                        effectNode.Action.valueNode.value
+                        );
+
+                    effectRuintimeList.Add(runtimeData);
+                    break;
+
+                case ActionType.Original:
+                    // 오리지널 이펙트는 어떻게?
+                    // 인덱스 값은 어디서 넘겨주지? -> 이미 만들어둔 인덱스가 있음
+                    UseOriginalEffect(effectNode.Action.originalActionId);
+                    break;
             }
         }
-    }
-
-    protected void SkillEffect(int index, List<CharacterBase> target)
-    {
-        // 타겟 확인
-        List<CharacterBase> targets = GetTargets(EffectNode.TargetType.Target);
-    }
-
-    /// <summary>
-    /// 동작 대상을 지정하는 함수
-    /// </summary>
-    /// <returns></returns>
-    private List<CharacterBase> GetTargets(EffectNode.TargetType type)
-    {
-        List<CharacterBase> targetList = new List<CharacterBase>();
-
-        switch (type)
-        {
-            case EffectNode.TargetType.Self:
-                targetList.Add(character);
-                break;
-
-            case EffectNode.TargetType.Target:
-                // targetList.Add(mainTarget);
-                break;
-
-            case EffectNode.TargetType.Both:
-                break;
-
-            case EffectNode.TargetType.AllEnemies:
-                break;
-
-            case EffectNode.TargetType.AllAllies:
-                break;
-
-            case EffectNode.TargetType.Everyone:
-                break;
-        }
-        return targetList;
     }
 
     /// <summary>
@@ -204,83 +186,6 @@ public abstract class SkillBase : MonoBehaviour
     }
 
     /// <summary>
-    /// 코인 이펙트 적용 함수
-    /// </summary>
-    /// <param name="coinIndex"></param>
-    /// <param name="isBrokenCoin"></param>
-    /// <param name="targets"></param>
-    protected void ApplyCoinEffects(int coinIndex, bool isBrokenCoin, List<CharacterBase> targets)
-    {
-        // 이펙트의 개수만큼 동작
-        foreach (var effect in skillSO.syncDatas[character.Sync].coins[coinIndex].EffectNodes)
-        {
-            // 대상 체크
-            List<CharacterBase> effectTargets = new List<CharacterBase>();
-            switch (effect.Target)
-            {
-                case EffectNode.TargetType.Self:
-                    effectTargets.Add(character);
-                    break;
-
-                case EffectNode.TargetType.Target:
-                    effectTargets = targets;
-                    break;
-
-                case EffectNode.TargetType.Both:
-                    effectTargets.Add(character);
-                    effectTargets.AddRange(targets);
-                    break;
-
-                case EffectNode.TargetType.AllEnemies:
-                    // effectTargets = BattleManager.instance.GetAllEnemies(); 
-                    break;
-
-                case EffectNode.TargetType.AllAllies:
-                    // effectTargets = BattleManager.instance.GetAllPlayer();
-                    break;
-
-                case EffectNode.TargetType.Everyone:
-                    // effectTargets.AddRange(BattleManager.instance.GetAllEnemies());
-                    // effectTargets.AddRange(BattleManager.instance.GetAllPlayer());
-                    break;
-            }
-
-            // 대상에게 데이터 값을 아래 효과로 적용
-            foreach (var tar in effectTargets)
-            {
-                // 적용을 위한 데이터 생성
-                // -> 해당 기능은 일단 이곳에 있으나, characterbase로 이전도 고민해볼것!
-                EffectRuntimeData addEffect = new EffectRuntimeData()
-                {
-                    effectSO = effect.Action.valueNode.effect,
-                    power = effect.Action.valueNode.value,
-                    count = effect.Action.valueNode.duration,
-                };
-
-
-                switch (effect.Action.actionType)
-                {
-                    case ActionType.AddEffect:
-                        tar.AddEffect(addEffect);
-                        break;
-
-                    case ActionType.RemoveEffect:
-                        tar.RemoveEffect(addEffect);
-                        break;
-
-                    case ActionType.Original:
-                        // 오리지널은 어떻게?
-                        // characterbase에 오리지널 액션을 부르는 통합 함수를 만들어두고,
-                        // 해당 함수를 characterbase를 상속받은 스크립트에서 내부 기능을 채우는 방식은?
-                        // 인자값은 index를 받는 식이면 충분할거 같은데
-                        UseOriginalEffect(skillSO.syncDatas[character.Sync].skillEffects[coinIndex].Action.originalActionId);
-                        break;
-                }
-            }
-        }
-    }
-
-    /// <summary>
     /// 오리지널 액션을 호출하는 함수
     /// </summary>
     /// <param name="index"></param>
@@ -291,6 +196,7 @@ public abstract class SkillBase : MonoBehaviour
 
         originalActions[index]?.Invoke();
     }
+    
 
     /// <summary>
     /// 스킬 동작 호출 함수
@@ -323,6 +229,33 @@ public abstract class SkillBase : MonoBehaviour
 
     }
     #endregion
+
+
+
+    [System.Serializable]
+    /// <summary>
+    /// 스킬 효과 런타임 데이터
+    /// </summary>
+    public class SkillEffectRuntimeData
+    {
+        [Header("---Skill EffectRuntime Data---")]
+        public SkillEffectSO so;
+        public EffectRange effectRange;
+        public int value;
+
+        /// <summary>
+        /// 생성자 - 데이터 생성 시 무조건 데이터가 빈 곳이 없도록 만들어야 함!
+        /// </summary>
+        /// <param name="so"></param>
+        /// <param name="effectRange"></param>
+        /// <param name="value"></param>
+        public SkillEffectRuntimeData(SkillEffectSO so, EffectRange effectRange, int value)
+        {
+            this.so = so;
+            this.effectRange = effectRange;
+            this.value = value;
+        }
+    }
 }
 
 

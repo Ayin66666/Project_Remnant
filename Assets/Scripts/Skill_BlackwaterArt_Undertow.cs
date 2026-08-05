@@ -21,7 +21,10 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
         character.SetAttackState(true);
 
         // 사용 시 효과 적용
-        ApplySkillEffect();
+        for(int i = 0; i < skillSO.syncDatas[character.Sync].skillEffects.Count; i++)
+        {
+            ApplyEffect(skillSO.syncDatas[character.Sync].skillEffects[i], useData.targets);
+        }
 
         // 전체 데미지 계산 - 1코인 스킬이라 위와 같이 계산
         totalDamage = (int)(character.CalDamage(CreateInfo()) // 기본 데미지 계산
