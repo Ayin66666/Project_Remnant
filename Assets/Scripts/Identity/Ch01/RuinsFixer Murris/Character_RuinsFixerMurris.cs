@@ -90,12 +90,14 @@ public class Character_RuinsFixerMurris : PlayerCharacter
 
 
     #region 패시브 - 교룡 여의
+    /// <summary>
+    /// 교룡 여의 추가 (추가 조건은 여의 3개 보유 + 교룡 여의가 없음)
+    /// </summary>
     public void AddJiaoCintamani()
     {
         // 이미 교룡 여의가 있다면 무시
         if (GetEffect(CintamaniSO) == null) return;
 
-        // 교룡 여의 1 추가
         EffectRuntimeData data = new EffectRuntimeData()
         {
             effectSO = JiaoCintamaniSO,
@@ -103,7 +105,19 @@ public class Character_RuinsFixerMurris : PlayerCharacter
             count = -1
         };
 
+        // 버프 - 교룡 여의 추가
         AddEffect(data);
+
+        // 필드 이펙트 - 유수 지대 추가
+        AddFieldEffect();
+    }
+
+    /// <summary>
+    /// 교룡 여의 획득 시 발동, 유수 지대 필드 효과 추가
+    /// </summary>
+    public void AddFieldEffect()
+    {
+
     }
     #endregion
 }

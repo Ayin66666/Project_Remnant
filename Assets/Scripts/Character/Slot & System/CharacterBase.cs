@@ -18,7 +18,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] private int panicTurn;
     [SerializeField] private bool isStagger;
     [SerializeField] private int staggerTurn;
-
     public bool IsAttack => isAttack;
     #endregion
 
@@ -63,9 +62,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] protected CharacterGroup characterGroup;
     [SerializeField] private Facing facing;
     [SerializeField] private bool isMove;
-    public bool IsMove => isMove;
-    public CharacterGroup CharacterType => characterGroup;
-
     private Coroutine movementCoroutine;
     public enum Facing
     {
@@ -84,7 +80,12 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         Enemy,
         AllyNpc,
     }
+    public bool IsMove => isMove;
+    public CharacterGroup CharacterType => characterGroup;
     #endregion
+
+    [Header("---Effect---")]
+    protected List<GameObject> effects;
 
 
     #region 시작 로직
@@ -138,6 +139,15 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     }
 
     /// <summary>
+    /// 공격 상태 bool 값을 세팅하는 함수
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetAttackState(bool value)
+    {
+        isAttack = value;
+    }
+
+    /// <summary>
     /// 바디의 바라보는 방향 설정
     /// </summary>
     /// <param name="facing"></param>
@@ -156,7 +166,10 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
                 break;
         }
     }
+    #endregion
 
+
+    #region 이동 로직
     /// <summary>
     /// 캐릭터 이동 로직 호출부
     /// </summary>
@@ -165,7 +178,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         if (movementCoroutine != null)
             StopCoroutine(movementCoroutine);
 
-        movementCoroutine = StartCoroutine(CharacterMoveCoroutine(moveSpeed, pos));
+        movementCoroutine = StartCoroutine(CoCharacterMove(moveSpeed, pos));
     }
 
     /// <summary>
@@ -174,7 +187,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// <param name="moveSpeed"></param>
     /// <param name="movePos"></param>
     /// <returns></returns>
-    private IEnumerator CharacterMoveCoroutine(float moveSpeed, Vector2 movePos)
+    private IEnumerator CoCharacterMove(float moveSpeed, Vector2 movePos)
     {
         isMove = true;
 
@@ -207,14 +220,14 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         if (movementCoroutine != null)
             StopCoroutine(movementCoroutine);
 
-        movementCoroutine = StartCoroutine(ClashKnockbackCoroutine(type, time));
+        movementCoroutine = StartCoroutine(CoClashKnockback(type, time));
     }
 
     /// <summary>
     /// 캐릭터 합 밀림 로직 동작부
     /// </summary>
     /// <returns></returns>
-    private IEnumerator ClashKnockbackCoroutine(KnockbackType type, float time)
+    private IEnumerator CoClashKnockback(KnockbackType type, float time)
     {
         isMove = true;
 
@@ -244,20 +257,10 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         movementCoroutine = null;
         isMove = false;
     }
-
-
-    /// <summary>
-    /// 현제 공격중인지 체크하는 함수
-    /// </summary>
-    /// <param name="value"></param>
-    public void SetAttackState(bool value)
-    {
-        isAttack = value;
-    }
     #endregion
 
 
-    #region 데미지 로직
+    #region 데미지 & 상태이상 로직
     /// <summary>
     /// 데미지 계산식을 활용한 일반 데미지 계산
     /// 단, 크리티컬 데미지는 계산되어 있지 않음
@@ -337,6 +340,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         }
     }
 
+
     /// <summary>
     /// 패닉 동작 / 정신력이 -45 이하가 되면 패닉 상태로 전환, 패닉 상태에서는 공격 불가
     /// </summary>
@@ -367,6 +371,15 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     }
 
     /// <summary>
+    /// 사망 로직 / 사망 시 이벤트가 있다면 override해서 사용
+    /// </summary>
+    public virtual void Die()
+    {
+        // 사망 스프라이트
+    }
+
+
+    /// <summary>
     /// 턴 종료 시 호출 / 패닉 상태라면 패틱 기간 감소 / 패닉 기간이 끝나면 패닉 상태 해제
     /// </summary>
     public void PanicCount()
@@ -395,14 +408,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
             staggerTurn = 0;
         }
     }
-
-    /// <summary>
-    /// 사망 로직 / 사망 시 이벤트가 있다면 override해서 사용
-    /// </summary>
-    public virtual void Die()
-    {
-        // 사망 스프라이트
-    }
     #endregion
 
 
@@ -428,31 +433,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         return data;
     }
 
-    /// <summary>
-    /// 키워드 사용 시, 해당 키워드의 횟수를 차감시키는 함수
-    /// 전부 사용했다면 딕셔너리 or List에서 제거함
-    /// </summary>
-    /// <param name="type"></param>
-    public void ConsumeKeyword(KeywordType type, int consumeCount = 1)
-    {
-        // 키워드 보유 여부 체크
-        if (!keywordEffects.TryGetValue(type, out var keyword))
-        {
-            Debug.Log($"존재하지 않는 키워드에 접근함! / CharacterBase.UseKeyword({type})");
-            return;
-        }
 
-        // 이벤트
-        OnStatusEffectActivate(type);
-
-        // 키워드 감소
-        keyword.count -= consumeCount;
-        if (keyword.count <= 0)
-        {
-            // dic에서 키워드 제거
-            keywordEffects.Remove(type);
-        }
-    }
 
     /// <summary>
     /// 키워드 데이터 추가 - 기존 데이터가 있다면 합산, 없다면 신규 추가
@@ -510,6 +491,32 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     }
 
     /// <summary>
+    /// 키워드 사용 시, 해당 키워드의 횟수를 차감시키는 함수
+    /// 전부 사용했다면 딕셔너리 or List에서 제거함
+    /// </summary>
+    /// <param name="type"></param>
+    public void ConsumeKeyword(KeywordType type, int consumeCount = 1)
+    {
+        // 키워드 보유 여부 체크
+        if (!keywordEffects.TryGetValue(type, out var keyword))
+        {
+            Debug.Log($"존재하지 않는 키워드에 접근함! / CharacterBase.UseKeyword({type})");
+            return;
+        }
+
+        // 이벤트
+        OnStatusEffectActivate(type);
+
+        // 키워드 감소
+        keyword.count -= consumeCount;
+        if (keyword.count <= 0)
+        {
+            // dic에서 키워드 제거
+            keywordEffects.Remove(type);
+        }
+    }
+
+    /// <summary>
     /// 이펙트 제거
     /// </summary>
     /// <param name="data"></param>
@@ -528,7 +535,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     #endregion
 
 
-    #region 트리거 로직
+    #region Virtual 트리거 함수 
     /// <summary>
     /// 턴 시작 시 호출
     /// </summary>

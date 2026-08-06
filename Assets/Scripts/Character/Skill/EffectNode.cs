@@ -85,6 +85,7 @@ public struct ActionNode
 {
     [Header("---Action---")]
     public ActionType actionType;
+    public EffectRange effectRange;
     public EffectValue valueNode;
 
     [Header("---Original Action---")]
@@ -124,6 +125,9 @@ public enum TriggerType
     DodgeSuccess = 1 << 10,
 }
 
+/// <summary>
+/// 효과의 동작 타입 Enum
+/// </summary>
 public enum ActionType
 {
     None,
@@ -133,10 +137,23 @@ public enum ActionType
     Original
 }
 
+/// <summary>
+/// 해당 값이 위력인지 횟수인지 구분하는 Enum
+/// </summary>
 public enum ValueType
 {
     None,
     Power,
     Count
+}
+
+/// <summary>
+/// 스킬 효과의 적용 범위를 지정하는 Enum
+/// </summary>
+public enum EffectRange
+{
+    None,
+    Skill,
+    Coin
 }
 #endregion

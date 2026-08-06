@@ -16,11 +16,15 @@ public class SkillEffectSO : EffectBaseSO
         CriticalMultiplier, // 치명타 데미지 증가
 
         VibrationExplosion, // 진동 폭발
+        
+        BasePowerUp, // 기본 위력 증가
+        CoinPowerUp, // 동전 위력 증가
     }
 
 
     public override void Use(CharacterBase target)
     {
-
+        // 해당 함수는 Keyword에서만 사용함
+        // Public의 경우 SO는 자신이 무엇인지에 대한 정보만 가지고 있음
     }
 }
