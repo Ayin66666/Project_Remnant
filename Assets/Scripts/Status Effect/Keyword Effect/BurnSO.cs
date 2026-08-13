@@ -14,7 +14,7 @@ public class BurnSO : KeywordSO
         int damage = data.power;
 
         // 데미지 전달
-        target.TakeDamage(damage);
+        target.TakeDamage(false, damage);
 
         // 카운트 감소
         target.ConsumeKeyword(KeywordType.Burn, 1);

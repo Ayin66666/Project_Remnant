@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 
@@ -26,31 +27,11 @@ public abstract class SkillBase : MonoBehaviour
     protected List<Action> originalActions;
     public SkillSO SkillSO => skillSO;
 
+    [Header("---Prefabs---")]
+    [SerializeField] protected List<GameObject> effects;
 
-    #region 기본 동작
-    /// <summary>
-    /// 공격을 위한 데이터 생성 함수
-    /// </summary>
-    /// <param name="isFront"></param>
-    /// <param name="coinIndex"></param>
-    /// <returns></returns>
-    protected virtual AttackInfo CreateInfo()
-    {
-        // Info는 코인 공격 시작 시 생성해야 함
-        // 생성 후 타겟에게 데이터를 넘겨주고 계산된 최종 데미지 값을 반환받음
-        // 받은 값은 Dictionary에 저장 후, 공격 시 각 모션의 데미지 % 만큼 타겟의 TakeDamage()로 전달
-        // List 내 모든 타겟이 사망했다면 공격 종료 후 dic 초기화
 
-        AttackInfo info = new AttackInfo()
-        {
-            sinType = skillSO.sinType,
-            attackType = skillSO.attackType,
-            attackPoint = character.Attack,
-            motionValue = skillSO.syncDatas[character.Sync].motionValue,
-        };
-
-        return info;
-    }
+    #region 데미지 데이터? -> 미묘한 위치
 
     /// <summary>
     /// 코인 앞뒷면 표시
@@ -68,7 +49,41 @@ public abstract class SkillBase : MonoBehaviour
         return UnityEngine.Random.Range(0, 100) < chance;
     }
 
+    /// <summary>
+    /// 공격자의 총 데미지 계산
+    /// </summary>
+    protected void CalTotalDamage()
+    {
+        // 데미지 계산을 위한 Info 제작
+        AttackInfo info = new AttackInfo()
+        {
+            sinType = skillSO.sinType,
+            attackType = skillSO.attackType,
+            attackPoint = character.Attack,
+            motionValue = skillSO.syncDatas[character.Sync].motionValue,
+        };
 
+        // 스킬의 총 데미지 계산
+        // (해당 데미지를 기반으로 CalCoinDamage() 함수에서 각 공격의 배율만큼 나눠서 사용함)
+        totalDamage = character.CalDamage(info);
+    }
+
+    /// <summary>
+    /// 치명타 여부 및 해당 공격의 최종 데미지 계산 후 전달
+    /// </summary>
+    /// <param name="totalDamage"></param>
+    /// <param name="percentage"></param>
+    /// <returns></returns>
+    protected (bool, int) CalCoinDamage(int totalDamage, float percentage)
+    {
+        bool isCir = PoiseSO.IsCritical(character);
+        int damage = (int)(totalDamage / percentage);
+        return (isCir, damage);
+    }
+    #endregion
+
+
+    #region 스킬 효과 로직
     /// <summary>
     /// 스킬 효과 발동 함수
     /// </summary>
@@ -199,8 +214,10 @@ public abstract class SkillBase : MonoBehaviour
 
         originalActions[index]?.Invoke();
     }
+    #endregion
 
 
+    #region 기본 동작
     /// <summary>
     /// 스킬 동작 호출 함수
     /// </summary>
@@ -214,6 +231,7 @@ public abstract class SkillBase : MonoBehaviour
     /// 기능 동작 코루틴
     /// </summary>
     protected abstract IEnumerator SkillAction(SkillUseData useData);
+
 
     /// <summary>
     /// 스킬 동작으로 인한 캐릭터 이동 호출 함수
@@ -231,6 +249,12 @@ public abstract class SkillBase : MonoBehaviour
     {
         // 데미지 초기화
         totalDamage = 0;
+
+        // 이펙트 종료
+        foreach (var obj in effects)
+        {
+            obj.SetActive(false);
+        }
 
         // 타겟 리스트 초기화
         targetList.Clear();

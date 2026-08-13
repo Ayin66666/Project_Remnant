@@ -8,7 +8,6 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
     // 1스킬 (강화)
     [Header("---Skill Setting---")]
     [SerializeField] private List<Transform> targetMovePos;
-    [SerializeField] private List<GameObject> effects;
     [SerializeField] private List<Transform> movePos;
     [SerializeField] private List<string> animBool;
 
@@ -29,19 +28,9 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
             ApplyEffect(skillSO.syncDatas[character.Sync].skillEffects[i], useData.targets);
         }
 
-        // 스킬 사용 버프 체크 -> 제작 필요
-        float criticalMultiplier = 1.5f;
-        float damageIncreas = 1.0f;
-
-        // 전체 데미지 계산 - 1코인 스킬이라 한번에 전부 계산함!
-        // 데미지 분배는 1타(50%) + 5타(50%)
-        totalDamage = (int)
-            (character.CalDamage(CreateInfo()) // 기본 데미지
-            * (PoiseSO.IsCritical(character) ? criticalMultiplier : 1f) // 크리티컬 여부
-            * damageIncreas // 최종 데미지 증가
-            * (useData.isCoinDestroy[0] ? 0.25f : 1f)); // 코인 파괴 여부
-
-
+        // 전체 데미지 계산 - 데미지 분배는 1타(50%) + 5타(10% x5)
+        CalTotalDamage();
+        
         // 적 위치 조절 (내 앞으로 이동)
         BattleManager.instance.SetTargetPos(useData.targets, targetMovePos[0]);
 
@@ -63,16 +52,16 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
     }
 
 
-    #region 애니메이션 로직
+    #region 애니메이션 이벤트 - 데미지 로직
     /// <summary>
     /// 1타 - 50% 1회
     /// </summary>
     public void Attack1_1()
     {
-        int damage = (int)(totalDamage * 0.5f);
+        (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.5f);
         foreach (CharacterBase target in targetList)
         {
-            target.TakeDamage(damage);
+            target.TakeDamage(isCri, damage);
         }
     }
 
@@ -85,17 +74,17 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
     }
 
     /// <summary>
-    /// Attack1_2() 의 세부동작 코루틴
+    /// Attack1_2() 의 세부동작 코루틴 (데미지 부여)
     /// </summary>
     /// <returns></returns>
     private IEnumerator CoAttack1_2()
     {
-        int damage = (int)(totalDamage * 0.5f) / 5;
+        (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.5f);
         for (int i = 0; i < 5; i++)
         {
             foreach (CharacterBase target in targetList)
             {
-                target.TakeDamage(damage);
+                target.TakeDamage(isCri, damage / 5);
             }
 
             // 딜레이

@@ -14,7 +14,7 @@ public class BleedSO : KeywordSO
 
         // 데미지 전달
         int damage = data.power;
-        target.TakeDamage(damage);
+        target.TakeDamage(false, damage);
 
         // 키워드 감소
         target.ConsumeKeyword(KeywordType.Burn, 1);

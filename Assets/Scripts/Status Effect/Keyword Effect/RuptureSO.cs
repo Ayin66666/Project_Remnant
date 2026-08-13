@@ -10,7 +10,7 @@ public class RuptureSO : KeywordSO
         if (data == null) return;
 
         // 데미지 부여
-        target.TakeDamage(data.power);
+        target.TakeDamage(false, data.power);
 
         // 키워드 감소
         target.ConsumeKeyword(KeywordType.Rupture, 1);

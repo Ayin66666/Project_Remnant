@@ -270,16 +270,28 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     public int CalDamage(AttackInfo info)
     {
         // 데미지 공식
-        // ((공격 포인트 * 모션 배율) * step) * 치명타 배율[1.5]
+        // ((공격 포인트 * 모션 배율) * 치명타 배율[1.5]) * step
         // step = 공격자의 공격 포인트 - 방어 포인트 했을 때, 얼마나 차이 나는지
         // (3 차이 날 때마다 데미지 10% 증감)
 
         // 크리티컬의 경우 공격 시 poise 값을 별도로 체크해서 크리티컬 체크를 해줘야 함!
-
         // 크리티컬은 호흡에 영향을 받기 때문에
         // 크리티컬 데미지의 경우 즉시 계산이 아닌 코인 회전 시 계산이 맞음
         //float damage = info.attackPoint * info.motionValue * (info.isCritical ? info.critMultiplier : 1);
 
+
+        // 26.08.13 고민점
+        // Step 의 경우 방어자가 계산하도록 전환
+        // 기본 데미지는 공격자 데이터를 기반으로 생성됨 (Total)
+        // 버프 체크도 필요한데?
+        // A. 스킬 효과로 인한 데미지 증가
+        // B. 버프로 인한 데미지 증가
+
+        // 버프 계산
+        // 이거 어디서 so를 두고 데이터를 가져오지? enum으로 하는게 맞나?
+        // int increasedDamage = GetEffect();
+
+        // 데미지 계산
         float damage = info.attackPoint * info.motionValue;
         int diff = info.attackPoint - defence;
         int step = diff / 3;
@@ -293,7 +305,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// 데미지 계산 로직 / 모든 데미지 계산 후 해당 함수 호출해야함!
     /// </summary>
     /// <param name="damage"></param>
-    public void TakeDamage(int damage)
+    public void TakeDamage(bool isCri, int damage)
     {
         // 데미지 계산 방식 변경 예정
         // 1. target의 정보와 내 공격 정보를 기반으로 데미지 계산을 위한 Info 전달
