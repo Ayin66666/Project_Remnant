@@ -16,6 +16,7 @@ public abstract class SkillBase : MonoBehaviour
     protected Coroutine useCoroutine;
 
     [Header("---Runtime Data---")]
+    [SerializeField] protected bool isCoinFront;
     [SerializeField] protected int totalDamage;
     [SerializeField] protected List<SkillEffectRuntimeData> effectRuntimeList;
     [SerializeField] protected List<CharacterBase> targetList;
@@ -31,22 +32,21 @@ public abstract class SkillBase : MonoBehaviour
     [SerializeField] protected List<GameObject> effects;
 
 
-    #region 데미지 데이터? -> 미묘한 위치
-
+    #region 코인 & 데미지 계산 로직
     /// <summary>
     /// 코인 앞뒷면 표시
     /// -> 1차 제작 완료 / UI 이벤트 필요
     /// </summary>
     /// <returns></returns>
-    protected bool CoinToss()
+    protected void CoinToss()
     {
         // 정신력 0 기준 기본확률은 50%,
-        // 45 기준 95%,
-        // -45 기준 5% 확률로 앞면이 나옴
+        // 45 기준 95% / -45 기준 5% 확률 앞면
 
         // 연출 부분은 어디에 둘지 고민중
         int chance = 50 + character.Mentality;
-        return UnityEngine.Random.Range(0, 100) < chance;
+        isCoinFront = UnityEngine.Random.Range(0, 100) < chance;
+
     }
 
     /// <summary>
@@ -54,18 +54,9 @@ public abstract class SkillBase : MonoBehaviour
     /// </summary>
     protected void CalTotalDamage()
     {
-        // 데미지 계산을 위한 Info 제작
-        AttackInfo info = new AttackInfo()
-        {
-            sinType = skillSO.sinType,
-            attackType = skillSO.attackType,
-            attackPoint = character.Attack,
-            motionValue = skillSO.syncDatas[character.Sync].motionValue,
-        };
-
         // 스킬의 총 데미지 계산
         // (해당 데미지를 기반으로 CalCoinDamage() 함수에서 각 공격의 배율만큼 나눠서 사용함)
-        totalDamage = character.CalDamage(info);
+        totalDamage = character.CalDamage(skillSO);
     }
 
     /// <summary>
@@ -76,8 +67,10 @@ public abstract class SkillBase : MonoBehaviour
     /// <returns></returns>
     protected (bool, int) CalCoinDamage(int totalDamage, float percentage)
     {
+        // 이거 isCoinFront 를 정하기 위한 CoinToss() 함수는 어디서?
+
         bool isCir = PoiseSO.IsCritical(character);
-        int damage = (int)(totalDamage / percentage);
+        int damage = (int)((totalDamage / percentage) * (isCoinFront ? 1 : 0.5f));
         return (isCir, damage);
     }
     #endregion
@@ -231,7 +224,6 @@ public abstract class SkillBase : MonoBehaviour
     /// 기능 동작 코루틴
     /// </summary>
     protected abstract IEnumerator SkillAction(SkillUseData useData);
-
 
     /// <summary>
     /// 스킬 동작으로 인한 캐릭터 이동 호출 함수

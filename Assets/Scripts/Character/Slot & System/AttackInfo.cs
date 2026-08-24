@@ -18,13 +18,17 @@ public struct AttackInfo
     /// </summary>
     public AttackType attackType;
     /// <summary>
+    /// 치명타 여부 - UI 표시용
+    /// </summary>
+    public bool isCritical;
+    /// <summary>
     /// 공격자의 공격 레벨
     /// </summary>
     public int attackPoint;
     /// <summary>
-    /// 공격의 배율
+    /// 공격 데미지
     /// </summary>
-    public float motionValue;
+    public int damage;
 }
 
 [System.Serializable]

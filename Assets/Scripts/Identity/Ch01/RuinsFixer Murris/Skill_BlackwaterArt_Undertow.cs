@@ -58,6 +58,10 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
     /// </summary>
     public void Attack1_1()
     {
+        // 코인 토스
+        CoinToss();
+
+        // 데미지 계산
         (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.5f);
         foreach (CharacterBase target in targetList)
         {

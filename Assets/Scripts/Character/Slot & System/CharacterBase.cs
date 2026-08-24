@@ -46,6 +46,13 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     #region
     [SerializeField] protected Dictionary<KeywordType, EffectRuntimeData> keywordEffects;
     [SerializeField] protected List<EffectRuntimeData> statusEffects;
+
+    // 버프 캐싱 데이터
+    protected int addAttackPoint;
+    protected int addDefencePoint;
+    protected Vector2Int addSpeedPoint;
+    protected int addIncreaseDamage;
+    protected int addDamageReduction;
     #endregion
 
     [Header("---Component---")]
@@ -261,13 +268,23 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
 
     #region 데미지 & 상태이상 로직
+    public int CalDamage(SkillSO skill)
+    {
+        // 버프 증감 체크
+        int totalAttackPoint = attack + addAttackPoint;
+
+        // 데미지 계산 (공격 & 방어 포인트 차이로 인한 증감 계산 X) (버프 계산되었음!)
+        int damage = (int)(totalAttackPoint * skill.syncDatas[sync].motionValue);
+        damage = (int)(damage * (1 + (10 * addIncreaseDamage) * 0.01f));
+
+        return damage;
+    }
+
     /// <summary>
-    /// 데미지 계산식을 활용한 일반 데미지 계산
-    /// 단, 크리티컬 데미지는 계산되어 있지 않음
+    /// 데미지 계산 로직 / 모든 데미지 계산 후 해당 함수 호출해야함!
     /// </summary>
-    /// <param name="info"></param>
-    /// <returns></returns>
-    public int CalDamage(AttackInfo info)
+    /// <param name="damage"></param>
+    public void TakeDamage(AttackInfo info)
     {
         // 데미지 공식
         // ((공격 포인트 * 모션 배율) * 치명타 배율[1.5]) * step
@@ -291,31 +308,29 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         // 이거 어디서 so를 두고 데이터를 가져오지? enum으로 하는게 맞나?
         // int increasedDamage = GetEffect();
 
-        // 데미지 계산
-        float damage = info.attackPoint * info.motionValue;
-        int diff = info.attackPoint - defence;
-        int step = diff / 3;
-        damage *= 1 + step * 0.1f;
-        damage = Mathf.Max(1, damage);
+        // 26.08.24 생각중
+        // 버프 데이터는 이미 List에 있으니, List 내에서 특정 조건에 맞는 애만 꺼내면 되는게?
+        // 조건은? -> 어차피 스텟 버프는 무조건 StatusEffectSO 아님?
+        // 고유 효과는? -> 고민중
 
-        return (int)damage;
-    }
+        // 결론
+        // 스킬 뎀증은 스킬에서 데미지 반환받은 뒤에,
+        // 공격 포인트는 캐싱해두기
+        // 뎀증 효과도 동일
 
-    /// <summary>
-    /// 데미지 계산 로직 / 모든 데미지 계산 후 해당 함수 호출해야함!
-    /// </summary>
-    /// <param name="damage"></param>
-    public void TakeDamage(bool isCri, int damage)
-    {
-        // 데미지 계산 방식 변경 예정
-        // 1. target의 정보와 내 공격 정보를 기반으로 데미지 계산을 위한 Info 전달
-        // 2. info 기반 데미지 계산 후 반환
-        // 3. 반환 데미지를 target의 takeDamage에 전달
-
-        // 이벤트
+        // 피격 이벤트
         OnHit();
 
         // 데미지 계산
+        int damage = Mathf.RoundToInt(info.damage * (1f + addDamageReduction * 0.1f));
+        int totalDefence = defence + addDefencePoint;
+        int diff = info.attackPoint - totalDefence;
+        int step = diff / 3;
+
+        damage = Mathf.RoundToInt(damage * (1f + step * 0.1f));
+        damage = Mathf.Max(1, damage);
+
+        // 데미지 적용
         curHp -= damage;
         if (curHp <= 0)
         {
@@ -454,7 +469,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     public void AddEffect(EffectRuntimeData data)
     {
         // 이펙트 데이터 체크
-        if(data.effectSO.Category == EffectBaseSO.EffectCategory.Public)
+        if (data.effectSO.Category == EffectBaseSO.EffectCategory.Public)
         {
             // 공용 이펙트
             if (data.effectSO == null)
