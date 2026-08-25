@@ -18,6 +18,10 @@ public struct AttackInfo
     /// </summary>
     public AttackType attackType;
     /// <summary>
+    /// 방어력 관련 계산 공식을 적용하는 공격인지 여부
+    /// </summary>
+    public bool isUseDamageCal;
+    /// <summary>
     /// 치명타 여부 - UI 표시용
     /// </summary>
     public bool isCritical;
@@ -28,18 +32,6 @@ public struct AttackInfo
     /// <summary>
     /// 공격 데미지
     /// </summary>
-    public int damage;
-}
-
-[System.Serializable]
-/// <summary>
-/// 키워드 데미지 정보 구조체
-/// </summary>
-public struct DamageInfo
-{
-    [Header("---Setting---")]
-    public SinType sinType;
-    public AttackType attackType;
     public int damage;
 }
 

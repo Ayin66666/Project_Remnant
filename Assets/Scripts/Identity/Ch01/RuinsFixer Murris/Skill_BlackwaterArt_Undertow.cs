@@ -10,7 +10,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
     [SerializeField] private List<Transform> targetMovePos;
     [SerializeField] private List<Transform> movePos;
     [SerializeField] private List<string> animBool;
-
+    private bool isCri = false;
 
     // 1타 100% 데미지 비율
     protected override IEnumerator SkillAction(SkillUseData useData)
@@ -30,7 +30,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
 
         // 전체 데미지 계산 - 데미지 분배는 1타(50%) + 5타(10% x5)
         CalTotalDamage();
-        
+
         // 적 위치 조절 (내 앞으로 이동)
         BattleManager.instance.SetTargetPos(useData.targets, targetMovePos[0]);
 
@@ -60,12 +60,26 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
     {
         // 코인 토스
         CoinToss();
+        
+        // 데미지 로직 문제가 있는데 고민 필요
 
         // 데미지 계산
         (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.5f);
+        this.isCri = isCri;
+
+        AttackInfo info = new AttackInfo()
+        {
+            sinType = SinType.Lust,
+            attackType = AttackType.None,
+            isUseDamageCal = false,
+            isCritical = isCri,
+            attackPoint = character.GetStat(CharacterBase.StatType.AttackPoint),
+            damage = damage,
+        };
+
         foreach (CharacterBase target in targetList)
         {
-            target.TakeDamage(isCri, damage);
+            target.TakeDamage(info);
         }
     }
 
@@ -84,11 +98,21 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
     private IEnumerator CoAttack1_2()
     {
         (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.5f);
+        AttackInfo info = new AttackInfo()
+        {
+            sinType = SinType.Lust,
+            attackType = AttackType.None,
+            isUseDamageCal = false,
+            isCritical = this.isCri,
+            attackPoint = character.GetStat(CharacterBase.StatType.AttackPoint),
+            damage = damage,
+        };
+
         for (int i = 0; i < 5; i++)
         {
             foreach (CharacterBase target in targetList)
             {
-                target.TakeDamage(isCri, damage / 5);
+                target.TakeDamage(info);
             }
 
             // 딜레이

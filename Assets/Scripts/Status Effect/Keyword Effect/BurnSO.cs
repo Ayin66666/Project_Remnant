@@ -11,10 +11,18 @@ public class BurnSO : KeywordSO
         if(data == null) return;
 
         // 데미지 작성
-        int damage = data.power;
+        AttackInfo info = new AttackInfo()
+        {
+            sinType = SinType.Wrath,
+            attackType = AttackType.None,
+            isUseDamageCal = false,
+            isCritical = false,
+            attackPoint = 0,
+            damage = data.power,
+        };
 
         // 데미지 전달
-        target.TakeDamage(false, damage);
+        target.TakeDamage(info);
 
         // 카운트 감소
         target.ConsumeKeyword(KeywordType.Burn, 1);

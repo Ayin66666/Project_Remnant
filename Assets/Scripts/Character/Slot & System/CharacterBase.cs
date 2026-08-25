@@ -460,6 +460,22 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         return data;
     }
 
+    /// <summary>
+    /// 값 반환을 위한 enum 함수
+    /// </summary>
+    public enum StatType
+    {
+        AttackPoint,
+        DefensePoint,
+    }
+    public int GetStat(StatType type)
+    {
+        return type switch
+        {
+            StatType.AttackPoint => addAttackPoint + attack,
+            StatType.DefensePoint => addDefencePoint + defence,
+        };
+    }
 
 
     /// <summary>

@@ -13,8 +13,17 @@ public class BleedSO : KeywordSO
         if (data == null) return;
 
         // 데미지 전달
-        int damage = data.power;
-        target.TakeDamage(false, damage);
+        AttackInfo info = new AttackInfo()
+        {
+            sinType = SinType.Lust,
+            attackType = AttackType.None,
+            isUseDamageCal = false,
+            isCritical = false,
+            attackPoint = 0,
+            damage = data.power,
+        };
+
+        target.TakeDamage(info);
 
         // 키워드 감소
         target.ConsumeKeyword(KeywordType.Burn, 1);
