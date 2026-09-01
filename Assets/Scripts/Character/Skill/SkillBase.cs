@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 
@@ -25,6 +24,7 @@ public abstract class SkillBase : MonoBehaviour
     [SerializeField] protected Animator anim;
     [SerializeField] protected SkillSO skillSO;
     [SerializeField] protected CharacterBase character;
+    [SerializeField] protected Transform targetMovePos;
     protected List<Action> originalActions;
     public SkillSO SkillSO => skillSO;
 
@@ -32,33 +32,7 @@ public abstract class SkillBase : MonoBehaviour
     [SerializeField] protected List<GameObject> effects;
 
 
-    #region 코인 & 데미지 계산 로직
-    /// <summary>
-    /// 코인 앞뒷면 표시
-    /// -> 1차 제작 완료 / UI 이벤트 필요
-    /// </summary>
-    /// <returns></returns>
-    protected void CoinToss()
-    {
-        // 정신력 0 기준 기본확률은 50%,
-        // 45 기준 95% / -45 기준 5% 확률 앞면
-
-        // 연출 부분은 어디에 둘지 고민중
-        int chance = 50 + character.Mentality;
-        isCoinFront = UnityEngine.Random.Range(0, 100) < chance;
-
-    }
-
-    /// <summary>
-    /// 공격자의 총 데미지 계산
-    /// </summary>
-    protected void CalTotalDamage()
-    {
-        // 스킬의 총 데미지 계산
-        // (해당 데미지를 기반으로 CalCoinDamage() 함수에서 각 공격의 배율만큼 나눠서 사용함)
-        totalDamage = character.CalDamage(skillSO);
-    }
-
+    #region 계산 & 효과 로직
     /// <summary>
     /// 치명타 여부 및 해당 공격의 최종 데미지 계산 후 전달
     /// </summary>
@@ -73,10 +47,53 @@ public abstract class SkillBase : MonoBehaviour
         int damage = (int)((totalDamage / percentage) * (isCoinFront ? 1 : 0.5f));
         return (isCir, damage);
     }
-    #endregion
 
+    /// <summary>
+    /// 동작 조건 체크 로직 (조건에 부합하다면 True, 부합하지 않다면 False 반환)
+    /// </summary>
+    /// <param name="condition"></param>
+    /// <returns></returns>
+    private bool ConditionCheck(EffectNode.ConditionNode condition, CharacterBase checkTarget)
+    {
+        // 조건이 없다면 즉시 True 반환
+        if (condition.compareType == EffectNode.CompareType.None)
+            return true;
 
-    #region 스킬 효과 로직
+        // 조건 값 체크
+        bool canUse = false;
+        int total = 0;
+        for (int i = 0; i < condition.values.Count; i++)
+        {
+            EffectRuntimeData data = checkTarget.GetEffect(condition.values[i].effect);
+            if (data == null) continue;
+
+            int val = condition.values[i].valueType == ValueType.Power ? data.power : data.count;
+            total += val;
+        }
+
+        // 조건 확인
+        switch (condition.compareType)
+        {
+            case EffectNode.CompareType.LessEqual:
+                // 체크 값이 조건보다 작거나 같다면
+                canUse = total <= condition.conditionValue;
+                break;
+
+            case EffectNode.CompareType.Equal:
+                // 체크 값이 조건과 같다면
+                canUse = total == condition.conditionValue;
+                break;
+
+            case EffectNode.CompareType.GreaterEqual:
+                // 체크 값이 조건보다 크거나 같다면
+                canUse = total >= condition.conditionValue;
+                break;
+        }
+
+        // 결과값 반환
+        return canUse;
+    }
+
     /// <summary>
     /// 스킬 효과 발동 함수
     /// </summary>
@@ -151,52 +168,6 @@ public abstract class SkillBase : MonoBehaviour
     }
 
     /// <summary>
-    /// 동작 조건 체크 로직 (조건에 부합하다면 True, 부합하지 않다면 False 반환)
-    /// </summary>
-    /// <param name="condition"></param>
-    /// <returns></returns>
-    private bool ConditionCheck(EffectNode.ConditionNode condition, CharacterBase checkTarget)
-    {
-        // 조건이 없다면 즉시 True 반환
-        if (condition.compareType == EffectNode.CompareType.None)
-            return true;
-
-        // 조건 값 체크
-        bool canUse = false;
-        int total = 0;
-        for (int i = 0; i < condition.values.Count; i++)
-        {
-            EffectRuntimeData data = checkTarget.GetEffect(condition.values[i].effect);
-            if (data == null) continue;
-
-            int val = condition.values[i].valueType == ValueType.Power ? data.power : data.count;
-            total += val;
-        }
-
-        // 조건 확인
-        switch (condition.compareType)
-        {
-            case EffectNode.CompareType.LessEqual:
-                // 체크 값이 조건보다 작거나 같다면
-                canUse = total <= condition.conditionValue;
-                break;
-
-            case EffectNode.CompareType.Equal:
-                // 체크 값이 조건과 같다면
-                canUse = total == condition.conditionValue;
-                break;
-
-            case EffectNode.CompareType.GreaterEqual:
-                // 체크 값이 조건보다 크거나 같다면
-                canUse = total >= condition.conditionValue;
-                break;
-        }
-
-        // 결과값 반환
-        return canUse;
-    }
-
-    /// <summary>
     /// 오리지널 액션을 호출하는 함수
     /// </summary>
     /// <param name="index"></param>
@@ -207,15 +178,64 @@ public abstract class SkillBase : MonoBehaviour
 
         originalActions[index]?.Invoke();
     }
+
+    [System.Serializable]
+    /// <summary>
+    /// 스킬 효과 런타임 데이터
+    /// </summary>
+    public class SkillEffectRuntimeData
+    {
+        [Header("---Skill EffectRuntime Data---")]
+        public SkillEffectSO so;
+        public EffectRange effectRange;
+        public int value;
+
+        /// <summary>
+        /// 생성자 - 데이터 생성 시 무조건 데이터가 빈 곳이 없도록 만들어야 함!
+        /// </summary>
+        /// <param name="so"></param>
+        /// <param name="effectRange"></param>
+        /// <param name="value"></param>
+        public SkillEffectRuntimeData(SkillEffectSO so, EffectRange effectRange, int value)
+        {
+            this.so = so;
+            this.effectRange = effectRange;
+            this.value = value;
+        }
+    }
     #endregion
 
 
-    #region 기본 동작
+    #region 동작 로직
     /// <summary>
     /// 스킬 동작 호출 함수
     /// </summary>
     public virtual void Use(SkillUseData useData)
     {
+        // 공격 시작
+        Reset();
+        character.SetAttackState(true);
+
+        // 타겟 데이터 추가 - 임시
+        targetList.AddRange(useData.targets);
+
+        // 적 위치 조절 (내 앞으로 이동)
+        foreach (CharacterBase ch in targetList)
+        {
+            ch.SetPos(targetMovePos);
+        }
+
+        // 사용 시 효과 적용
+        for (int i = 0; i < skillSO.syncDatas[character.Sync].skillEffects.Count; i++)
+        {
+            ApplyEffect(skillSO.syncDatas[character.Sync].skillEffects[i], useData.targets);
+        }
+
+        // 스킬의 총 데미지 계산
+        // (해당 데미지를 기반으로 CalCoinDamage() 함수에서 각 공격의 배율만큼 나눠서 사용함)
+        totalDamage = character.CalDamage(skillSO);
+
+        // 공격 액션 동작
         if (useCoroutine != null) StopCoroutine(useCoroutine);
         useCoroutine = StartCoroutine(SkillAction(useData));
     }
@@ -252,33 +272,6 @@ public abstract class SkillBase : MonoBehaviour
         targetList.Clear();
     }
     #endregion
-
-
-
-    [System.Serializable]
-    /// <summary>
-    /// 스킬 효과 런타임 데이터
-    /// </summary>
-    public class SkillEffectRuntimeData
-    {
-        [Header("---Skill EffectRuntime Data---")]
-        public SkillEffectSO so;
-        public EffectRange effectRange;
-        public int value;
-
-        /// <summary>
-        /// 생성자 - 데이터 생성 시 무조건 데이터가 빈 곳이 없도록 만들어야 함!
-        /// </summary>
-        /// <param name="so"></param>
-        /// <param name="effectRange"></param>
-        /// <param name="value"></param>
-        public SkillEffectRuntimeData(SkillEffectSO so, EffectRange effectRange, int value)
-        {
-            this.so = so;
-            this.effectRange = effectRange;
-            this.value = value;
-        }
-    }
 }
 
 

@@ -1,72 +1,64 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using DG.Tweening;
 
 public class Skill_BlackwaterArt_Undertow : SkillBase
 {
     // 1스킬 (강화)
     [Header("---Skill Setting---")]
-    [SerializeField] private List<Transform> targetMovePos;
+    [SerializeField] private Transform rackPos;
     [SerializeField] private List<Transform> movePos;
     [SerializeField] private List<string> animBool;
     private bool isCri = false;
 
+
     // 1타 100% 데미지 비율
     protected override IEnumerator SkillAction(SkillUseData useData)
     {
-        // 공격 시작
-        character.SetAttackState(true);
-        Reset();
-
-        // 타겟 데이터 추가 - 임시
-        targetList.AddRange(useData.targets);
-
-        // 사용 시 효과 적용
-        for (int i = 0; i < skillSO.syncDatas[character.Sync].skillEffects.Count; i++)
-        {
-            ApplyEffect(skillSO.syncDatas[character.Sync].skillEffects[i], useData.targets);
-        }
-
-        // 전체 데미지 계산 - 데미지 분배는 1타(50%) + 5타(10% x5)
-        CalTotalDamage();
-
-        // 적 위치 조절 (내 앞으로 이동)
-        BattleManager.instance.SetTargetPos(useData.targets, targetMovePos[0]);
-
-        // 애니메이션
+        // 데미지 분배는 1타(50%) + 5타(10% x5)
+        (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.5f);
+        this.isCri = isCri;
+        
+        // 코인 토스
+        character.CoinToss();
+        
+        // 애니메이션 + 이동
         anim.SetTrigger("Action");
         anim.SetBool(animBool[0], true);
-        while (anim.GetBool(animBool[0]))
+
+        Vector3 startPos = character.transform.position;
+        Vector3 endPos = movePos[0].position;
+        bool isAttack = false;
+        float timer = 0;
+        while(timer < 1)
         {
+            if (timer > 0.5f && !isAttack)
+            {
+                isAttack = true;
+                Attack1_1();
+            }
+
+            timer += Time.deltaTime / 0.35f;
+            character.transform.position = Vector3.Lerp(startPos, endPos, timer);
             yield return null;
         }
+
+        character.transform.DOMove(startPos, endPos, )
+
+        // 추가타 호출
+        yield return StartCoroutine(Attack1_2());
+        anim.SetBool(animBool[0], false);
 
         // 공격 종료
         character.SetAttackState(false);
     }
 
-    public override void Movement(int index)
-    {
-        character.CharacterMove(0.55f, targetMovePos[index].position);
-    }
-
-
-    #region 애니메이션 이벤트 - 데미지 로직
     /// <summary>
     /// 1타 - 50% 1회
     /// </summary>
     public void Attack1_1()
     {
-        // 코인 토스
-        CoinToss();
-        
-        // 데미지 로직 문제가 있는데 고민 필요
-
-        // 데미지 계산
-        (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.5f);
-        this.isCri = isCri;
-
         AttackInfo info = new AttackInfo()
         {
             sinType = SinType.Lust,
@@ -74,7 +66,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
             isUseDamageCal = false,
             isCritical = isCri,
             attackPoint = character.GetStat(CharacterBase.StatType.AttackPoint),
-            damage = damage,
+            damage = totalDamage / 2,
         };
 
         foreach (CharacterBase target in targetList)
@@ -84,20 +76,11 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
     }
 
     /// <summary>
-    /// 2타 - 10% 5회
-    /// </summary>
-    public void Attack1_2()
-    {
-        StartCoroutine(CoAttack1_2());
-    }
-
-    /// <summary>
     /// Attack1_2() 의 세부동작 코루틴 (데미지 부여)
     /// </summary>
     /// <returns></returns>
-    private IEnumerator CoAttack1_2()
+    private IEnumerator Attack1_2()
     {
-        (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.5f);
         AttackInfo info = new AttackInfo()
         {
             sinType = SinType.Lust,
@@ -105,7 +88,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
             isUseDamageCal = false,
             isCritical = this.isCri,
             attackPoint = character.GetStat(CharacterBase.StatType.AttackPoint),
-            damage = damage,
+            damage = totalDamage / 5,
         };
 
         for (int i = 0; i < 5; i++)
@@ -119,5 +102,4 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
             yield return new WaitForSeconds(0.05f);
         }
     }
-    #endregion
 }

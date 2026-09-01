@@ -457,18 +457,6 @@ public class BattleManager : MonoBehaviour
     #endregion
 
 
-    #region 전투 로직
-    /// <summary>
-    /// 요청받은 캐릭터를 지정된 위치로 이동
-    /// </summary>
-    /// <param name="targets"></param>
-    public void SetTargetPos(List<CharacterBase> targets, Transform targetPos)
-    {
-
-    }
-    #endregion
-
-
     #region UI 로직
     /// <summary>
     /// 화면 페이드 효과
