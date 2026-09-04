@@ -255,6 +255,19 @@ public abstract class SkillBase : MonoBehaviour
     }
 
     /// <summary>
+    /// 캐릭터의 바라보는 방향을 타겟에 맞춰 설정해주는 함수
+    /// </summary>
+    public void SetFacing()
+    {
+        // 지금은 0번 타겟으로 기준을 잡고 있으나
+        // 공격 도중 적이 죽을 경우 다음 타겟으로 전환해줘야하니
+        // 타겟 List에서 체크해서 비어있거나 죽었다면 다음 타겟을 기준으로 하게 만들어야 함!
+        CharacterBase.Facing fa = (character.transform.position.x - targetList[0].transform.position.x) > 0 ? 
+        CharacterBase.Facing.Left : CharacterBase.Facing.Right;
+        character.SetFacing(fa);
+    }
+
+    /// <summary>
     /// 동작 초기화 - 혹시 모를 상황 대비
     /// </summary>
     public virtual void Reset()

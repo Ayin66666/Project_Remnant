@@ -175,7 +175,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// 바디의 바라보는 방향 설정
     /// </summary>
     /// <param name="facing"></param>
-    protected void SetFacing(Facing facing)
+    public void SetFacing(Facing facing)
     {
         switch (facing)
         {

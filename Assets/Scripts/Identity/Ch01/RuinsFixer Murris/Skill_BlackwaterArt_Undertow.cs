@@ -7,9 +7,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
 {
     // 1스킬 (강화)
     [Header("---Skill Setting---")]
-    [SerializeField] private Transform rackPos;
     [SerializeField] private List<Transform> movePos;
-    [SerializeField] private List<string> animBool;
     private bool isCri = false;
 
 
@@ -25,7 +23,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
         
         // 애니메이션 + 이동
         anim.SetTrigger("Action");
-        anim.SetBool(animBool[0], true);
+        anim.SetBool("isSkill_1-2", true);
 
         Vector3 startPos = character.transform.position;
         Vector3 endPos = movePos[0].position;
@@ -44,11 +42,9 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
             yield return null;
         }
 
-        character.transform.DOMove(startPos, endPos, )
-
         // 추가타 호출
         yield return StartCoroutine(Attack1_2());
-        anim.SetBool(animBool[0], false);
+        anim.SetBool("isSkill_1-2", false);
 
         // 공격 종료
         character.SetAttackState(false);
