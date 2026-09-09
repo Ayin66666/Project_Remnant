@@ -18,8 +18,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] private int panicTurn;
     [SerializeField] private bool isStagger;
     [SerializeField] private int staggerTurn;
-    [SerializeField] private bool isCoinFront;
-    public bool IsCoinFront => isCoinFront;
     public bool IsAttack => isAttack;
     #endregion
 
@@ -94,6 +92,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     #endregion
 
     [Header("---Effect---")]
+    [SerializeField] private GameObject coinObj;
     protected List<GameObject> effects;
 
 
@@ -136,18 +135,20 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
     #region 전투 로직
     /// <summary>
-    /// 코인 앞뒷면 표시
-    /// -> 1차 제작 완료 / UI 이벤트 필요
+    /// 정신력 기반 코인 계산 로직 / UI 효과는 계산된 걸 UIManager에게 전달하는 방식으로 동작하게 할것!
     /// </summary>
     /// <returns></returns>
-    public void CoinToss()
+    public List<bool> CoinToss(int count)
     {
-        // 정신력 0 기준 기본확률은 50%,
-        // 45 기준 95% / -45 기준 5% 확률 앞면
+        List<bool> result = new List<bool>(count);
 
-        // 연출 부분은 어디에 둘지 고민중
         int chance = 50 + mentality;
-        isCoinFront = Random.Range(0, 100) < chance;
+        for (int i = 0; i < count; i++)
+        {
+            result.Add(Random.Range(0, 100) < chance ? true : false);
+        }
+
+        return result;
     }
 
     /// <summary>
