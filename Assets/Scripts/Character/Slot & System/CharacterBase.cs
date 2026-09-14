@@ -60,8 +60,8 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] protected Transform body;
     [SerializeField] protected Rigidbody2D rigid;
     [SerializeField] protected Animator anim;
-    [SerializeField] protected CharacterUI characterUI;
     [SerializeField] protected SkillSlot[] attackSlots;
+    public CharacterUI characterUI;
     #endregion
 
     [Header("---Movement---")]

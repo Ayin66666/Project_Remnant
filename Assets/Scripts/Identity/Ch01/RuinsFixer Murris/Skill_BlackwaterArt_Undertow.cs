@@ -21,6 +21,8 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
         // 대상 바라보기
         SetFacing();
 
+        // character.characterUI.ShowSkillUI();
+
         // 코인 토스 - 첫 토스에서 모든 결과가 나옴!
         List<bool> coinResult = character.CoinToss(skillSO.syncDatas[character.Sync].coins.Count);
 

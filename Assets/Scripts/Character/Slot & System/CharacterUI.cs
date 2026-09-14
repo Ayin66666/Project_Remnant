@@ -23,7 +23,11 @@ public class CharacterUI : MonoBehaviour
     [SerializeField] private RectTransform effectIconRect;
     [SerializeField] private GameObject effectIconPrefab;
 
+    [Header("---Skill UI---")]
+    [SerializeField] private SkillResuitUI skillUI;
 
+
+    #region Status
     /// <summary>
     /// 체력 & 그로기 UI 셋팅 (최초 1회)
     /// </summary>
@@ -96,4 +100,13 @@ public class CharacterUI : MonoBehaviour
         EffectIconUI ui = obj.GetComponent<EffectIconUI>();
         ui.SetUp(effectInfo, this);
     }
+    #endregion
+
+
+    #region Skill
+    public void SetSkillUI(bool isOn, int sync, SkillSO so)
+    {
+        skillUI.SetUI(isOn, sync, so);
+    }
+    #endregion
 }
