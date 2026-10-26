@@ -1,16 +1,13 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 
 public class Character_RuinsFixerMurris : PlayerCharacter
 {
-
-    [Header("---Passive---")]
-    private EffectBaseSO blackWaterSO;
-    private EffectBaseSO CintamaniSO;
-    private EffectBaseSO JiaoCintamaniSO;
-    private GameObject fieldEffectSO; // 임시 작성 - 필드 이펙트 완성 후 재작성 필요
-
+    [Header("---Effect SO---")]
+    [SerializeField] private EffectBaseSO blackWaterSO;
+    [SerializeField] private EffectBaseSO CintamaniSO;
+    [SerializeField] private EffectBaseSO JiaoCintamaniSO;
+    [SerializeField] private GameObject fieldEffectSO; // 임시 작성 - 필드 이펙트 완성 후 재작성 필요
 
     /* 구현 방식
     // 패시브 로직은 패시브 단위로 작성하는게 아니라
@@ -57,24 +54,56 @@ public class Character_RuinsFixerMurris : PlayerCharacter
     */
 
 
-    #region 패시브 - 흑수
-    public void AddBlackWater()
+    private void Update()
+    {
+        // 테스트
+        if(Input.GetKeyDown(KeyCode.Z))
+        {
+            AddBlackWater();
+        }
+
+        // 테스트
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            AddCintamani();
+        }
+
+        // 테스트
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            AddJiaoCintamani();
+        }
+
+        // 테스트
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            AddFieldEffect();
+        }
+    }
+
+    #region 패시브
+    /// <summary>
+    /// 흑수 추가 (디폴트는 5, -1)
+    /// </summary>
+    /// <param name="power"></param>
+    /// <param name="count"></param>
+    public void AddBlackWater(int power = 5, int count = -1)
     {
         // 스킬 사용 시 동작 - 흑수 5 추가
         // 이것도 따지자면 Skill에 있는 게 맞지 않나?
         EffectRuntimeData data = new EffectRuntimeData()
         {
             effectSO = blackWaterSO,
-            power = 5,
-            count = -1
+            power = power,
+            count = count
         };
 
         AddEffect(data);
     }
-    #endregion
 
-
-    #region 패시브 - 여의
+    /// <summary>
+    /// 여의 추가 (디폴트는 1, -1)
+    /// </summary>
     public void AddCintamani()
     {
         // 여의 1 추가
@@ -87,17 +116,15 @@ public class Character_RuinsFixerMurris : PlayerCharacter
 
         AddEffect(data);
     }
-    #endregion
 
-
-    #region 패시브 - 교룡 여의
     /// <summary>
-    /// 교룡 여의 추가 (추가 조건은 여의 3개 보유 + 교룡 여의가 없음)
+    /// 교룡 여의 추가 (추가 조건은 여의 3개 보유 + 교룡 여의가 없음 / 디폴트는 1, -1)
     /// </summary>
     public void AddJiaoCintamani()
     {
         // 이미 교룡 여의가 있다면 무시
-        if (GetEffect(CintamaniSO) == null) return;
+        if (GetEffect(CintamaniSO) != null) 
+            return;
 
         EffectRuntimeData data = new EffectRuntimeData()
         {
@@ -118,7 +145,9 @@ public class Character_RuinsFixerMurris : PlayerCharacter
     /// </summary>
     public void AddFieldEffect()
     {
-
+        // 유수 지대가 이미 있다면 무시
+        if (true)
+            return;
     }
     #endregion
 }

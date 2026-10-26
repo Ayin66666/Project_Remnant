@@ -15,10 +15,12 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     #region
     [SerializeField] private bool isAttack;
     [SerializeField] private bool isPanic;
-    [SerializeField] private int panicTurn;
     [SerializeField] private bool isStagger;
+    [SerializeField] private int panicTurn;
     [SerializeField] private int staggerTurn;
     public bool IsAttack => isAttack;
+    public bool IsPanic => isPanic;
+    public bool IsStagger => isStagger;
     #endregion
 
     [Header("---Status---")]
@@ -501,6 +503,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         {
             StatType.AttackPoint => addAttackPoint + attack,
             StatType.DefensePoint => addDefencePoint + defence,
+            _ => throw new System.NotImplementedException(),
         };
     }
 
@@ -511,54 +514,94 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// <param name="data"></param>
     public void AddEffect(EffectRuntimeData data)
     {
+        Debug.Log($"호출 : 이펙트 추가 {data.effectSO.EffectName} / {data.power} / {data.count}");
+
         // 이펙트 데이터 체크
         if (data.effectSO.Category == EffectBaseSO.EffectCategory.Public)
         {
-            // 공용 이펙트
-            if (data.effectSO == null)
-            {
-                Debug.LogError($"데이터 추가 실패! / {data}, {data.effectSO} 가 없음!");
-                return;
-            }
-
-            // 데이터 추가
-            statusEffects.Add(data);
+            AddStatEffect(data);
         }
         else
         {
-            // 키워드
-            // 일반 키워드는 파생 키워드를 덮어쓰지 못함
-            // 파생 키워드는 이미 부여된 일반 & 파생 키워드가 있다면 해당 키워드를 덮어씀
-            keywordEffects.TryGetValue(data.effectSO.Keyword, out var runtimeData);
-            if (runtimeData == null)
-            {
-                // 데이터가 없다면 - 신규 데이터 추가
-                EffectRuntimeData newData = new EffectRuntimeData()
-                {
-                    effectSO = data.effectSO,
-                    power = data.power,
-                    count = data.count
-                };
-
-                keywordEffects.Add(data.effectSO.Keyword, newData);
-
-                Debug.Log("키워드 신규 추가 : " + keywordEffects.ContainsKey(data.effectSO.Keyword));
-            }
-            else
-            {
-                // 데이터가 있다면 - 데이터 합산
-                if (data.effectSO is KeywordSO keyword)
-                {
-                    // 파생 키워드라면 / 추가하려는 파생 키워드로 전환
-                    if (keyword.IsDerived)
-                        runtimeData.effectSO = data.effectSO;
-                }
-
-                runtimeData.power += data.power;
-                runtimeData.count += data.count;
-            }
+            AddKeyword(data);
         }
     }
+
+    private void AddStatEffect(EffectRuntimeData data)
+    {
+        // 공용 이펙트
+        if (data.effectSO == null)
+        {
+            Debug.LogError($"데이터 추가 실패! / {data}, {data.effectSO} 가 없음!");
+            return;
+        }
+
+        // 기존 데이터에 해당 이펙트가 있는 지 체크
+        foreach (var d in statusEffects)
+        {
+            if (d.effectSO == data.effectSO)
+            {
+                // 무제한 유지 데이터인지 체크
+                if (data.count == -1)
+                {
+                    d.power = Mathf.Min(d.power + data.power, d.effectSO.MaxPower);
+                    d.count = -1;
+                }
+                else
+                {
+                    d.power = Mathf.Min(d.power + data.power, d.effectSO.MaxPower);
+                    d.count = Mathf.Min(d.count + data.count, d.effectSO.MaxCount);
+                }
+
+                return;
+            }
+        }
+
+        // 없을 경우 새로 생성 후 추가
+        EffectRuntimeData newData = new EffectRuntimeData()
+        {
+            effectSO = data.effectSO,
+            power = data.power,
+            count = data.count
+        };
+
+        statusEffects.Add(newData);
+    }
+
+    private void AddKeyword(EffectRuntimeData data)
+    {
+        // 키워드
+        // 일반 키워드는 파생 키워드를 덮어쓰지 못함
+        // 파생 키워드는 이미 부여된 일반 & 파생 키워드가 있다면 해당 키워드를 덮어씀
+        keywordEffects.TryGetValue(data.effectSO.Keyword, out var runtimeData);
+        if (runtimeData == null)
+        {
+            // 데이터가 없다면 - 신규 데이터 추가
+            EffectRuntimeData newData = new EffectRuntimeData()
+            {
+                effectSO = data.effectSO,
+                power = data.power,
+                count = data.count
+            };
+
+            keywordEffects.Add(data.effectSO.Keyword, newData);
+            Debug.Log("키워드 신규 추가 : " + keywordEffects.ContainsKey(data.effectSO.Keyword));
+        }
+        else
+        {
+            // 데이터가 있다면 - 데이터 합산
+            if (data.effectSO is KeywordSO keyword)
+            {
+                // 파생 키워드라면 / 추가하려는 파생 키워드로 전환
+                if (keyword.IsDerived)
+                    runtimeData.effectSO = data.effectSO;
+            }
+
+            runtimeData.power = Mathf.Min(runtimeData.power + data.power, runtimeData.effectSO.MaxPower);
+            runtimeData.count = Mathf.Min(runtimeData.count + data.count, runtimeData.effectSO.MaxCount);
+        }
+    }
+
 
     /// <summary>
     /// 키워드 사용 시, 해당 키워드의 횟수를 차감시키는 함수

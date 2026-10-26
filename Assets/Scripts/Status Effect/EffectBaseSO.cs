@@ -5,18 +5,11 @@ public abstract class EffectBaseSO : ScriptableObject
 {
     [Header("---Setting---")]
     [SerializeField] private TriggerType triggerType; // -> 이거 만약 트리거가 다중이면? / List 처리해야하나? / flag 사용했음!
-    [SerializeField] private StackType stackType;
     [SerializeField] private EffectCategory effectCategory;
     [SerializeField] private KeywordType keywordType;
-    [SerializeField] private int maxStack;
-    /// <summary>
-    /// 스택 가능, 불가능 여부
-    /// </summary>
-    public enum StackType
-    {
-        None,
-        Stackable
-    }
+    [SerializeField] private int maxPower;
+    [SerializeField] private int maxCount;
+
     public enum EffectCategory
     {
         Public,
@@ -32,8 +25,8 @@ public abstract class EffectBaseSO : ScriptableObject
     [SerializeField, TextArea] private string effectDescription;
 
     public TriggerType Trigger => triggerType;
-    public StackType Stack => stackType;
-    public int MaxStack => maxStack;
+    public int MaxPower => maxPower;
+    public int MaxCount => maxCount;
     public Sprite Icon => icon;
     public string EffectName => effectName;
     public string EffectDescription => effectDescription;

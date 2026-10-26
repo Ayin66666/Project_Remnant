@@ -1,6 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
 
 public class Skill_BlackwaterArt_SinkingCurrent : SkillBase
 {
@@ -13,6 +13,10 @@ public class Skill_BlackwaterArt_SinkingCurrent : SkillBase
         // 적을 지나치며 강한 일격
         // 뒤로 후려차며 2타
         // 데미지 분배는 1타(40%) + 1타(60%)
+
+
+
+        // UI 호출 - 코인 앞 뒷면 & 최종 위력 표시
 
         // 바라보는 방향 전환
         SetFacing();
@@ -63,12 +67,16 @@ public class Skill_BlackwaterArt_SinkingCurrent : SkillBase
     private void Attack1()
     {
         // 1타 (40%)
-        (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.4f);
+        (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.4f, 1);
+
+        // 목표 대상에게 데미지를 주는 로직
     }
 
     private void Attack2()
     {
         // 2타 (60%)
-        (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.6f);
+        (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.6f, 2);
+
+        // 목표 대상에게 데미지를 주는 로직
     }
 }

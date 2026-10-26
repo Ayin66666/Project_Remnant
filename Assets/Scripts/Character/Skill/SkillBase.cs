@@ -15,10 +15,11 @@ public abstract class SkillBase : MonoBehaviour
     protected Coroutine useCoroutine;
 
     [Header("---Runtime Data---")]
-    [SerializeField] protected bool isCoinFront;
     [SerializeField] protected int totalDamage;
+    [SerializeField] protected List<bool> coinToss;
     [SerializeField] protected List<SkillEffectRuntimeData> effectRuntimeList;
     [SerializeField] protected List<CharacterBase> targetList;
+
 
     [Header("---Component---")]
     [SerializeField] protected Animator anim;
@@ -39,12 +40,10 @@ public abstract class SkillBase : MonoBehaviour
     /// <param name="totalDamage"></param>
     /// <param name="percentage"></param>
     /// <returns></returns>
-    protected (bool, int) CalCoinDamage(int totalDamage, float percentage)
+    protected (bool, int) CalCoinDamage(int totalDamage, float percentage, int coinIndex)
     {
-        // 이거 isCoinFront 를 정하기 위한 CoinToss() 함수는 어디서?
-
         bool isCir = PoiseSO.IsCritical(character);
-        int damage = (int)((totalDamage / percentage) * (isCoinFront ? 1 : 0.5f));
+        int damage = (int)((totalDamage / percentage) * (coinToss[coinIndex] ? 1 : 0.5f));
         return (isCir, damage);
     }
 

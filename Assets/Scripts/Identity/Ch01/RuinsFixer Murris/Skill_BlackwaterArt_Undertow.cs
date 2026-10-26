@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 
 public class Skill_BlackwaterArt_Undertow : SkillBase
@@ -15,7 +16,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
     protected override IEnumerator SkillAction(SkillUseData useData)
     {
         // 데미지 분배는 1타(50%) + 5타(10% x5)
-        (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.5f);
+        (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.5f, 0);
         this.isCri = isCri;
 
         // 대상 바라보기
@@ -27,8 +28,10 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
         List<bool> coinResult = character.CoinToss(skillSO.syncDatas[character.Sync].coins.Count);
 
         // 애니메이션 + 이동
+        /*
         anim.SetTrigger("Action");
         anim.SetBool("isSkill_1-2", true);
+        */
 
         Vector3 startPos = character.transform.position;
         Vector3 endPos = movePos[0].position;
@@ -49,7 +52,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
 
         // 추가타 호출
         yield return StartCoroutine(Attack1_2());
-        anim.SetBool("isSkill_1-2", false);
+        // anim.SetBool("isSkill_1-2", false);
 
         // 공격 종료
         character.SetAttackState(false);

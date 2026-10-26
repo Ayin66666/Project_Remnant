@@ -7,7 +7,7 @@ using TMPro;
 
 public class SkillResuitUI : MonoBehaviour
 {
-    [Header("---Setting---")]
+    [Header("---Runtime Data---")]
     [SerializeField] private SkillSO skillSO;
     [SerializeField] private bool isOn;
     [SerializeField] private bool isCoinTossing;
