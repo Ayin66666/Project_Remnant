@@ -117,7 +117,7 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   효과 발동을 위한 조건(>, =, <, None)을 설정하는 ConditionNode,<br />
   수치를 결정하는 EffectValue와 효과를 지정하는 ActionNode로 구성하였습니다.<br />
   
-```
+``` csharp
 public class CoinInfoSO : ScriptableObject
 {
     [Header("---Coin Setting---")]
@@ -132,7 +132,7 @@ public class CoinInfoSO : ScriptableObject
     public List<EffectNode> EffectNodes => effectNodes;
 }
 ```
-```
+``` csharp
 [System.Serializable]
 public class EffectNode
 {
@@ -168,7 +168,7 @@ public class EffectNode
     }
 }
 ```
-```
+``` csharp
 public struct ActionNode
 {
     [Header("---Action---")]
@@ -181,7 +181,7 @@ public struct ActionNode
     [TextArea] public string actionDescription;
 }
 ```
-  스킬 데이터를 종류별로 분리한 결과 복수의 조건과 효과를 요구하는 스킬 구현이 가능해졌으며,<br />
+  스킬 데이터를 종류별로 분리한 결과 복수의 조건과 효과를 요구하는 스킬 구현이 가능해졌으며<br />
   스킬 내 규칙과 동작을 개별 노드로 분리되어 있어 설명 스크립트 작성 자동화,<br />
   동기화(돌파)에 따른 스킬 강화 기능을 구현할 수 있었습니다.<br />
   
