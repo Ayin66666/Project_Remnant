@@ -92,7 +92,7 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
 
 ### **B. 사례**
 
-#### **▣ B-1.특수한 스킬 설계를 고려한 데이터 구조 설계**
+#### **▣ B-1.특수한 스킬 구조를 고려한 데이터 구조 설계**
 
 - **문제점**<br />
   기존 프로젝트에서 제작한 스킬과 다른 형식으로 동작하는 스킬 데이터 구현
@@ -185,6 +185,79 @@ public struct ActionNode
   스킬 내 규칙과 동작을 개별 노드로 분리되어 있어 설명 스크립트 작성 자동화,<br />
   동기화(돌파)에 따른 스킬 강화 기능을 구현할 수 있었습니다.<br />
   
+---
+
+#### **▣ B-2.스킬 설명 빌더**
+
+- **문제점**<br />
+  캐릭터 동기화(돌파)에 따른 스킬 강화 기능으로 인한 스킬 설명 작정량 증가<br />
+  
+- **고민**<br />
+  과거 개인 프로젝트로 진행한 'Project : Combo'에서는<br />
+  레벨업에 따른 스킬 설명을 List<string>에 직접 작성해서 SO에 저장하였습니다.<br />
+
+  이같은 방식은 제작은 간단하나 모든 데이터를 직접 작성해야하며,<br />
+  스킬의 레벨이 늘어날수록 작성 과정에서 오타나 입력 누락이 발생할 확률이 높아집니다.<br />
+
+  특히 이번 프로젝트의 스킬 시스템은 하나의 스킬이 다수의 코인을 가지고 있으며,<br />
+  다수의 코인 내에는 다수의 발동 효과가 존재하기 때문에 직접 작성할 경우,<br />
+  데이터 관리 및 작업 능률이 심각하게 떨어질 것이라 판단하였습니다.<br />
+  
+- **해결책**<br />
+  스킬 설명 작성 로직을 구현하기 위해 먼저 스킬 설명 구조의 규칙을 잡았습니다.<br />
+  모든 스킬 설명은 [조건] + [조건 값] + 이라면 + [동작] 형태로 구현됩니다.<br />
+  
+  이는 위에서 구현한 ECA패턴의 노드와 info를 읽어 작성이 가능하며,<br />
+  고유 동작(오리지널)의 경우 조건을 읽을 수 없으므로,<br />
+  별개의 string 값을 넣어 해당 값을 [동작] 위치에 넣도록 구현하였습니다.<br />
+
+  이 같은 방법으로 고유 동작을 포함한 스킬 설명 작성이 필요 없이<br />
+  SkillSO와 캐릭터의 동기화 수치만 알면 바로 스킬 설명을 작성하는<br />
+  SkillDescriptionBuilder를 구현하였습니다.<br />
+  
+``` csharp
+    public static string MakeDescription(SkillSO skillSO, int sync)
+    {
+        // 사용 시 발동 효과 텍스트화
+        StringBuilder sd = new StringBuilder();
+        for (int i = 0; i < skillSO.syncDatas[sync].skillEffects.Count; i++)
+        {
+            // 조건 텍스트화
+            string triggerText = GetTriggerText(skillSO.syncDatas[sync].skillEffects[i].Trigger);
+            string conditionText = GetConditionText(skillSO.syncDatas[sync].skillEffects[i]);
+            string actionText = GetActionText(skillSO.syncDatas[sync].skillEffects[i].Action);
+
+            // 데이터 추가
+            sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
+        }
+
+        // 코인 효과 텍스트화
+        List<CoinInfoSO> coinInfo = skillSO.syncDatas[sync].coins;
+        for (int i = 0; i < coinInfo.Count; i++)
+        {
+            // 코인 표시 텍스트
+            sd.Append($"{i + 1} 코인\n");
+
+            // 조건 & 동작 데이터
+            for (int j = 0; j < coinInfo[i].EffectNodes.Count; j++)
+            {
+                // 트리거 - ([사용 시], [피격 시], [합 승리 시] 등등)
+                string triggerText = GetTriggerText(coinInfo[i].EffectNodes[j].Trigger);
+
+                // 조건 - (n1이 n2 이상이면, n1 + n2 의 합이 n3 이상이면 등등)
+                string conditionText = GetConditionText(coinInfo[i].EffectNodes[j]);
+
+                // 효과 - (누구에게 + 체력 50 회복, 실드 25% 획득, 주는 데미지 50% 증가 등등)
+                string actionText = GetActionText(coinInfo[i].EffectNodes[j].Action);
+
+                // 텍스트 조립 ([트리거] [조건] [동작])
+                sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
+            }
+        }
+
+        return sd.ToString();
+    }
+  ```
 ---
 
 ## **4. 버프 & 디버프 시스템**
