@@ -95,7 +95,7 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
 #### **▣ B-1.특수한 스킬 구조를 고려한 데이터 구조 설계**
 
 - **문제점**<br />
-  기존 프로젝트에서 제작한 스킬과 다른 형식으로 동작하는 스킬 데이터 구현
+  기존 프로젝트에서 제작한 스킬과 다른 형식으로 동작하는 스킬 데이터 구현<br />
 
 - **고민**<br />
   Project : Remnant의 스킬은 게임 'Limbus Company'의 전투 로직을 구현하는 것이 목표입니다.<br />
@@ -205,15 +205,14 @@ public struct ActionNode
   
 - **해결책**<br />
   스킬 설명 작성 로직을 구현하기 위해 먼저 스킬 설명 구조의 규칙을 잡았습니다.<br />
-  모든 스킬 설명은 [조건] + [조건 값] + 이라면 + [동작] 형태로 구현됩니다.<br />
+  모든 스킬 설명은 [트리거] + [조건] + [동작] 형태로 구현됩니다.<br />
   
-  이는 위에서 구현한 ECA패턴의 노드와 info를 읽어 작성이 가능하며,<br />
-  고유 동작(오리지널)의 경우 조건을 읽을 수 없으므로,<br />
-  별개의 string 값을 넣어 해당 값을 [동작] 위치에 넣도록 구현하였습니다.<br />
+  이는 위에서 구현한 ECA패턴의 node와 info를 읽어 작성이 가능하였습니다.<br />
+  단, 고유 동작(오리지널)의 경우 조건을 읽을 수 없으므로<br />
+  별개의 string 값에 설명을 넣고 해당 값을 [동작] 위치에 넣도록 구현하였습니다.<br />
 
-  이 같은 방법으로 고유 동작을 포함한 스킬 설명 작성이 필요 없이<br />
-  SkillSO와 캐릭터의 동기화 수치만 알면 바로 스킬 설명을 작성하는<br />
-  SkillDescriptionBuilder를 구현하였습니다.<br />
+  이 방법으로 별도의 설명 작성이 필요 없이 SkillSO와 캐릭터의 동기화 수치만 알면<br />
+  바로 스킬 설명을 작성하는 SkillDescriptionBuilder를 구현할 수 있었습니다.<br />
   
 ``` csharp
     public static string MakeDescription(SkillSO skillSO, int sync)
@@ -258,6 +257,7 @@ public struct ActionNode
         return sd.ToString();
     }
   ```
+  
 ---
 
 ## **4. 버프 & 디버프 시스템**
@@ -265,17 +265,102 @@ public struct ActionNode
 ### **A. 구현 정리**
 
 #### ▣ 공용 & 키워드 이펙트
-- 
+- 공용 버프 6종(위력 증가, 데미지 증가, 공격 & 방어 포인트 증가, 코인 위력 증가, 최종 위력 증가)
+- 키워드 버프 & 디버프 7종(화상, 출혈, 진동, 파열, 침잠, 호흡, 충전)
+- 파생 키워드 n종(...)
+- 캐릭터 고유 버프 & 디버프
+
+버프 & 디버프 시스템 구현에서 중요하게 고려한 부분은<br />
+게임 'Limbus Company'의 공용 이펙트 & 키워드 구현 및 키워드를 기반으로 제작되는<br />
+파생 키워드(기존 키워드의 효과에 +a로 동작하는 버프 & 디버프) 구현입니다.<br />
 
 ---
 
 ### **B. 사례**
 
-#### **▣ B-1.**
+#### **▣ B-1.공용 & 키워드 이펙트 구현**
 
 - **문제점**<br />
-
+  2종류(공용, 키워드)로 나뉘는 버프 & 디버프 구현<br />
+  동작 규칙이 서로 다른 버프 & 디버프 관리<br />
+  
 - **고민**<br />
+  'Project : Remnant'의 모티브인 'Limbus Company'에는 버프 & 디버프가 2종류로 나뉩니다.<br />
+  하나는 데미지 증감, 공격 포인트 증감과 같이 일반적인 버프 & 디버프(이하 공용),<br />
+  다른 하나는 조건 만족 시 동작하거나, 다른 기능의 동작 조건이 되는 버프 & 디버프(이하 키워드)입니다.<br />
+  
+  공용 버프는 위력(버프 중첩 횟수)과 지속 턴이, 키워드는 위력과 횟수(사용 가능 횟수)로 관리됩니다.<br />
+  버프 & 디버프라는 카테고리는 동일하나, 차감 조건이나 동작 효과가 모두 다르기 때문에,<br />
+  어떤 방식으로 구현하고 관리할지 결정하는 과정에서 고민이 발생하였습니다.<br />
+  
+- **해결책**<br />
+  EffectBaseSO abstract Class 단일 상속 구조로는 규칙이 다른 공용, 키워드 구현이 어렵다고 판단했습니다.<br />
+  공용 버프 & 디버프는 EffectBaseSO를 상속받아 구현하되, 키워드는 EffectBaseSO 아래 계층을 추가하여<br />
+  KeywordSO를 상속받아 Keyword_이름 형태로 구현하였습니다.<br />
+
+  기본적인 버프 & 디버프의 데이터는 EffectBaseSO에서 관리하며,<br />
+  KeywordSO는 자신이 파생 키워드인지, 아닌지에 대한 데이터를 가지도록 구현하였습니다.<br />
+  
+  ``` csharp
+  public abstract class EffectBaseSO : ScriptableObject
+  {
+      [Header("---Setting---")]
+      [SerializeField] private TriggerType triggerType; // -> flag 사용
+      [SerializeField] private EffectCategory effectCategory;
+      [SerializeField] private KeywordType keywordType;
+      [SerializeField] private int maxPower;
+      [SerializeField] private int maxCount;
+
+      public enum EffectCategory { Public, Keyword, Original }
+      public EffectCategory Category => effectCategory;
+      public KeywordType Keyword => keywordType;
+
+      [Header("---UI---")]
+      [SerializeField] private Sprite icon;
+      [SerializeField] private string effectName;
+      [SerializeField, TextArea] private string effectDescription;
+
+      public TriggerType Trigger => triggerType;
+      public int MaxPower => maxPower;
+      public int MaxCount => maxCount;
+      public Sprite Icon => icon;
+      public string EffectName => effectName;
+      public string EffectDescription => effectDescription;
+  
+      // 세부 기능 구현부
+      public abstract void Use(CharacterBase target);
+  }
+  ```  
+  ``` csharp
+  public class KeywordSO : EffectBaseSO
+  {
+      [Header("---Keyword Base Setting---")]
+      [SerializeField] protected bool isderived;
+      public bool IsDerived => isderived;
+  
+      public override void Use(CharacterBase target)
+      {
+          // 세부 구현은 override 하여 세부 클래스에서 구현함!
+      }
+  }
+
+  ```
+  
+---
+
+#### **▣ B-2.파생 키워드 구현**
+
+- **문제점**<br />
+  기존 키워드의 보유 값을 덮어쓰며 동작하는 파생 키워드 구현<br />
+  키워드 & 파생 키워드 간 관계 및 구현 방법 결정<br />
+  
+- **고민**<br />
+  파생 키워드는 해당 키워드의 기본 기능에 추가적인 효과가 더해진 버프 & 디버프입니다.<br />
+  파생 키워드 추가 시, 파생 키워드의 원본 키워드나 같은 원본 키워드에서 파생된 파생 키워드가 있을 경우<br />
+  해당 키워드의 위력과 횟수를 덮어쓰는 방식으로 동작합니다.<br />
+
+  파생 키워드 구현 과정에서 자신의 원본 키워드와 자신의 동작을 구현하는 방법,<br />
+  버프 & 디버프 추가 시 자신과 동일한 키워드를 찾아내는 로직 구현에서 고민이 발생하였습니다.<br />
 
 - **해결책**<br />
 
