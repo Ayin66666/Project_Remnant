@@ -57,43 +57,56 @@ public class Character_RuinsFixerMurris : PlayerCharacter
     private void Update()
     {
         // 테스트
-        if(Input.GetKeyDown(KeyCode.Z))
+        if (Input.GetKeyDown(KeyCode.Z))
         {
-            AddBlackWater();
+            AddEffect(EffectType.BlackWater, 5, -1);
         }
 
         // 테스트
         if (Input.GetKeyDown(KeyCode.X))
         {
-            AddCintamani();
+            AddEffect(EffectType.Cintamani, 5, -1);
         }
 
         // 테스트
         if (Input.GetKeyDown(KeyCode.C))
         {
-            AddJiaoCintamani();
+            AddEffect(EffectType.JiaoCintamani, 5, -1);
         }
 
         // 테스트
         if (Input.GetKeyDown(KeyCode.V))
         {
-            AddFieldEffect();
+
         }
     }
 
+
     #region 패시브
+    public enum EffectType
+    {
+        BlackWater,
+        Cintamani,
+        JiaoCintamani
+    }
+
     /// <summary>
-    /// 흑수 추가 (디폴트는 5, -1)
+    /// 고유 효과 추가 (흑수, 여의, 교룡 여의)
     /// </summary>
+    /// <param name="type"></param>
     /// <param name="power"></param>
     /// <param name="count"></param>
-    public void AddBlackWater(int power = 5, int count = -1)
+    public void AddEffect(EffectType type, int power, int count)
     {
-        // 스킬 사용 시 동작 - 흑수 5 추가
-        // 이것도 따지자면 Skill에 있는 게 맞지 않나?
         EffectRuntimeData data = new EffectRuntimeData()
         {
-            effectSO = blackWaterSO,
+            effectSO = type switch
+            {
+                EffectType.BlackWater => blackWaterSO,
+                EffectType.Cintamani => CintamaniSO,
+                EffectType.JiaoCintamani => JiaoCintamaniSO,
+            },
+
             power = power,
             count = count
         };
@@ -102,50 +115,12 @@ public class Character_RuinsFixerMurris : PlayerCharacter
     }
 
     /// <summary>
-    /// 여의 추가 (디폴트는 1, -1)
-    /// </summary>
-    public void AddCintamani()
-    {
-        // 여의 1 추가
-        EffectRuntimeData data = new EffectRuntimeData()
-        {
-            effectSO = CintamaniSO,
-            power = 1,
-            count = -1
-        };
-
-        AddEffect(data);
-    }
-
-    /// <summary>
-    /// 교룡 여의 추가 (추가 조건은 여의 3개 보유 + 교룡 여의가 없음 / 디폴트는 1, -1)
-    /// </summary>
-    public void AddJiaoCintamani()
-    {
-        // 이미 교룡 여의가 있다면 무시
-        if (GetEffect(CintamaniSO) != null) 
-            return;
-
-        EffectRuntimeData data = new EffectRuntimeData()
-        {
-            effectSO = JiaoCintamaniSO,
-            power = 1,
-            count = -1
-        };
-
-        // 버프 - 교룡 여의 추가
-        AddEffect(data);
-
-        // 필드 이펙트 - 유수 지대 추가
-        AddFieldEffect();
-    }
-
-    /// <summary>
     /// 교룡 여의 획득 시 발동, 유수 지대 필드 효과 추가
     /// </summary>
     public void AddFieldEffect()
     {
         // 유수 지대가 이미 있다면 무시
+        // 판단은 StageManager에서 GetFieldEffect() 함수 같은거로 판단하도록 구현 필요
         if (true)
             return;
     }

@@ -23,6 +23,15 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     public bool IsStagger => isStagger;
     #endregion
 
+    [Header("---Skills---")]
+    #region
+    [SerializeField] protected List<SkillBase> skill1;
+    [SerializeField] protected List<SkillBase> skill2;
+    [SerializeField] protected List<SkillBase> skill3;
+    [SerializeField] protected List<SkillBase> skillGuard;
+    [SerializeField] protected List<GameObject> passive;
+    #endregion
+
     [Header("---Status---")]
     #region
     [SerializeField] protected int level;

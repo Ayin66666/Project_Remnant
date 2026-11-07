@@ -38,7 +38,7 @@ public class EffectNode
         None,
         LessEqual,
         Equal,
-        GreaterEqual,
+        GreaterEqual
     }
     #endregion
 
