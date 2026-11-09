@@ -117,77 +117,126 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   효과 발동을 위한 조건(>, =, <, None)을 설정하는 ConditionNode,<br />
   수치를 결정하는 EffectValue와 효과를 지정하는 ActionNode로 구성하였습니다.<br />
   
-``` csharp
-public class CoinInfoSO : ScriptableObject
-{
-    [Header("---Coin Setting---")]
-    [SerializeField] private CoinType coinType;
-    // 해당 코인이 전체 데미지 중 몇 %의 데미지를 주는지
-    [SerializeField] private int damagePercent;
-    // 사용시, 적중시 같은 효과 발동 조건 데이터가 담긴 so
-    [SerializeField] private List<EffectNode> effectNodes;
+  ``` csharp
+  public class CoinInfoSO : ScriptableObject
+  {
+      [Header("---Coin Setting---")]
+      [SerializeField] private CoinType coinType;
+      // 해당 코인이 전체 데미지 중 몇 %의 데미지를 주는지
+      [SerializeField] private int damagePercent;
+      // 사용시, 적중시 같은 효과 발동 조건 데이터가 담긴 so
+      [SerializeField] private List<EffectNode> effectNodes;
 
-    public CoinType Coin => coinType;
-    public int DamagePercent => damagePercent;
-    public List<EffectNode> EffectNodes => effectNodes;
-}
-```
-``` csharp
-[System.Serializable]
-public class EffectNode
-{
-    [Header("---Trigger---")]
-    [SerializeField] private TriggerType triggerType;
-    [SerializeField] private TargetType targetType;
+      public CoinType Coin => coinType;
+      public int DamagePercent => damagePercent;
+      public List<EffectNode> EffectNodes => effectNodes;
+  }
+  ```
+  ``` csharp
+  [System.Serializable]
+  public class EffectNode
+  {
+      [Header("---Trigger---")]
+      [SerializeField] private TriggerType triggerType;
+      [SerializeField] private TargetType targetType;
 
-    [Header("---Condition---")]
-    [SerializeField] private ConditionNode condition;
+      [Header("---Condition---")]
+      [SerializeField] private ConditionNode condition;
 
-    [Header("---Action---")]
-    [SerializeField] private ActionNode action;
+      [Header("---Action---")]
+      [SerializeField] private ActionNode action;
 
-    #region Getter
-    public TriggerType Trigger => triggerType;
-    public TargetType Target => targetType;
-    public ConditionNode Condition => condition;
-    public ActionNode Action => action;
-    #endregion
+      #region Getter
+      public TriggerType Trigger => triggerType;
+      public TargetType Target => targetType;
+      public ConditionNode Condition => condition;
+      public ActionNode Action => action;
+      #endregion
 
-    #region Enum
-    public enum TargetType { Self, Target, Both, AllEnemies, AllAllies, Everyone }
-    public enum CompareType{ None, LessEqual, Equal, GreaterEqual }
-    #endregion
+      #region Enum
+      public enum TargetType { Self, Target, Both, AllEnemies, AllAllies, Everyone }
+      public enum CompareType{ None, LessEqual, Equal, GreaterEqual }
+      #endregion
 
-    public struct ConditionNode
-    {
-        [Header("---Condition---")]
-        public TargetType checkTarget;
-        public CompareType compareType;
-        public int conditionValue;
-        public List<EffectValue> values;
-    }
-}
-```
-``` csharp
-public struct ActionNode
-{
-    [Header("---Action---")]
-    public ActionType actionType;
-    public EffectRange effectRange;
-    public EffectValue valueNode;
+      public struct ConditionNode
+      {
+          [Header("---Condition---")]
+          public TargetType checkTarget;
+          public CompareType compareType;
+          public int conditionValue;
+          public List<EffectValue> values;
+      }
+  }
+  ```
+  ``` csharp
+  public struct ActionNode
+  {
+      [Header("---Action---")]
+      public ActionType actionType;
+      public EffectRange effectRange;
+      public EffectValue valueNode;
 
-    [Header("---Original Action---")]
-    public int originalActionId;
-    [TextArea] public string actionDescription;
-}
-```
+      [Header("---Original Action---")]
+      public int originalActionId;
+      [TextArea] public string actionDescription;
+  }
+  ```
   스킬 데이터를 종류별로 분리한 결과 복수의 조건과 효과를 요구하는 스킬 구현이 가능해졌으며<br />
   스킬 내 규칙과 동작을 개별 노드로 분리되어 있어 설명 스크립트 작성 자동화,<br />
   동기화(돌파)에 따른 스킬 강화 기능을 구현할 수 있었습니다.<br />
-  
+
 ---
 
-#### **▣ B-2.스킬 설명 빌더**
+#### **▣ B-2.데미지 계산**
+
+- **문제점**<br />
+  버프 & 디버프 및 스킬 효과를 포함한 데미지 계산 로직 구현<br />
+  스킬 효과(스킬 데미지 n% 증가, 스킬 치명타 피해량 n%증가 등) 적용 방법<br />
+  
+- **고민**<br />
+  기존 개발에서는 데미지 계산을 공격자에서 스킬 데미지를 계산한 뒤,<br />
+  피격자에게 넘겨 다시 계산하는 방식으로 구현하였습니다.<br />
+
+  하지만 이번 프로젝트는 데미지 계산에 스킬 계수, 공격력, 버프 & 디버프와 더불어<br />
+  스킬 고유 효과(데미지, 치명타 피해량 증가 등)이 있어<br />
+  기존 방식처럼 계산 로직을 나눠 구현하기 부적절하였습니다.<br />
+
+  또한 계산 위치도 스킬의 고유 효과가 존재해 공격자가 계산할지,<br />
+  SkillBase를 상속받은 동작 스크립트에서 계산할지, 피격자가 계산할지 선택이 필요하였습니다.<br />
+  
+- **해결책**<br />
+  기존 방식처럼 계산 로직이 나눠져 있으면 스킬 효과를 포함할 경우 지나치게 복잡해질 것이라 판단하여<br />
+  데미지 계산을 전담할 전용 클래스 DamageCalculator를 구현하였습니다.<br />
+
+  ``` csharp
+  [System.Serializable]
+  public struct CalInfo
+  {
+      [Header("---공격자 데이터---")]
+      public CharacterBase attacker;
+      public SkillSO skill;
+      private List<ActionNode> actions; // 데미지 계산 시 적용할 스킬 효과 List
+
+      [Header("---피격자 데이터---")]
+      public CharacterBase defender;
+  }
+  ```
+  DamageCalculator는 CalculateDamage(CalInfo info)로<br />
+  공격자, 피격자, 공격 스킬 정보를 받아 데미지를 계산합니다.<br />
+  
+  이때 스킬 데미지 증감 효과를 List<ActionNode> actions로 받아 적용하여<br />
+  스킬 효과로 인한 데미지 증가, 감소를 포함해서 계산할 수 있도록 구현하였습니다.<br />
+  // 이하 작성 필요
+  
+  ```
+        // 코인 앞면 : 1 뒷면 : 0.5
+        // {(공격력 * 스킬 계수 * 치명타 배율 * 코인 결과) * 최종 데미지 증감 * step} * 데미지 감소
+        // step = (공격력 - 방어력) / 3 = 두 수치의 차이 10당 데미지 10% 증감 (최대 +-30%)
+  ```
+
+---
+
+#### **▣ B-3.스킬 설명 빌더**
 
 - **문제점**<br />
   캐릭터 동기화(돌파)에 따른 스킬 강화 기능으로 인한 스킬 설명 작정량 증가<br />
@@ -214,48 +263,48 @@ public struct ActionNode
   이 방법으로 별도의 설명 작성이 필요 없이 SkillSO와 캐릭터의 동기화 수치만 알면<br />
   바로 스킬 설명을 작성하는 SkillDescriptionBuilder를 구현할 수 있었습니다.<br />
   
-``` csharp
-    public static string MakeDescription(SkillSO skillSO, int sync)
-    {
-        // 사용 시 발동 효과 텍스트화
-        StringBuilder sd = new StringBuilder();
-        for (int i = 0; i < skillSO.syncDatas[sync].skillEffects.Count; i++)
-        {
-            // 조건 텍스트화
-            string triggerText = GetTriggerText(skillSO.syncDatas[sync].skillEffects[i].Trigger);
-            string conditionText = GetConditionText(skillSO.syncDatas[sync].skillEffects[i]);
-            string actionText = GetActionText(skillSO.syncDatas[sync].skillEffects[i].Action);
+  ``` csharp
+      public static string MakeDescription(SkillSO skillSO, int sync)
+      {
+          // 사용 시 발동 효과 텍스트화
+          StringBuilder sd = new StringBuilder();
+          for (int i = 0; i < skillSO.syncDatas[sync].skillEffects.Count; i++)
+          {
+              // 조건 텍스트화
+              string triggerText = GetTriggerText(skillSO.syncDatas[sync].skillEffects[i].Trigger);
+              string conditionText = GetConditionText(skillSO.syncDatas[sync].skillEffects[i]);
+              string actionText = GetActionText(skillSO.syncDatas[sync].skillEffects[i].Action);
 
-            // 데이터 추가
-            sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
-        }
+              // 데이터 추가
+              sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
+          }
 
-        // 코인 효과 텍스트화
-        List<CoinInfoSO> coinInfo = skillSO.syncDatas[sync].coins;
-        for (int i = 0; i < coinInfo.Count; i++)
-        {
-            // 코인 표시 텍스트
-            sd.Append($"{i + 1} 코인\n");
+          // 코인 효과 텍스트화
+          List<CoinInfoSO> coinInfo = skillSO.syncDatas[sync].coins;
+          for (int i = 0; i < coinInfo.Count; i++)
+          {
+              // 코인 표시 텍스트
+              sd.Append($"{i + 1} 코인\n");
 
-            // 조건 & 동작 데이터
-            for (int j = 0; j < coinInfo[i].EffectNodes.Count; j++)
-            {
-                // 트리거 - ([사용 시], [피격 시], [합 승리 시] 등등)
-                string triggerText = GetTriggerText(coinInfo[i].EffectNodes[j].Trigger);
+              // 조건 & 동작 데이터
+              for (int j = 0; j < coinInfo[i].EffectNodes.Count; j++)
+              {
+                  // 트리거 - ([사용 시], [피격 시], [합 승리 시] 등등)
+                  string triggerText = GetTriggerText(coinInfo[i].EffectNodes[j].Trigger);
 
-                // 조건 - (n1이 n2 이상이면, n1 + n2 의 합이 n3 이상이면 등등)
-                string conditionText = GetConditionText(coinInfo[i].EffectNodes[j]);
+                  // 조건 - (n1이 n2 이상이면, n1 + n2 의 합이 n3 이상이면 등등)
+                  string conditionText = GetConditionText(coinInfo[i].EffectNodes[j]);
 
-                // 효과 - (누구에게 + 체력 50 회복, 실드 25% 획득, 주는 데미지 50% 증가 등등)
-                string actionText = GetActionText(coinInfo[i].EffectNodes[j].Action);
+                  // 효과 - (누구에게 + 체력 50 회복, 실드 25% 획득, 주는 데미지 50% 증가 등등)
+                  string actionText = GetActionText(coinInfo[i].EffectNodes[j].Action);
+  
+                  // 텍스트 조립 ([트리거] [조건] [동작])
+                  sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
+              }
+          }
 
-                // 텍스트 조립 ([트리거] [조건] [동작])
-                sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
-            }
-        }
-
-        return sd.ToString();
-    }
+          return sd.ToString();
+      }
   ```
   
 ---
@@ -359,11 +408,12 @@ public struct ActionNode
   파생 키워드 추가 시, 파생 키워드의 원본 키워드나 같은 원본 키워드에서 파생된 파생 키워드가 있을 경우<br />
   해당 키워드의 위력과 횟수를 덮어쓰는 방식으로 동작합니다.<br />
 
-  파생 키워드 구현 과정에서 자신의 원본 키워드와 자신의 동작을 구현하는 방법,<br />
-  버프 & 디버프 추가 시 자신과 동일한 키워드를 찾아내는 로직 구현에서 고민이 발생하였습니다.<br />
+  파생 키워드와 원본 키워드의 구현 및 관계 정리와 파생 키워드 추가 시<br />
+  자신과 동일한 원본 키워드를 찾아내는 로직 구현 방법을 결정해야 했습니다.<br />
 
 - **해결책**<br />
-
+  
+  
 ---
 
 ## **5. 전투 시스템**
