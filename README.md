@@ -2,14 +2,14 @@
 
 개인 프로젝트로 제작한 2D 턴제 게임 'Project : Remnant' 입니다.<br />
 
-Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한 프로젝트로,<br />
+Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한 프로젝트로<br />
 과거 팀 프로젝트로 진행한 3D 턴제 게임 'Project : Yuria'의 턴제 전투 시스템 개선 및 업그레이드,<br />
 'Limbus Company'의 전투 시스템 구현, ECA 패턴 기반 스킬 시스템, 자동 세이브 구현을 목표로 제작하였습니다.
 <br />
 
 ## 요약
 - 게임 장르 : 2D 턴제 게임
-- 제작 기간 : 25.12.01 ~ 26.00.00
+- 제작 기간 : 25.12.01 ~ ??.??.??
 - 개발 목표 : 게임 'Limbus Company'의 턴제 전투 시스템 구현, ECA 패턴 기반 스킬 시스템, 자동 세이브
 - 기술 문서 : "
 - 동작 영상 : "
@@ -112,8 +112,7 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   
   <img width="1302" height="517" alt="Image" src="https://github.com/user-attachments/assets/5e4bf2d8-2650-4b81-922c-c2f213d7d7cc" /><br />
   
-  스킬을 코인 단위로 나눈 CoinInfoSO,<br />
-  코인 내에 들어갈 조건과 효과를 담당하는 EffectNode,<br />
+  스킬을 코인 단위로 나눈 CoinInfoSO, 코인 내에 들어갈 조건과 효과를 담당하는 EffectNode,<br />
   효과 발동을 위한 조건(>, =, <, None)을 설정하는 ConditionNode,<br />
   수치를 결정하는 EffectValue와 효과를 지정하는 ActionNode로 구성하였습니다.<br />
   
@@ -133,7 +132,6 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   }
   ```
   ``` csharp
-  [System.Serializable]
   public class EffectNode
   {
       [Header("---Trigger---")]
@@ -208,6 +206,8 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   기존 방식처럼 계산 로직이 나눠져 있으면 스킬 효과를 포함할 경우 지나치게 복잡해질 것이라 판단하여<br />
   데미지 계산을 전담할 전용 클래스 DamageCalculator를 구현하였습니다.<br />
 
+  <img width="873" height="407" alt="Image" src="https://github.com/user-attachments/assets/2f4bad55-a6d7-4b9a-be48-38efe33ee4e1" /><br />
+  
   ``` csharp
   [System.Serializable]
   public struct CalInfo
@@ -226,14 +226,22 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   
   이때 스킬 데미지 증감 효과를 List<ActionNode> actions로 받아 적용하여<br />
   스킬 효과로 인한 데미지 증가, 감소를 포함해서 계산할 수 있도록 구현하였습니다.<br />
-  // 이하 작성 필요
   
   ```
         // 코인 앞면 : 1 뒷면 : 0.5
         // {(공격력 * 스킬 계수 * 치명타 배율 * 코인 결과) * 최종 데미지 증감 * step} * 데미지 감소
-        // step = (공격력 - 방어력) / 3 = 두 수치의 차이 10당 데미지 10% 증감 (최대 +-30%)
+        // step = (공격력 - 방어력) / 3 = 두 수치의 차이 10당 데미지 10% 증감 (최대 ±30%)
+
+        // -> 여기 CalculateDamage() 함수 예제 넣어야 함!
   ```
 
+  이때 데미지 공식에서 step(공격 & 방어 레벨 차이에 따른 데미지 증감)을 넣은 이유는<br />
+  게임 플레이 과정에서 레벨 차이로 인한 전투 난이도 차이를 구현하기 위해서입니다.<br />
+
+  단, 무한정 주는 데미지가 오르거나 내려갈 경우 클리어가 불가능하거나<br />
+  반대로 스테이지가 너무 쉬워져 전투 기믹을 모두 보는 것이 불가능해지는 것을 고려하여<br />
+  데미지의 증감치는 ±30%를 한도로 잡았습니다.<br />
+  
 ---
 
 #### **▣ B-3.스킬 설명 빌더**
@@ -394,7 +402,7 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   }
 
   ```
-  
+
 ---
 
 #### **▣ B-2.파생 키워드 구현**
@@ -412,7 +420,6 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   자신과 동일한 원본 키워드를 찾아내는 로직 구현 방법을 결정해야 했습니다.<br />
 
 - **해결책**<br />
-  
   
 ---
 
