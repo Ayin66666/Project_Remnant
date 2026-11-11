@@ -73,7 +73,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
             attackType = AttackType.None,
             isUseDamageCal = false,
             isCritical = isCri,
-            attackPoint = character.GetStat(CharacterBase.StatType.AttackPoint),
+            attackPoint = character.GetStat().aPoint,
             damage = totalDamage / 2,
         };
 
@@ -99,7 +99,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
             attackType = AttackType.None,
             isUseDamageCal = false,
             isCritical = isCri,
-            attackPoint = character.GetStat(CharacterBase.StatType.AttackPoint),
+            attackPoint = character.GetStat().aPoint,
             damage = totalDamage / 5,
         };
 

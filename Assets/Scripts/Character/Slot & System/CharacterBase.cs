@@ -127,7 +127,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     }
 
     /// <summary>
-    /// 캐릭터 데이터 전달
+    /// 캐릭터 데이터 세팅
     /// </summary>
     /// <param name="level"></param>
     /// <param name="sync"></param>
@@ -478,6 +478,26 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
 
     #region 버프 & 디버프 로직
     /// <summary>
+    /// 버프를 포함한 스테이터스 정보 반환 -> 교체 중
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    /// <exception cref="System.NotImplementedException"></exception>
+    public StatData GetStat()
+    {
+        StatData data = new StatData()
+        {
+            aPoint = attack + addAttackPoint,
+            dPoint = defence + addDefencePoint,
+            increaseDamage = addIncreaseDamage,
+            reductionDamage = addDamageReduction,
+            critMultiplier = 1.5f
+        };
+
+        return data;
+    }
+
+    /// <summary>
     /// 필요한 키워드의 보유 값 전달 / 없을 경우 Null 반환
     /// </summary>
     /// <param name="keyword">값이 필요한 키워드</param>
@@ -497,25 +517,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         EffectRuntimeData data = statusEffects.Where(x => x.effectSO == so).FirstOrDefault();
         return data;
     }
-
-    /// <summary>
-    /// 값 반환을 위한 enum 함수
-    /// </summary>
-    public enum StatType
-    {
-        AttackPoint,
-        DefensePoint,
-    }
-    public int GetStat(StatType type)
-    {
-        return type switch
-        {
-            StatType.AttackPoint => addAttackPoint + attack,
-            StatType.DefensePoint => addDefencePoint + defence,
-            _ => throw new System.NotImplementedException(),
-        };
-    }
-
 
     /// <summary>
     /// 키워드 데이터 추가 - 기존 데이터가 있다면 합산, 없다면 신규 추가
@@ -726,5 +727,17 @@ public class EffectRuntimeData
     /// Keyword의 경우 횟수, 공용의 경우 지속 턴
     /// </summary>
     public int count; // -1의 경우 무한유지
+}
+
+/// <summary>
+/// 버프 + 자기 스테이터스를 계산한 값
+/// </summary>
+public struct StatData
+{
+    public int aPoint;
+    public int dPoint;
+    public int increaseDamage;
+    public int reductionDamage;
+    public float critMultiplier;
 }
 #endregion
