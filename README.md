@@ -232,15 +232,6 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   데미지, 치명타 피해량 증가 등 스킬 효과를 포함해서 데미지를 계산할 수 있도록 구현하였습니다.<br />
 
   ``` csharp
-  [System.Serializable]
-  public struct SkillEffect
-  {
-      // 추가할 옵션이 있다면 이곳에 추가 후 데미지 계산 로직에 적용
-      public float increaseDamage; // 데미지 증가
-      public float critMultiplier; // 치명타 배율
-  }
-  ```
-  ``` csharp
   public static int CalculateDamage(CalInfo info)
   {
       // 데미지 계산 로직은 다음과 같음
@@ -301,6 +292,82 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   
   인격 레벨 대신 공격 & 방어 포인트을 선택한 이유는 레벨 차이가 절대적인 방식보다는<br />
   버프 & 디버프를 통해 차이가 나도 극복 가능한 전략적인 요소가 있는 것이 좋다고 판단하였기 때문입니다.<br />
+
+  
+  ``` csharp
+      public static SkillEffect ApplySkillEffects(List<ActionNode> actions)
+    {
+        SkillEffect skillEffect = new SkillEffect()
+        {
+            increaseDamage = 0.0f,
+            critMultiplier = 0.0f
+        };
+
+        // 전환할 데이터가 없는 경우 종료
+        if (actions == null || actions.Count == 0)
+        {
+            Debug.Log("전환할 데이터가 없음");
+            return skillEffect;
+        }
+
+        for (int i = 0; i < actions.Count; i++)
+        {
+            ActionNode act = actions[i];
+            if (act.actionType != ActionType.SkillEffect)
+            {
+                // 스킬 효과가 아닌 경우 종료
+                Debug.LogError($"[DamageCalculator] 스킬 효과가 아닌 ActionNode가 전달 / (ActionType : {act.actionType})");
+                break;
+            }
+
+            SkillEffectSO effect = act.valueNode.effect as SkillEffectSO;
+            if(effect == null)
+            {
+                // 스킬 효과 SO가 아닌 경우 종료
+                Debug.LogError($"[DamageCalculator] SkillEffectSO가 아닌 ActionNode가 전달 / (ActionType : {act.actionType})");
+                break;
+            }
+
+            // 여러 종류지만 실제 대응해야 하는 효과는 스킬의 데미지 증가만!
+            switch (effect.EffectType)
+            {
+                // 대응이 필요 없는 케이스 -> skillbase에서 효과 체크 후 적용시킴
+                case SkillEffectSO.SkillEffectType.None:
+                case SkillEffectSO.SkillEffectType.ExtraDamage:
+                case SkillEffectSO.SkillEffectType.VibrationExplosion:
+                case SkillEffectSO.SkillEffectType.BasePowerUp:
+                case SkillEffectSO.SkillEffectType.CoinPowerUp:
+                    break;
+
+                // 대응이 필요한 케이스 -> 데미지 계산 시 적용
+                case SkillEffectSO.SkillEffectType.IncreaseFinalDamage:
+                    skillEffect.increaseDamage += act.valueNode.value;
+                    break;
+
+                case SkillEffectSO.SkillEffectType.CriticalMultiplier:
+                    skillEffect.critMultiplier += act.valueNode.value;
+                    break;
+            }
+        }
+
+        return skillEffect;
+    }
+  ```
+  ``` csharp
+  [System.Serializable]
+  public struct SkillEffect
+  {
+      // 추가할 옵션이 있다면 이곳에 추가 후 데미지 계산 로직에 적용
+      public float increaseDamage; // 데미지 증가
+      public float critMultiplier; // 치명타 배율
+  }
+  ```
+    
+  스킬 효과 전환 로직에서는 데미지 계산과 직결되는 효과에 한해 대응하도록 구현하였습니다.<br />
+  전달받은 데이터를 체크하여 문제가 있을 경우 효과 적용을 정지하고 위치 전달 후 데이터를 반환합니다.<br />
+
+  현 프로젝트에서 데미지 공식에 영향을 주는 데이터는 2종류이나<br />
+  SkillEffect와 EffectType를 늘려 더 많은 종류의 데이터에 대응할 수 있습니다.<br />
   
 ---
 
@@ -374,7 +441,7 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
           return sd.ToString();
       }
   ```
-  
+
 ---
 
 ## **4. 버프 & 디버프 시스템**
