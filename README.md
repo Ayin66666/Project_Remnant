@@ -196,17 +196,19 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   피격자에게 넘겨 다시 계산하는 방식으로 구현하였습니다.<br />
 
   하지만 이번 프로젝트는 데미지 계산에 스킬 계수, 공격력, 버프 & 디버프와 더불어<br />
-  스킬 고유 효과(데미지, 치명타 피해량 증가 등)이 있어<br />
-  기존 방식처럼 계산 로직을 나눠 구현하기 부적절하였습니다.<br />
+  스킬 고유 효과가 있어 계산 로직을 나눠 구현하기 부적절하였습니다.<br />
 
   또한 계산 위치도 스킬의 고유 효과가 존재해 공격자가 계산할지,<br />
   SkillBase를 상속받은 동작 스크립트에서 계산할지, 피격자가 계산할지 선택이 필요하였습니다.<br />
   
 - **해결책**<br />
-  기존 방식처럼 계산 로직이 나눠져 있으면 스킬 효과를 포함할 경우 지나치게 복잡해질 것이라 판단하여<br />
+  계산 로직이 나눠져 있으면 지나치게 복잡해질 것이라 판단하여<br />
   데미지 계산을 전담할 전용 클래스 DamageCalculator를 구현하였습니다.<br />
+  
+  또한 데미지 계산 단위를 스킬 전체 데미지에서 해당 스킬의 코인 단위로 변경하여,<br />
+  특정 코인의 데미지 증가, 치명타 피해량 증가와 같은 기능에도 대응할 수 있도록 설계하였습니다.<br />
 
-  <img width="873" height="407" alt="Image" src="https://github.com/user-attachments/assets/2f4bad55-a6d7-4b9a-be48-38efe33ee4e1" /><br />
+  <img width="932" height="562" alt="Project_Remnant_공격 데미지적용_플로우차트 drawio" src="https://github.com/user-attachments/assets/9c44bf48-03c2-4bee-b1f4-2219bb6c4760" /><br />
   
   ``` csharp
   [System.Serializable]
@@ -215,32 +217,90 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
       [Header("---공격자 데이터---")]
       public CharacterBase attacker;
       public SkillSO skill;
+      public float coinValue; // 해당 코인이 주는 데미지 비율(전체 데미지 중 해당 코인이 n%의 데미지를 준다)
+      public bool isFront; // 코인 앞 뒷면 여부 (앞면 : true, 뒷면 : false)
+      public bool isCritical;
+      public bool isBreak; // 코인 파괴 여부 (파괴 시 데미지 0.25 / 일반 1.0)
       private List<ActionNode> actions; // 데미지 계산 시 적용할 스킬 효과 List
 
       [Header("---피격자 데이터---")]
       public CharacterBase defender;
   }
   ```
-  DamageCalculator는 CalculateDamage(CalInfo info)로<br />
-  공격자, 피격자, 공격 스킬 정보를 받아 데미지를 계산합니다.<br />
-  
-  이때 스킬 데미지 증감 효과를 List<ActionNode> actions로 받아 적용하여<br />
-  스킬 효과로 인한 데미지 증가, 감소를 포함해서 계산할 수 있도록 구현하였습니다.<br />
-  
-  ```
-        // 코인 앞면 : 1 뒷면 : 0.5
-        // {(공격력 * 스킬 계수 * 치명타 배율 * 코인 결과) * 최종 데미지 증감 * step} * 데미지 감소
-        // step = (공격력 - 방어력) / 3 = 두 수치의 차이 10당 데미지 10% 증감 (최대 ±30%)
+  DamageCalculator는 CalculateDamage(CalInfo info)로 계산에 필요한 정보를 받아 데미지를 계산합니다.<br />
+  스킬 효과의 경우 ApplySkillEffects(CalInfo info)로 SkillEffect로 변환 후 적용하는 방법으로<br />
+  데미지, 치명타 피해량 증가 등 스킬 효과를 포함해서 데미지를 계산할 수 있도록 구현하였습니다.<br />
 
-        // -> 여기 CalculateDamage() 함수 예제 넣어야 함!
+  ``` csharp
+  [System.Serializable]
+  public struct SkillEffect
+  {
+      // 추가할 옵션이 있다면 이곳에 추가 후 데미지 계산 로직에 적용
+      public float increaseDamage; // 데미지 증가
+      public float critMultiplier; // 치명타 배율
+  }
+  ```
+  ``` csharp
+  public static int CalculateDamage(CalInfo info)
+  {
+      // 데미지 계산 로직은 다음과 같음
+      // 코인 앞면 : 1 뒷면 : 0.5
+      // (공격력 * 스킬 계수 * 치명타 배율 * 코인 배율 * 코인 파괴 여부) * 최종 데미지 증감 * 레벨 차이 증감
+      // 레벨 차이 증감 = (공격력 - 방어력) / 3 = 두 수치의 차이 10당 데미지 10% 증감 (최대 ±30%)
+
+      // 공격자 데이터 세팅
+      StatData attacker = info.attacker.GetStat();
+      float skillValue = info.skill.syncDatas[info.attacker.Sync].motionValue;
+    
+      // 피격자 데이터 세팅
+      StatData defender = info.defender.GetStat();
+
+      // 스킬 효과 세팅
+      SkillEffect skillEffects = ApplySkillEffects(info.actions);
+
+
+      // --- 이하 데미지 계산 로직 ---
+
+      // 기본 데미지
+      float damage = attacker.aPoint * skillValue * info.coinValue;
+
+      // 코인 파괴 여부 적용
+      damage *= (info.isBreak ? 0.25f : 1.0f);
+
+      // 치명타 적용
+      damage *= (info.isCritical ? attacker.critMultiplier + skillEffects.critMultiplier : 1.0f);
+
+      // 데미지 증감 적용
+      damage *= (1.0f + ((attacker.increaseDamage + skillEffects.increaseDamage) / 100f) - (defender.reductionDamage / 100f));
+
+      // 코인 앞 & 뒷면 적용
+      damage *= (info.isFront ? 1.0f : 0.5f);
+
+      // 레벨 차이 적용
+      float step = Mathf.Clamp(1.0f + (attacker.aPoint - defender.dPoint) / 100f, 0.7f, 1.3f);
+      damage *= step;
+
+      // 반환 -> 데미지 음수 방지 및 최소 데미지 보정
+      return Mathf.Max(1, (int)damage);
+    }
   ```
 
   이때 데미지 공식에서 step(공격 & 방어 레벨 차이에 따른 데미지 증감)을 넣은 이유는<br />
   게임 플레이 과정에서 레벨 차이로 인한 전투 난이도 차이를 구현하기 위해서입니다.<br />
 
-  단, 무한정 주는 데미지가 오르거나 내려갈 경우 클리어가 불가능하거나<br />
-  반대로 스테이지가 너무 쉬워져 전투 기믹을 모두 보는 것이 불가능해지는 것을 고려하여<br />
-  데미지의 증감치는 ±30%를 한도로 잡았습니다.<br />
+  과거 프로젝트에서는 초~중반 난이도는 어렵지만,<br />
+  일정 이상 성장할 경우 전투 난이도가 너무 쉬워지는 문제가 종종 발생하였습니다.<br />
+  
+  이번 프로젝트에서는 난이도 문제를 해소하기 위해 스테이지 클리어를 위한 평균 턴 수를 결정하였습니다.<br />
+  직접 플레이하며 스테이지 클리어를 위한 턴은 일반 전투 8 ~ 12턴, 보스 전투 12 ~ 19턴이 적당하다 판단하였고,<br />
+  인격 레벨업 & 동기화 상승으로 유저 스펙이 올라갔을 때 유저가 성장을 체감할 수 있으면서<br />
+  전투 기믹이 무시당하지 않을 수 있는 수준을 20 ~ 30% 수준으로 판단하였습니다.<br />
+
+  공격 & 방어 포인트는 인격의 레벨에 따라 상승하므로,<br />
+  공격자 & 피격자의 차이를 체크하는 방식으로 난이도 조절을 진행하기로 결정하였습니다.<br />
+  
+  인격 레벨 대신 공격 & 방어 포인트을 선택한 이유는 레벨 차이가 절대적인 방식보다는<br />
+  버프 & 디버프를 통해 차이가 나도 극복 가능한 전략적인 요소가 있는 것이 좋다고 판단하였기 때문입니다.<br />
   
 ---
 
@@ -400,7 +460,6 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
           // 세부 구현은 override 하여 세부 클래스에서 구현함!
       }
   }
-
   ```
 
 ---
