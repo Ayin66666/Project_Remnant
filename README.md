@@ -2,14 +2,14 @@
 
 개인 프로젝트로 제작한 2D 턴제 게임 'Project : Remnant' 입니다.<br />
 
-Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한 프로젝트로,<br />
+Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한 프로젝트로<br />
 과거 팀 프로젝트로 진행한 3D 턴제 게임 'Project : Yuria'의 턴제 전투 시스템 개선 및 업그레이드,<br />
 'Limbus Company'의 전투 시스템 구현, ECA 패턴 기반 스킬 시스템, 자동 세이브 구현을 목표로 제작하였습니다.
 <br />
 
 ## 요약
 - 게임 장르 : 2D 턴제 게임
-- 제작 기간 : 25.12.01 ~ 26.00.00
+- 제작 기간 : 25.12.01 ~ ??.??.??
 - 개발 목표 : 게임 'Limbus Company'의 턴제 전투 시스템 구현, ECA 패턴 기반 스킬 시스템, 자동 세이브
 - 기술 문서 : "
 - 동작 영상 : "
@@ -112,82 +112,266 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   
   <img width="1302" height="517" alt="Image" src="https://github.com/user-attachments/assets/5e4bf2d8-2650-4b81-922c-c2f213d7d7cc" /><br />
   
-  스킬을 코인 단위로 나눈 CoinInfoSO,<br />
-  코인 내에 들어갈 조건과 효과를 담당하는 EffectNode,<br />
+  스킬을 코인 단위로 나눈 CoinInfoSO, 코인 내에 들어갈 조건과 효과를 담당하는 EffectNode,<br />
   효과 발동을 위한 조건(>, =, <, None)을 설정하는 ConditionNode,<br />
   수치를 결정하는 EffectValue와 효과를 지정하는 ActionNode로 구성하였습니다.<br />
   
-``` csharp
-public class CoinInfoSO : ScriptableObject
-{
-    [Header("---Coin Setting---")]
-    [SerializeField] private CoinType coinType;
-    // 해당 코인이 전체 데미지 중 몇 %의 데미지를 주는지
-    [SerializeField] private int damagePercent;
-    // 사용시, 적중시 같은 효과 발동 조건 데이터가 담긴 so
-    [SerializeField] private List<EffectNode> effectNodes;
+  ``` csharp
+  public class CoinInfoSO : ScriptableObject
+  {
+      [Header("---Coin Setting---")]
+      [SerializeField] private CoinType coinType;
+      // 해당 코인이 전체 데미지 중 몇 %의 데미지를 주는지
+      [SerializeField] private int damagePercent;
+      // 사용시, 적중시 같은 효과 발동 조건 데이터가 담긴 so
+      [SerializeField] private List<EffectNode> effectNodes;
 
-    public CoinType Coin => coinType;
-    public int DamagePercent => damagePercent;
-    public List<EffectNode> EffectNodes => effectNodes;
-}
-```
-``` csharp
-[System.Serializable]
-public class EffectNode
-{
-    [Header("---Trigger---")]
-    [SerializeField] private TriggerType triggerType;
-    [SerializeField] private TargetType targetType;
+      public CoinType Coin => coinType;
+      public int DamagePercent => damagePercent;
+      public List<EffectNode> EffectNodes => effectNodes;
+  }
+  ```
+  ``` csharp
+  public class EffectNode
+  {
+      [Header("---Trigger---")]
+      [SerializeField] private TriggerType triggerType;
+      [SerializeField] private TargetType targetType;
 
-    [Header("---Condition---")]
-    [SerializeField] private ConditionNode condition;
+      [Header("---Condition---")]
+      [SerializeField] private ConditionNode condition;
 
-    [Header("---Action---")]
-    [SerializeField] private ActionNode action;
+      [Header("---Action---")]
+      [SerializeField] private ActionNode action;
 
-    #region Getter
-    public TriggerType Trigger => triggerType;
-    public TargetType Target => targetType;
-    public ConditionNode Condition => condition;
-    public ActionNode Action => action;
-    #endregion
+      #region Getter
+      public TriggerType Trigger => triggerType;
+      public TargetType Target => targetType;
+      public ConditionNode Condition => condition;
+      public ActionNode Action => action;
+      #endregion
 
-    #region Enum
-    public enum TargetType { Self, Target, Both, AllEnemies, AllAllies, Everyone }
-    public enum CompareType{ None, LessEqual, Equal, GreaterEqual }
-    #endregion
+      #region Enum
+      public enum TargetType { Self, Target, Both, AllEnemies, AllAllies, Everyone }
+      public enum CompareType{ None, LessEqual, Equal, GreaterEqual }
+      #endregion
 
-    public struct ConditionNode
-    {
-        [Header("---Condition---")]
-        public TargetType checkTarget;
-        public CompareType compareType;
-        public int conditionValue;
-        public List<EffectValue> values;
-    }
-}
-```
-``` csharp
-public struct ActionNode
-{
-    [Header("---Action---")]
-    public ActionType actionType;
-    public EffectRange effectRange;
-    public EffectValue valueNode;
+      public struct ConditionNode
+      {
+          [Header("---Condition---")]
+          public TargetType checkTarget;
+          public CompareType compareType;
+          public int conditionValue;
+          public List<EffectValue> values;
+      }
+  }
+  ```
+  ``` csharp
+  public struct ActionNode
+  {
+      [Header("---Action---")]
+      public ActionType actionType;
+      public EffectRange effectRange;
+      public EffectValue valueNode;
 
-    [Header("---Original Action---")]
-    public int originalActionId;
-    [TextArea] public string actionDescription;
-}
-```
+      [Header("---Original Action---")]
+      public int originalActionId;
+      [TextArea] public string actionDescription;
+  }
+  ```
   스킬 데이터를 종류별로 분리한 결과 복수의 조건과 효과를 요구하는 스킬 구현이 가능해졌으며<br />
   스킬 내 규칙과 동작을 개별 노드로 분리되어 있어 설명 스크립트 작성 자동화,<br />
   동기화(돌파)에 따른 스킬 강화 기능을 구현할 수 있었습니다.<br />
+
+---
+
+#### **▣ B-2.데미지 계산**
+
+- **문제점**<br />
+  버프 & 디버프 및 스킬 효과를 포함한 데미지 계산 로직 구현<br />
+  스킬 효과(스킬 데미지 n% 증가, 스킬 치명타 피해량 n%증가 등) 적용 방법<br />
+  
+- **고민**<br />
+  기존 개발에서는 데미지 계산을 공격자에서 스킬 데미지를 계산한 뒤,<br />
+  피격자에게 넘겨 다시 계산하는 방식으로 구현하였습니다.<br />
+
+  하지만 이번 프로젝트는 데미지 계산에 스킬 계수, 공격력, 버프 & 디버프와 더불어<br />
+  스킬 고유 효과가 있어 계산 로직을 나눠 구현하기 부적절하였습니다.<br />
+
+  또한 계산 위치도 스킬의 고유 효과가 존재해 공격자가 계산할지,<br />
+  SkillBase를 상속받은 동작 스크립트에서 계산할지, 피격자가 계산할지 선택이 필요하였습니다.<br />
+  
+- **해결책**<br />
+  계산 로직이 나눠져 있으면 지나치게 복잡해질 것이라 판단하여<br />
+  데미지 계산을 전담할 전용 클래스 DamageCalculator를 구현하였습니다.<br />
+  
+  또한 데미지 계산 단위를 스킬 전체 데미지에서 해당 스킬의 코인 단위로 변경하여,<br />
+  특정 코인의 데미지 증가, 치명타 피해량 증가와 같은 기능에도 대응할 수 있도록 설계하였습니다.<br />
+
+  <img width="932" height="562" alt="Project_Remnant_공격 데미지적용_플로우차트 drawio" src="https://github.com/user-attachments/assets/9c44bf48-03c2-4bee-b1f4-2219bb6c4760" /><br />
+  
+  ``` csharp
+  [System.Serializable]
+  public struct CalInfo
+  {
+      [Header("---공격자 데이터---")]
+      public CharacterBase attacker;
+      public SkillSO skill;
+      public float coinValue; // 해당 코인이 주는 데미지 비율(전체 데미지 중 해당 코인이 n%의 데미지를 준다)
+      public bool isFront; // 코인 앞 뒷면 여부 (앞면 : true, 뒷면 : false)
+      public bool isCritical;
+      public bool isBreak; // 코인 파괴 여부 (파괴 시 데미지 0.25 / 일반 1.0)
+      private List<ActionNode> actions; // 데미지 계산 시 적용할 스킬 효과 List
+
+      [Header("---피격자 데이터---")]
+      public CharacterBase defender;
+  }
+  ```
+  DamageCalculator는 CalculateDamage(CalInfo info)로 계산에 필요한 정보를 받아 데미지를 계산합니다.<br />
+  스킬 효과의 경우 ApplySkillEffects(CalInfo info)로 SkillEffect로 변환 후 적용하는 방법으로<br />
+  데미지, 치명타 피해량 증가 등 스킬 효과를 포함해서 데미지를 계산할 수 있도록 구현하였습니다.<br />
+
+  ``` csharp
+  public static int CalculateDamage(CalInfo info)
+  {
+      // 데미지 계산 로직은 다음과 같음
+      // 코인 앞면 : 1 뒷면 : 0.5
+      // (공격력 * 스킬 계수 * 치명타 배율 * 코인 배율 * 코인 파괴 여부) * 최종 데미지 증감 * 레벨 차이 증감
+      // 레벨 차이 증감 = (공격력 - 방어력) / 3 = 두 수치의 차이 10당 데미지 10% 증감 (최대 ±30%)
+
+      // 공격자 데이터 세팅
+      StatData attacker = info.attacker.GetStat();
+      float skillValue = info.skill.syncDatas[info.attacker.Sync].motionValue;
+    
+      // 피격자 데이터 세팅
+      StatData defender = info.defender.GetStat();
+
+      // 스킬 효과 세팅
+      SkillEffect skillEffects = ApplySkillEffects(info.actions);
+
+
+      // --- 이하 데미지 계산 로직 ---
+
+      // 기본 데미지
+      float damage = attacker.aPoint * skillValue * info.coinValue;
+
+      // 코인 파괴 여부 적용
+      damage *= (info.isBreak ? 0.25f : 1.0f);
+
+      // 치명타 적용
+      damage *= (info.isCritical ? attacker.critMultiplier + skillEffects.critMultiplier : 1.0f);
+
+      // 데미지 증감 적용
+      damage *= (1.0f + ((attacker.increaseDamage + skillEffects.increaseDamage) / 100f) - (defender.reductionDamage / 100f));
+
+      // 코인 앞 & 뒷면 적용
+      damage *= (info.isFront ? 1.0f : 0.5f);
+
+      // 레벨 차이 적용
+      float step = Mathf.Clamp(1.0f + (attacker.aPoint - defender.dPoint) / 100f, 0.7f, 1.3f);
+      damage *= step;
+
+      // 반환 -> 데미지 음수 방지 및 최소 데미지 보정
+      return Mathf.Max(1, (int)damage);
+    }
+  ```
+
+  이때 데미지 공식에서 step(공격 & 방어 레벨 차이에 따른 데미지 증감)을 넣은 이유는<br />
+  게임 플레이 과정에서 레벨 차이로 인한 전투 난이도 차이를 구현하기 위해서입니다.<br />
+
+  과거 프로젝트에서는 초~중반 난이도는 어렵지만,<br />
+  일정 이상 성장할 경우 전투 난이도가 너무 쉬워지는 문제가 종종 발생하였습니다.<br />
+  
+  이번 프로젝트에서는 난이도 문제를 해소하기 위해 스테이지 클리어를 위한 평균 턴 수를 결정하였습니다.<br />
+  직접 플레이하며 스테이지 클리어를 위한 턴은 일반 전투 8 ~ 12턴, 보스 전투 12 ~ 19턴이 적당하다 판단하였고,<br />
+  인격 레벨업 & 동기화 상승으로 유저 스펙이 올라갔을 때 유저가 성장을 체감할 수 있으면서<br />
+  전투 기믹이 무시당하지 않을 수 있는 수준을 20 ~ 30% 수준으로 판단하였습니다.<br />
+
+  공격 & 방어 포인트는 인격의 레벨에 따라 상승하므로,<br />
+  공격자 & 피격자의 차이를 체크하는 방식으로 난이도 조절을 진행하기로 결정하였습니다.<br />
+  
+  인격 레벨 대신 공격 & 방어 포인트을 선택한 이유는 레벨 차이가 절대적인 방식보다는<br />
+  버프 & 디버프를 통해 차이가 나도 극복 가능한 전략적인 요소가 있는 것이 좋다고 판단하였기 때문입니다.<br />
+
+  
+  ``` csharp
+      public static SkillEffect ApplySkillEffects(List<ActionNode> actions)
+    {
+        SkillEffect skillEffect = new SkillEffect()
+        {
+            increaseDamage = 0.0f,
+            critMultiplier = 0.0f
+        };
+
+        // 전환할 데이터가 없는 경우 종료
+        if (actions == null || actions.Count == 0)
+        {
+            Debug.Log("전환할 데이터가 없음");
+            return skillEffect;
+        }
+
+        for (int i = 0; i < actions.Count; i++)
+        {
+            ActionNode act = actions[i];
+            if (act.actionType != ActionType.SkillEffect)
+            {
+                // 스킬 효과가 아닌 경우 종료
+                Debug.LogError($"[DamageCalculator] 스킬 효과가 아닌 ActionNode가 전달 / (ActionType : {act.actionType})");
+                break;
+            }
+
+            SkillEffectSO effect = act.valueNode.effect as SkillEffectSO;
+            if(effect == null)
+            {
+                // 스킬 효과 SO가 아닌 경우 종료
+                Debug.LogError($"[DamageCalculator] SkillEffectSO가 아닌 ActionNode가 전달 / (ActionType : {act.actionType})");
+                break;
+            }
+
+            // 여러 종류지만 실제 대응해야 하는 효과는 스킬의 데미지 증가만!
+            switch (effect.EffectType)
+            {
+                // 대응이 필요 없는 케이스 -> skillbase에서 효과 체크 후 적용시킴
+                case SkillEffectSO.SkillEffectType.None:
+                case SkillEffectSO.SkillEffectType.ExtraDamage:
+                case SkillEffectSO.SkillEffectType.VibrationExplosion:
+                case SkillEffectSO.SkillEffectType.BasePowerUp:
+                case SkillEffectSO.SkillEffectType.CoinPowerUp:
+                    break;
+
+                // 대응이 필요한 케이스 -> 데미지 계산 시 적용
+                case SkillEffectSO.SkillEffectType.IncreaseFinalDamage:
+                    skillEffect.increaseDamage += act.valueNode.value;
+                    break;
+
+                case SkillEffectSO.SkillEffectType.CriticalMultiplier:
+                    skillEffect.critMultiplier += act.valueNode.value;
+                    break;
+            }
+        }
+
+        return skillEffect;
+    }
+  ```
+  ``` csharp
+  [System.Serializable]
+  public struct SkillEffect
+  {
+      // 추가할 옵션이 있다면 이곳에 추가 후 데미지 계산 로직에 적용
+      public float increaseDamage; // 데미지 증가
+      public float critMultiplier; // 치명타 배율
+  }
+  ```
+    
+  스킬 효과 전환 로직에서는 데미지 계산과 직결되는 효과에 한해 대응하도록 구현하였습니다.<br />
+  전달받은 데이터를 체크하여 문제가 있을 경우 효과 적용을 정지하고 위치 전달 후 데이터를 반환합니다.<br />
+
+  현 프로젝트에서 데미지 공식에 영향을 주는 데이터는 2종류이나<br />
+  SkillEffect와 EffectType를 늘려 더 많은 종류의 데이터에 대응할 수 있습니다.<br />
   
 ---
 
-#### **▣ B-2.스킬 설명 빌더**
+#### **▣ B-3.스킬 설명 빌더**
 
 - **문제점**<br />
   캐릭터 동기화(돌파)에 따른 스킬 강화 기능으로 인한 스킬 설명 작정량 증가<br />
@@ -214,50 +398,50 @@ public struct ActionNode
   이 방법으로 별도의 설명 작성이 필요 없이 SkillSO와 캐릭터의 동기화 수치만 알면<br />
   바로 스킬 설명을 작성하는 SkillDescriptionBuilder를 구현할 수 있었습니다.<br />
   
-``` csharp
-    public static string MakeDescription(SkillSO skillSO, int sync)
-    {
-        // 사용 시 발동 효과 텍스트화
-        StringBuilder sd = new StringBuilder();
-        for (int i = 0; i < skillSO.syncDatas[sync].skillEffects.Count; i++)
-        {
-            // 조건 텍스트화
-            string triggerText = GetTriggerText(skillSO.syncDatas[sync].skillEffects[i].Trigger);
-            string conditionText = GetConditionText(skillSO.syncDatas[sync].skillEffects[i]);
-            string actionText = GetActionText(skillSO.syncDatas[sync].skillEffects[i].Action);
+  ``` csharp
+      public static string MakeDescription(SkillSO skillSO, int sync)
+      {
+          // 사용 시 발동 효과 텍스트화
+          StringBuilder sd = new StringBuilder();
+          for (int i = 0; i < skillSO.syncDatas[sync].skillEffects.Count; i++)
+          {
+              // 조건 텍스트화
+              string triggerText = GetTriggerText(skillSO.syncDatas[sync].skillEffects[i].Trigger);
+              string conditionText = GetConditionText(skillSO.syncDatas[sync].skillEffects[i]);
+              string actionText = GetActionText(skillSO.syncDatas[sync].skillEffects[i].Action);
 
-            // 데이터 추가
-            sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
-        }
+              // 데이터 추가
+              sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
+          }
 
-        // 코인 효과 텍스트화
-        List<CoinInfoSO> coinInfo = skillSO.syncDatas[sync].coins;
-        for (int i = 0; i < coinInfo.Count; i++)
-        {
-            // 코인 표시 텍스트
-            sd.Append($"{i + 1} 코인\n");
+          // 코인 효과 텍스트화
+          List<CoinInfoSO> coinInfo = skillSO.syncDatas[sync].coins;
+          for (int i = 0; i < coinInfo.Count; i++)
+          {
+              // 코인 표시 텍스트
+              sd.Append($"{i + 1} 코인\n");
 
-            // 조건 & 동작 데이터
-            for (int j = 0; j < coinInfo[i].EffectNodes.Count; j++)
-            {
-                // 트리거 - ([사용 시], [피격 시], [합 승리 시] 등등)
-                string triggerText = GetTriggerText(coinInfo[i].EffectNodes[j].Trigger);
+              // 조건 & 동작 데이터
+              for (int j = 0; j < coinInfo[i].EffectNodes.Count; j++)
+              {
+                  // 트리거 - ([사용 시], [피격 시], [합 승리 시] 등등)
+                  string triggerText = GetTriggerText(coinInfo[i].EffectNodes[j].Trigger);
 
-                // 조건 - (n1이 n2 이상이면, n1 + n2 의 합이 n3 이상이면 등등)
-                string conditionText = GetConditionText(coinInfo[i].EffectNodes[j]);
+                  // 조건 - (n1이 n2 이상이면, n1 + n2 의 합이 n3 이상이면 등등)
+                  string conditionText = GetConditionText(coinInfo[i].EffectNodes[j]);
 
-                // 효과 - (누구에게 + 체력 50 회복, 실드 25% 획득, 주는 데미지 50% 증가 등등)
-                string actionText = GetActionText(coinInfo[i].EffectNodes[j].Action);
-
-                // 텍스트 조립 ([트리거] [조건] [동작])
-                sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
-            }
-        }
-
-        return sd.ToString();
-    }
-  ```
+                  // 효과 - (누구에게 + 체력 50 회복, 실드 25% 획득, 주는 데미지 50% 증가 등등)
+                  string actionText = GetActionText(coinInfo[i].EffectNodes[j].Action);
   
+                  // 텍스트 조립 ([트리거] [조건] [동작])
+                  sd.Append($"[{triggerText}] {conditionText} {actionText}\n");
+              }
+          }
+
+          return sd.ToString();
+      }
+  ```
+
 ---
 
 ## **4. 버프 & 디버프 시스템**
@@ -343,9 +527,8 @@ public struct ActionNode
           // 세부 구현은 override 하여 세부 클래스에서 구현함!
       }
   }
-
   ```
-  
+
 ---
 
 #### **▣ B-2.파생 키워드 구현**
@@ -359,11 +542,11 @@ public struct ActionNode
   파생 키워드 추가 시, 파생 키워드의 원본 키워드나 같은 원본 키워드에서 파생된 파생 키워드가 있을 경우<br />
   해당 키워드의 위력과 횟수를 덮어쓰는 방식으로 동작합니다.<br />
 
-  파생 키워드 구현 과정에서 자신의 원본 키워드와 자신의 동작을 구현하는 방법,<br />
-  버프 & 디버프 추가 시 자신과 동일한 키워드를 찾아내는 로직 구현에서 고민이 발생하였습니다.<br />
+  파생 키워드와 원본 키워드의 구현 및 관계 정리와 파생 키워드 추가 시<br />
+  자신과 동일한 원본 키워드를 찾아내는 로직 구현 방법을 결정해야 했습니다.<br />
 
 - **해결책**<br />
-
+  
 ---
 
 ## **5. 전투 시스템**
