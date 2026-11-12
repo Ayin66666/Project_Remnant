@@ -24,7 +24,7 @@ public class PlayerCharacter : CharacterBase
     /// 플레이어 - 스테이터스 세팅 기능
     /// </summary>
     /// <param name="data"></param>
-    protected override void SetupStatus(StatusDataSO data)
+    protected override void SetUpStatus(StatusDataSO data)
     {
         maxHp = data.BaseHp // 기본 체력
             + data.SyncUpData[sync].hp // 동기화 체력 
@@ -41,6 +41,10 @@ public class PlayerCharacter : CharacterBase
             + Mathf.RoundToInt(data.LevelUpData.defence * level * data.GrowthFactorData.defenceFactor);
 
         speedRange = data.SyncUpData[sync].attackSpeed;
+
+        slashGurad = data.SlashGuard;
+        pierceGuard = data.PierceGuard;
+        bluntGuard = data.BluntGuard;
 
         stagger.Clear();
         foreach (int g in data.Groggy)

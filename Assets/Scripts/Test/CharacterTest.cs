@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class CharacterTest : CharacterBase
 {
-    protected override void SetupStatus(StatusDataSO data)
+    protected override void SetUpStatus(StatusDataSO data)
     {
         throw new System.NotImplementedException();
     }

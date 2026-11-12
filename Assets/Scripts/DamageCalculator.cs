@@ -12,7 +12,7 @@ public static class DamageCalculator
     {
         // 데미지 계산 로직은 다음과 같음
         // 코인 앞면 : 1 뒷면 : 0.5
-        // (공격력 * 스킬 계수 * 치명타 배율 * 코인 배율 * 코인 파괴 여부) * 최종 데미지 증감 * 레벨 차이 증감
+        // (공격력 * 스킬 계수 * 코인 배율) * 치명타 배율 * 참관타 내성 * 코인 앞 뒷면 * 코인 파괴 여부 * 최종 데미지 증감 * 레벨 차이 증감
         // 레벨 차이 증감 = (공격력 - 방어력) / 3 = 두 수치의 차이 10당 데미지 10% 증감 (최대 ±30%)
 
 
@@ -29,20 +29,29 @@ public static class DamageCalculator
 
         // --- 이하 데미지 계산 로직 ---
 
-        // 기본 데미지
+        // 기본 데미지 (스킬 게수, 코인 배율)
         float damage = attacker.aPoint * skillValue * info.coinValue;
-
-        // 코인 파괴 여부 적용
-        damage *= (info.isBreak ? 0.25f : 1.0f);
 
         // 치명타 적용
         damage *= (info.isCritical ? attacker.critMultiplier + skillEffects.critMultiplier : 1.0f);
 
-        // 데미지 증감 적용
-        damage *= (1.0f + ((attacker.increaseDamage + skillEffects.increaseDamage) / 100f) - (defender.reductionDamage / 100f));
+        // 참관타 내성 적용
+        damage *= info.skill.attackType switch
+        {
+            AttackType.Slash => 1.0f - defender.slashGurad,
+            AttackType.Pierce => 1.0f - defender.pierceGuard,
+            AttackType.Blunt => 1.0f - defender.bluntGuard,
+            _ => 1.0f
+        };
 
         // 코인 앞 & 뒷면 적용
         damage *= (info.isFront ? 1.0f : 0.5f);
+
+        // 코인 파괴 여부 적용
+        damage *= (info.isBreak ? 0.25f : 1.0f);
+
+        // 최종 데미지 증감 적용
+        damage *= (1.0f + ((attacker.increaseDamage + skillEffects.increaseDamage) / 100f) - (defender.reductionDamage / 100f));
 
         // 레벨 차이 적용
         float step = Mathf.Clamp(1.0f + (attacker.aPoint - defender.dPoint) / 100f, 0.7f, 1.3f);

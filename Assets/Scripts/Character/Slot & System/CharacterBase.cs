@@ -43,6 +43,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     [SerializeField] protected int attack;
     [SerializeField] protected int defence;
     [SerializeField] protected int speed;
+    [SerializeField] protected float slashGurad, pierceGuard, bluntGuard;
     [SerializeField] protected Vector2Int speedRange;
     public int MaxHp => maxHp;
     public List<int> StaggerList => stagger;
@@ -122,7 +123,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     public void SetUp(StatusDataSO data, int level, int sync)
     {
         SetupData(level, sync);
-        SetupStatus(data);
+        SetUpStatus(data);
         characterUI.SetUp(this);
     }
 
@@ -140,7 +141,7 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// <summary>
     /// 스테이터스 셋팅
     /// </summary>
-    protected abstract void SetupStatus(StatusDataSO data);
+    protected abstract void SetUpStatus(StatusDataSO data);
     #endregion
 
 
@@ -324,38 +325,6 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
     /// <param name="damage"></param>
     public void TakeDamage(AttackInfo info)
     {
-        // 데미지 공식
-        // ((공격 포인트 * 모션 배율) * 치명타 배율[1.5]) * step
-        // step = 공격자의 공격 포인트 - 방어 포인트 했을 때, 얼마나 차이 나는지
-        // (3 차이 날 때마다 데미지 10% 증감)
-
-        // 크리티컬의 경우 공격 시 poise 값을 별도로 체크해서 크리티컬 체크를 해줘야 함!
-        // 크리티컬은 호흡에 영향을 받기 때문에
-        // 크리티컬 데미지의 경우 즉시 계산이 아닌 코인 회전 시 계산이 맞음
-        //float damage = info.attackPoint * info.motionValue * (info.isCritical ? info.critMultiplier : 1);
-
-
-        // 26.08.13 고민점
-        // Step 의 경우 방어자가 계산하도록 전환
-        // 기본 데미지는 공격자 데이터를 기반으로 생성됨 (Total)
-        // 버프 체크도 필요한데?
-        // A. 스킬 효과로 인한 데미지 증가
-        // B. 버프로 인한 데미지 증가
-
-        // 버프 계산
-        // 이거 어디서 so를 두고 데이터를 가져오지? enum으로 하는게 맞나?
-        // int increasedDamage = GetEffect();
-
-        // 26.08.24 생각중
-        // 버프 데이터는 이미 List에 있으니, List 내에서 특정 조건에 맞는 애만 꺼내면 되는게?
-        // 조건은? -> 어차피 스텟 버프는 무조건 StatusEffectSO 아님?
-        // 고유 효과는? -> 고민중
-
-        // 결론
-        // 스킬 뎀증은 스킬에서 데미지 반환받은 뒤에,
-        // 공격 포인트는 캐싱해두기
-        // 뎀증 효과도 동일
-
         // 피격 이벤트
         OnHit();
 
@@ -491,7 +460,11 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
             dPoint = defence + addDefencePoint,
             increaseDamage = addIncreaseDamage,
             reductionDamage = addDamageReduction,
-            critMultiplier = 1.5f
+            critMultiplier = 1.5f,
+
+            slashGurad = slashGurad,
+            bluntGuard = bluntGuard,
+            pierceGuard = pierceGuard
         };
 
         return data;
@@ -739,5 +712,8 @@ public struct StatData
     public int increaseDamage;
     public int reductionDamage;
     public float critMultiplier;
+
+    // 참관타 내성
+    public float slashGurad, pierceGuard, bluntGuard;
 }
 #endregion

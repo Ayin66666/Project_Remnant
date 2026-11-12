@@ -111,10 +111,9 @@ public class CharacterDescription : MonoBehaviour
 
 
         statusText.text = $"<sprite=1> {hp}  <sprite=2> {speed.x} - {speed.y}  <sprite=3> {attack}/{defence}";
-        for (int i = 0; i < resistText.Length; i++)
-        {
-            resistText[i].text = data.identity.master.statData.AttackResistance[i].ToString("0.0");
-        }
+        resistText[0].text = data.identity.master.statData.SlashGuard.ToString("0.0");
+        resistText[1].text = data.identity.master.statData.PierceGuard.ToString("0.0");
+        resistText[2].text = data.identity.master.statData.BluntGuard.ToString("0.0");
     }
 
     /// <summary>

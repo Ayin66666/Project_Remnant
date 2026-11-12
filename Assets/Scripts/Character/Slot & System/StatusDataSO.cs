@@ -10,11 +10,13 @@ public class StatusDataSO : ScriptableObject
     // 2. 레벨업 상승 능력치 (1렙당 체력증, 1렙당 공증, 1렙당 방증)
     // 3. 동기화 상승 능력치 (동기화 별 증가 스테이터스 수치)
 
-    [Header("---Status---")]
+    [Header("---Base Status---")]
     [SerializeField] private int baseHp;
     [SerializeField] private int baseAttackPoint;
     [SerializeField] private int baseDefencePoint;
-    [SerializeField] private List<float> attackResistance;
+    [SerializeField] private float slashGurad, pierceGuard, bluntGuard;
+
+    [Header("---Growth Data---")]
     [SerializeField] private List<int> groggy;
     [SerializeField] private GrowthFactor growthFactor;
     [SerializeField] private LevelUpStat levelUpStat;
@@ -59,7 +61,11 @@ public class StatusDataSO : ScriptableObject
     public List<int> Groggy { get { return groggy; } set { groggy = value; } }
     public int BaseAttackPoint { get { return baseAttackPoint; } set { baseAttackPoint = value; } }
     public int BaseDefencePoint { get { return baseDefencePoint; } set { baseDefencePoint = value; } }
-    public List<float> AttackResistance { get { return attackResistance; } set { attackResistance = value; } }
+    public float SlashGuard { get { return slashGurad; } set { slashGurad = value; } }
+    public float PierceGuard { get { return pierceGuard; } set { pierceGuard = value; } }
+    public float BluntGuard { get { return bluntGuard; } set { bluntGuard = value; } }
+
+
     public LevelUpStat LevelUpData { get { return levelUpStat; } set { levelUpStat = value; } }
     public List<SyncUpStat> SyncUpData { get { return syncUpData; } set { syncUpData = value; } }
     public GrowthFactor GrowthFactorData { get { return growthFactor; } set { growthFactor = value; } }
