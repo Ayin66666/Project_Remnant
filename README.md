@@ -117,18 +117,29 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   수치를 결정하는 EffectValue와 효과를 지정하는 ActionNode로 구성하였습니다.<br />
   
   ``` csharp
-  public class CoinInfoSO : ScriptableObject
+  public struct CalInfo
   {
-      [Header("---Coin Setting---")]
-      [SerializeField] private CoinType coinType;
-      // 해당 코인이 전체 데미지 중 몇 %의 데미지를 주는지
-      [SerializeField] private int damagePercent;
-      // 사용시, 적중시 같은 효과 발동 조건 데이터가 담긴 so
-      [SerializeField] private List<EffectNode> effectNodes;
+      // -> 스킬 코인 타입에 따른 데미지 계산 로직 (파불코 = 파괴 시 0.25 / 일반 1.0)
 
-      public CoinType Coin => coinType;
-      public int DamagePercent => damagePercent;
-      public List<EffectNode> EffectNodes => effectNodes;
+      [Header("---공격자 데이터---")]
+      // 공격자
+      public CharacterBase attacker;
+      // 공격 스킬
+      public SkillSO skill;
+      // 해당 코인이 주는 데미지 비율(전체 데미지 중 해당 코인이 n%의 데미지를 준다)
+      public float coinValue;
+      // 코인 앞 뒷면 여부 (앞면 : true, 뒷면 : false)
+      public bool isFront;
+      // 치명타 여부 (치명타 : true, 일반타 : false)
+      public bool isCritical;
+      // 코인 파괴 여부 (파괴 시 데미지 0.25 / 일반 1.0)
+      public bool isBreak;
+      // 데미지 계산 시 적용할 스킬 효과 List
+      public List<ActionNode> actions;
+
+      [Header("---피격자 데이터---")]
+      /// 피격자
+      public CharacterBase defender;
   }
   ```
   ``` csharp
@@ -236,13 +247,14 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   {
       // 데미지 계산 로직은 다음과 같음
       // 코인 앞면 : 1 뒷면 : 0.5
-      // (공격력 * 스킬 계수 * 치명타 배율 * 코인 배율 * 코인 파괴 여부) * 최종 데미지 증감 * 레벨 차이 증감
+      // (공격력 * 스킬 계수 * 코인 배율) * 치명타 배율 * 참관타 내성 * 코인 앞 뒷면 * 코인 파괴 여부 * 최종 데미지 증감 * 레벨 차이 증감
       // 레벨 차이 증감 = (공격력 - 방어력) / 3 = 두 수치의 차이 10당 데미지 10% 증감 (최대 ±30%)
+
 
       // 공격자 데이터 세팅
       StatData attacker = info.attacker.GetStat();
       float skillValue = info.skill.syncDatas[info.attacker.Sync].motionValue;
-    
+
       // 피격자 데이터 세팅
       StatData defender = info.defender.GetStat();
 
@@ -252,20 +264,29 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
 
       // --- 이하 데미지 계산 로직 ---
 
-      // 기본 데미지
+      // 기본 데미지 (스킬 게수, 코인 배율)
       float damage = attacker.aPoint * skillValue * info.coinValue;
-
-      // 코인 파괴 여부 적용
-      damage *= (info.isBreak ? 0.25f : 1.0f);
 
       // 치명타 적용
       damage *= (info.isCritical ? attacker.critMultiplier + skillEffects.critMultiplier : 1.0f);
 
-      // 데미지 증감 적용
-      damage *= (1.0f + ((attacker.increaseDamage + skillEffects.increaseDamage) / 100f) - (defender.reductionDamage / 100f));
+      // 참관타 내성 적용
+      damage *= info.skill.attackType switch
+      {
+          AttackType.Slash => 1.0f - defender.slashGurad,
+          AttackType.Pierce => 1.0f - defender.pierceGuard,
+          AttackType.Blunt => 1.0f - defender.bluntGuard,
+          _ => 1.0f
+      };
 
       // 코인 앞 & 뒷면 적용
       damage *= (info.isFront ? 1.0f : 0.5f);
+
+      // 코인 파괴 여부 적용
+      damage *= (info.isBreak ? 0.25f : 1.0f);
+
+      // 최종 데미지 증감 적용
+      damage *= (1.0f + ((attacker.increaseDamage + skillEffects.increaseDamage) / 100f) - (defender.reductionDamage / 100f));
 
       // 레벨 차이 적용
       float step = Mathf.Clamp(1.0f + (attacker.aPoint - defender.dPoint) / 100f, 0.7f, 1.3f);
@@ -273,19 +294,20 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
 
       // 반환 -> 데미지 음수 방지 및 최소 데미지 보정
       return Mathf.Max(1, (int)damage);
-    }
+  
+  }
   ```
 
   이때 데미지 공식에서 step(공격 & 방어 레벨 차이에 따른 데미지 증감)을 넣은 이유는<br />
-  게임 플레이 과정에서 레벨 차이로 인한 전투 난이도 차이를 구현하기 위해서입니다.<br />
+  전투 과정에서 레벨 차이로 인한 난이도 차이를 구현하기 위해서입니다.<br />
 
-  과거 프로젝트에서는 초~중반 난이도는 어렵지만,<br />
-  일정 이상 성장할 경우 전투 난이도가 너무 쉬워지는 문제가 종종 발생하였습니다.<br />
+  과거 제작했던 프로젝트의 공통점은 초~중반 난이도는 어렵지만,<br />
+  일정 이상 성장할 경우 전투 난이도가 너무 쉬워지는 문제가 자주 발생하였습니다.<br />
   
   이번 프로젝트에서는 난이도 문제를 해소하기 위해 스테이지 클리어를 위한 평균 턴 수를 결정하였습니다.<br />
   직접 플레이하며 스테이지 클리어를 위한 턴은 일반 전투 8 ~ 12턴, 보스 전투 12 ~ 19턴이 적당하다 판단하였고,<br />
   인격 레벨업 & 동기화 상승으로 유저 스펙이 올라갔을 때 유저가 성장을 체감할 수 있으면서<br />
-  전투 기믹이 무시당하지 않을 수 있는 수준을 20 ~ 30% 수준으로 판단하였습니다.<br />
+  전투 기믹이 무시당하지 않을 수 있는 턴 증감 수준을 20 ~ 30% 수준으로 판단하였습니다.<br />
 
   공격 & 방어 포인트는 인격의 레벨에 따라 상승하므로,<br />
   공격자 & 피격자의 차이를 체크하는 방식으로 난이도 조절을 진행하기로 결정하였습니다.<br />
