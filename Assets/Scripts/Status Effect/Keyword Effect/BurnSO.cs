@@ -15,9 +15,7 @@ public class BurnSO : KeywordSO
         {
             sinType = SinType.Wrath,
             attackType = AttackType.None,
-            isUseDamageCal = false,
             isCritical = false,
-            attackPoint = 0,
             damage = data.power,
         };
 

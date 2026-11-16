@@ -9,15 +9,11 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
     // 1스킬 (강화)
     [Header("---Skill Setting---")]
     [SerializeField] private List<Transform> movePos;
-    private bool isCri = false;
-
 
     // 1타 100% 데미지 비율
     protected override IEnumerator SkillAction(SkillUseData useData)
     {
         // 데미지 분배는 1타(50%) + 5타(10% x5)
-        (bool isCri, int damage) = CalCoinDamage(totalDamage, 0.5f, 0);
-        this.isCri = isCri;
 
         // 대상 바라보기
         SetFacing();
@@ -63,6 +59,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
     /// </summary>
     public void Attack1_1()
     {
+        /*
         // 이펙트 - 후려치며 폭팔하는 이펙트
         effects[0].SetActive(true);
 
@@ -81,6 +78,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
         {
             target.TakeDamage(info);
         }
+        */
     }
 
     /// <summary>
@@ -91,7 +89,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
     {
         // 이펙트 - 후폭풍
         effects[1].SetActive(true);
-
+        /*
         // 데미지 계산
         AttackInfo info = new AttackInfo()
         {
@@ -113,7 +111,7 @@ public class Skill_BlackwaterArt_Undertow : SkillBase
             // 딜레이
             yield return new WaitForSeconds(0.05f);
         }
-
+        */
         yield return new WaitWhile(() => effects[1].activeSelf == false);
     }
 }

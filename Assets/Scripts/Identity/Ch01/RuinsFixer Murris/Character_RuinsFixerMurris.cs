@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -8,6 +9,10 @@ public class Character_RuinsFixerMurris : PlayerCharacter
     [SerializeField] private EffectBaseSO CintamaniSO;
     [SerializeField] private EffectBaseSO JiaoCintamaniSO;
     [SerializeField] private GameObject fieldEffectSO; // 임시 작성 - 필드 이펙트 완성 후 재작성 필요
+
+    [Header("---Test---")]
+    [SerializeField] private CharacterBase testTarget;
+
 
     /* 구현 방식
     // 패시브 로직은 패시브 단위로 작성하는게 아니라
@@ -74,10 +79,16 @@ public class Character_RuinsFixerMurris : PlayerCharacter
             AddEffect(EffectType.JiaoCintamani, 5, -1);
         }
 
-        // 테스트
+        // 테스트 - 데미지 계산
         if (Input.GetKeyDown(KeyCode.V))
         {
+            SkillUseData data = new SkillUseData()
+            {
+                targets = new List<CharacterBase>() { testTarget },
+                isCoinDestroy = new List<bool>() { false, false }
+            };
 
+            skill1[0].Use(data);
         }
     }
 

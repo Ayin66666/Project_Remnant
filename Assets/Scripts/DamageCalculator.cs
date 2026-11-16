@@ -31,31 +31,39 @@ public static class DamageCalculator
 
         // 기본 데미지 (스킬 게수, 코인 배율)
         float damage = attacker.aPoint * skillValue * info.coinValue;
+        Debug.Log($"데미지 계산 중 :{attacker.aPoint} {skillValue} {info.coinValue} {attacker.critMultiplier} {damage}");
 
         // 치명타 적용
         damage *= (info.isCritical ? attacker.critMultiplier + skillEffects.critMultiplier : 1.0f);
+        Debug.Log($"데미지 계산 중 : {damage}");
+
 
         // 참관타 내성 적용
         damage *= info.skill.attackType switch
         {
-            AttackType.Slash => 1.0f - defender.slashGurad,
-            AttackType.Pierce => 1.0f - defender.pierceGuard,
-            AttackType.Blunt => 1.0f - defender.bluntGuard,
+            AttackType.Slash => defender.slashGurad,
+            AttackType.Pierce => defender.pierceGuard,
+            AttackType.Blunt => defender.bluntGuard,
             _ => 1.0f
         };
+        Debug.Log($"데미지 계산 중 : {damage}");
 
         // 코인 앞 & 뒷면 적용
         damage *= (info.isFront ? 1.0f : 0.5f);
+        Debug.Log($"데미지 계산 중 : {damage}");
 
         // 코인 파괴 여부 적용
         damage *= (info.isBreak ? 0.25f : 1.0f);
+        Debug.Log($"데미지 계산 중 : {damage}");
 
         // 최종 데미지 증감 적용
         damage *= (1.0f + ((attacker.increaseDamage + skillEffects.increaseDamage) / 100f) - (defender.reductionDamage / 100f));
+        Debug.Log($"데미지 계산 중 : {damage}");
 
         // 레벨 차이 적용
         float step = Mathf.Clamp(1.0f + (attacker.aPoint - defender.dPoint) / 100f, 0.7f, 1.3f);
         damage *= step;
+        Debug.Log($"데미지 계산 중 : {damage}");
 
         // 반환 -> 데미지 음수 방지 및 최소 데미지 보정
         return Mathf.Max(1, (int)damage);

@@ -35,19 +35,6 @@ public abstract class SkillBase : MonoBehaviour
 
     #region 계산 & 효과 로직
     /// <summary>
-    /// 치명타 여부 및 해당 공격의 최종 데미지 계산 후 전달
-    /// </summary>
-    /// <param name="totalDamage"></param>
-    /// <param name="percentage"></param>
-    /// <returns></returns>
-    protected (bool, int) CalCoinDamage(int totalDamage, float percentage, int coinIndex)
-    {
-        bool isCir = PoiseSO.IsCritical(character);
-        int damage = (int)((totalDamage / percentage) * (coinToss[coinIndex] ? 1 : 0.5f));
-        return (isCir, damage);
-    }
-
-    /// <summary>
     /// 동작 조건 체크 로직 (조건에 부합하다면 True, 부합하지 않다면 False 반환)
     /// </summary>
     /// <param name="condition"></param>

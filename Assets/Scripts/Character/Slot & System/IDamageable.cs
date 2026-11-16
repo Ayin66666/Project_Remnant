@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public interface IDamageable
 {
     /// <summary>
@@ -22,5 +24,30 @@ public interface IDamageable
     /// 사망 로직
     /// </summary>
     public void Die();
+}
+
+/// <summary>
+/// 계산 결과 전달용 구조체
+/// </summary>
+[System.Serializable]
+public struct AttackInfo
+{
+    [Header("---Setting---")]
+    /// <summary>
+    /// 데미지의 죄악 종류
+    /// </summary>
+    public SinType sinType;
+    /// <summary>
+    /// 공격 타입 - 참관타
+    /// </summary>
+    public AttackType attackType;
+    /// <summary>
+    /// 치명타 여부 - UI 표시용
+    /// </summary>
+    public bool isCritical;
+    /// <summary>
+    /// 공격 데미지
+    /// </summary>
+    public int damage;
 }
 

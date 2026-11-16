@@ -13,9 +13,7 @@ public class RuptureSO : KeywordSO
         {
             sinType = SinType.Lust,
             attackType = AttackType.None,
-            isUseDamageCal = false,
             isCritical = false,
-            attackPoint = 0,
             damage = data.power,
         };
 

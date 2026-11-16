@@ -328,17 +328,8 @@ public abstract class CharacterBase : MonoBehaviour, IDamageable
         // 피격 이벤트
         OnHit();
 
-        // 데미지 계산
-        int damage = Mathf.RoundToInt(info.damage * (1f + addDamageReduction * 0.1f));
-        int totalDefence = defence + addDefencePoint;
-        int diff = info.attackPoint - totalDefence;
-        int step = diff / 3;
-
-        damage = Mathf.RoundToInt(damage * (1f + step * 0.1f));
-        damage = Mathf.Max(1, damage);
-
         // 데미지 적용
-        curHp -= damage;
+        curHp -= info.damage;
         if (curHp <= 0)
         {
             curHp = 0;
