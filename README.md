@@ -20,10 +20,38 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
 - Visual Studio 2022
 - ComfyUI
 - Window 11
-
 <br />
 
 ## 주요 구현
+
+<h3><a href="#1-인격캐릭터--몬스터-1">1. 인격(캐릭터) & 몬스터</a></h3>
+
+| 제목 | 구현 내역 |
+| :---: | --- |
+| 플레이어 인격 | 플레이어 인격 2종 구현<br /> 스킬 14종 구현 (ch01 = 9개, cch02 = 5개) |
+| 몬스터 | 몬스터 4종 구현 |
+
+<h3><a href="#2-인격캐릭터-편성-1">2. 인격(캐릭터) 편성</a></h3>
+
+| 제목 | 구현 내역 |
+| :---: | --- |
+| 내용 추가 필요 | 내용 추가 필요 |
+
+<h3><a href="#3-스킬-시스템-1">3. 스킬 시스템</a></h3>
+
+| 제목 | 구현 내역 |
+| :---: | --- |
+| 스킬 시스템 | ECA 패턴 기반 스킬 데이터 구현<br /> ECA 패턴 스킬 데이터를 읽어 자동으로 설명 스크립트 작성<br /> 동기화(돌파)에 따른 스킬 강화 |
+
+<h3><a href="#4-버프--디버프-시스템-1">4. 버프 & 디버프 시스템</a></h3>
+
+| 제목 | 구현 내역 |
+| :---: | --- |
+| 공용 & 키워드 이펙트 | 공용 버프 6종(위력 증가, 데미지 증가, 공격 & 방어 포인트 증가, 코인 위력 증가, 최종 위력 증가)<br /> 키워드 버프 & 디버프 7종(화상, 출혈, 진동, 파열, 침잠, 호흡, 충전)<br /> 파생 키워드 n종(...)<br /> 캐릭터 고유 버프 & 디버프 |
+<br />
+
+---
+
 ## **1. 인격(캐릭터) & 몬스터**
 
 ### **A. 구현 정리**
@@ -56,21 +84,38 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
 
 ### **A. 구현 정리**
 
-#### ▣
--
+#### ▣ 편성창
+- 인격(캐릭터), 에고(전용 스킬) 편성창 구현
+- 편성 데이터 자동저장 구현
+
+편성 시스템 구현에서 중요하게 생각한 부분은<br />
+보유하고 있는 인격(캐릭터)와 에고(전용 스킬)의 데이터 관리,<br />
+인격 & 에고 편성 후 자동 저장, 좀 더 편리한 UI 구조 설계입니다.<br />
 
 ---
 
 ### **B. 사례**
 
-#### **▣ B-1.**
+#### **▣ B-1. 인격 & 에고 데이터 관리**
 
 - **문제점**<br />
+  캐릭터 별 인격 & 에고 데이터 분류와 필요한 데이터 로드 기능 구현<br />
+  인격 & 에고 편성 후 편성 데이터 자동 저장<br />
 
 - **고민**<br />
+  인격 편성 시스템은 플레이어가 자신이 사용할 인격과 에고를 선택하는 기능으로,<br />
+  선택한 캐릭터의 인격 & 에고 데이터만 유저에게 리스트로 보여주는 데이터 필터링과<br />
+  편성 후 자동으로 편성 데이터를 저장하는 시스템이 필요하였습니다.<br />
+
+  이때 필터링을 어떤 방식으로 구현할지, 편성 과정에서 자동 저장은<br />
+  어떤 방식으로 구현하고 저장 빈도(트리거)를 무엇으로 잡을지 고민이 발생하였습니다.<br />
 
 - **해결책**<br />
-
+  SO에 Enum으로 자신이 어떤 캐릭터의 인격 & 에고인지 표시하고,<br />
+  캐릭터의 인격 & 에고 SO를 List로 관리하는 SO로 관리 & 호출하는 방법을 선택하였습니다.<br />
+  
+  // -> 이하 작성 필요
+  
 ---
 
 ## **3. 스킬 시스템**
@@ -81,7 +126,6 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
 - ECA 패턴 기반 스킬 데이터 구현
 - ECA 패턴 스킬 데이터를 읽어 자동으로 설명 스크립트 작성
 - 동기화(돌파)에 따른 스킬 강화
-
 <br />
 
 스킬 시스템 구현에서 중요하게 고려한 부분은 데이터 & 동작 분리,<br />
@@ -117,18 +161,29 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   수치를 결정하는 EffectValue와 효과를 지정하는 ActionNode로 구성하였습니다.<br />
   
   ``` csharp
-  public class CoinInfoSO : ScriptableObject
+  public struct CalInfo
   {
-      [Header("---Coin Setting---")]
-      [SerializeField] private CoinType coinType;
-      // 해당 코인이 전체 데미지 중 몇 %의 데미지를 주는지
-      [SerializeField] private int damagePercent;
-      // 사용시, 적중시 같은 효과 발동 조건 데이터가 담긴 so
-      [SerializeField] private List<EffectNode> effectNodes;
+      // -> 스킬 코인 타입에 따른 데미지 계산 로직 (파불코 = 파괴 시 0.25 / 일반 1.0)
 
-      public CoinType Coin => coinType;
-      public int DamagePercent => damagePercent;
-      public List<EffectNode> EffectNodes => effectNodes;
+      [Header("---공격자 데이터---")]
+      // 공격자
+      public CharacterBase attacker;
+      // 공격 스킬
+      public SkillSO skill;
+      // 해당 코인이 주는 데미지 비율(전체 데미지 중 해당 코인이 n%의 데미지를 준다)
+      public float coinValue;
+      // 코인 앞 뒷면 여부 (앞면 : true, 뒷면 : false)
+      public bool isFront;
+      // 치명타 여부 (치명타 : true, 일반타 : false)
+      public bool isCritical;
+      // 코인 파괴 여부 (파괴 시 데미지 0.25 / 일반 1.0)
+      public bool isBreak;
+      // 데미지 계산 시 적용할 스킬 효과 List
+      public List<ActionNode> actions;
+
+      [Header("---피격자 데이터---")]
+      /// 피격자
+      public CharacterBase defender;
   }
   ```
   ``` csharp
@@ -236,13 +291,14 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   {
       // 데미지 계산 로직은 다음과 같음
       // 코인 앞면 : 1 뒷면 : 0.5
-      // (공격력 * 스킬 계수 * 치명타 배율 * 코인 배율 * 코인 파괴 여부) * 최종 데미지 증감 * 레벨 차이 증감
+      // (공격력 * 스킬 계수 * 코인 배율) * 치명타 배율 * 참관타 내성 * 코인 앞 뒷면 * 코인 파괴 여부 * 최종 데미지 증감 * 레벨 차이 증감
       // 레벨 차이 증감 = (공격력 - 방어력) / 3 = 두 수치의 차이 10당 데미지 10% 증감 (최대 ±30%)
+
 
       // 공격자 데이터 세팅
       StatData attacker = info.attacker.GetStat();
       float skillValue = info.skill.syncDatas[info.attacker.Sync].motionValue;
-    
+
       // 피격자 데이터 세팅
       StatData defender = info.defender.GetStat();
 
@@ -252,20 +308,29 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
 
       // --- 이하 데미지 계산 로직 ---
 
-      // 기본 데미지
+      // 기본 데미지 (스킬 게수, 코인 배율)
       float damage = attacker.aPoint * skillValue * info.coinValue;
-
-      // 코인 파괴 여부 적용
-      damage *= (info.isBreak ? 0.25f : 1.0f);
 
       // 치명타 적용
       damage *= (info.isCritical ? attacker.critMultiplier + skillEffects.critMultiplier : 1.0f);
 
-      // 데미지 증감 적용
-      damage *= (1.0f + ((attacker.increaseDamage + skillEffects.increaseDamage) / 100f) - (defender.reductionDamage / 100f));
+      // 참관타 내성 적용
+      damage *= info.skill.attackType switch
+      {
+          AttackType.Slash => 1.0f - defender.slashGurad,
+          AttackType.Pierce => 1.0f - defender.pierceGuard,
+          AttackType.Blunt => 1.0f - defender.bluntGuard,
+          _ => 1.0f
+      };
 
       // 코인 앞 & 뒷면 적용
       damage *= (info.isFront ? 1.0f : 0.5f);
+
+      // 코인 파괴 여부 적용
+      damage *= (info.isBreak ? 0.25f : 1.0f);
+
+      // 최종 데미지 증감 적용
+      damage *= (1.0f + ((attacker.increaseDamage + skillEffects.increaseDamage) / 100f) - (defender.reductionDamage / 100f));
 
       // 레벨 차이 적용
       float step = Mathf.Clamp(1.0f + (attacker.aPoint - defender.dPoint) / 100f, 0.7f, 1.3f);
@@ -273,19 +338,20 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
 
       // 반환 -> 데미지 음수 방지 및 최소 데미지 보정
       return Mathf.Max(1, (int)damage);
-    }
+  
+  }
   ```
 
   이때 데미지 공식에서 step(공격 & 방어 레벨 차이에 따른 데미지 증감)을 넣은 이유는<br />
-  게임 플레이 과정에서 레벨 차이로 인한 전투 난이도 차이를 구현하기 위해서입니다.<br />
+  전투 과정에서 레벨 차이로 인한 난이도 차이를 구현하기 위해서입니다.<br />
 
-  과거 프로젝트에서는 초~중반 난이도는 어렵지만,<br />
-  일정 이상 성장할 경우 전투 난이도가 너무 쉬워지는 문제가 종종 발생하였습니다.<br />
+  과거 제작했던 프로젝트의 공통점은 초~중반 난이도는 어렵지만,<br />
+  일정 이상 성장할 경우 전투 난이도가 너무 쉬워지는 문제가 자주 발생하였습니다.<br />
   
   이번 프로젝트에서는 난이도 문제를 해소하기 위해 스테이지 클리어를 위한 평균 턴 수를 결정하였습니다.<br />
   직접 플레이하며 스테이지 클리어를 위한 턴은 일반 전투 8 ~ 12턴, 보스 전투 12 ~ 19턴이 적당하다 판단하였고,<br />
   인격 레벨업 & 동기화 상승으로 유저 스펙이 올라갔을 때 유저가 성장을 체감할 수 있으면서<br />
-  전투 기믹이 무시당하지 않을 수 있는 수준을 20 ~ 30% 수준으로 판단하였습니다.<br />
+  전투 기믹이 무시당하지 않을 수 있는 턴 증감 수준을 20 ~ 30% 수준으로 판단하였습니다.<br />
 
   공격 & 방어 포인트는 인격의 레벨에 따라 상승하므로,<br />
   공격자 & 피격자의 차이를 체크하는 방식으로 난이도 조절을 진행하기로 결정하였습니다.<br />
@@ -482,6 +548,8 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   공용 버프 & 디버프는 EffectBaseSO를 상속받아 구현하되, 키워드는 EffectBaseSO 아래 계층을 추가하여<br />
   KeywordSO를 상속받아 Keyword_이름 형태로 구현하였습니다.<br />
 
+  <img width="932" height="432" alt="Project_Remnant_버프 디버프_플로우차트 drawio" src="https://github.com/user-attachments/assets/7881f477-806d-467c-9846-391e5398ccc4" /><br />
+  
   기본적인 버프 & 디버프의 데이터는 EffectBaseSO에서 관리하며,<br />
   KeywordSO는 자신이 파생 키워드인지, 아닌지에 대한 데이터를 가지도록 구현하였습니다.<br />
   
@@ -538,7 +606,7 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   키워드 & 파생 키워드 간 관계 및 구현 방법 결정<br />
   
 - **고민**<br />
-  파생 키워드는 해당 키워드의 기본 기능에 추가적인 효과가 더해진 버프 & 디버프입니다.<br />
+  파생 키워드는 해당 키워드의 기본 기능에 추가적인 효과가 더해진 버프 & 디버프로<br />
   파생 키워드 추가 시, 파생 키워드의 원본 키워드나 같은 원본 키워드에서 파생된 파생 키워드가 있을 경우<br />
   해당 키워드의 위력과 횟수를 덮어쓰는 방식으로 동작합니다.<br />
 
@@ -546,6 +614,49 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
   자신과 동일한 원본 키워드를 찾아내는 로직 구현 방법을 결정해야 했습니다.<br />
 
 - **해결책**<br />
+  EffectBaseSO에 KeywordType keywordType를 추가하여 자신의 베이스 키워드를 지정하고,<br />
+  키워드의 데이터 관리 방식을 Dictionary<KeywordType, EffectRuntimeData>로 구현하여<br />
+  자신의 베이스가 되는 키워드를 검색할 수 있도록 구현하였습니다.<br />
+
+  ``` csharp
+  private void AddKeyword(EffectRuntimeData data)
+  {
+      // 키워드
+      // 일반 키워드는 파생 키워드를 덮어쓰지 못함
+      // 파생 키워드는 이미 부여된 일반 & 파생 키워드가 있다면 해당 키워드를 덮어씀
+      keywordEffects.TryGetValue(data.effectSO.Keyword, out var runtimeData);
+      if (runtimeData == null)
+      {
+          // 데이터가 없다면 - 신규 데이터 추가
+          EffectRuntimeData newData = new EffectRuntimeData()
+          {
+              effectSO = data.effectSO,
+              power = data.power,
+              count = data.count
+          };
+
+          keywordEffects.Add(data.effectSO.Keyword, newData);
+          Debug.Log("키워드 신규 추가 : " + keywordEffects.ContainsKey(data.effectSO.Keyword));
+      }
+      else
+      {
+          // 데이터가 있다면 - 데이터 합산
+          if (data.effectSO is KeywordSO keyword)
+          {
+              // 파생 키워드라면 / 추가하려는 파생 키워드로 전환
+              if (keyword.IsDerived)
+                  runtimeData.effectSO = data.effectSO;
+          }
+
+          runtimeData.power = Mathf.Min(runtimeData.power + data.power, runtimeData.effectSO.MaxPower);
+          runtimeData.count = Mathf.Min(runtimeData.count + data.count, runtimeData.effectSO.MaxCount);
+      }
+  }
+  ```
+
+  또한 KeywordSO에서 bool IsDerived로 자신이 파생 키워드인지 확인할 수 있도록 하여<br />
+  데이터 추가 과정에서 파생 키워드라면 런타임 데이터의 SO를 교체하는 방식으로<br />
+  기존 키워드에서 파생 키워드로 교체하는 로직을 구현하였습니다.<br />
   
 ---
 
@@ -553,8 +664,9 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
 
 ### **A. 구현 정리**
 
-#### ▣
-- 
+#### ▣ 전투 시스템
+- 턴제 전투 시스템
+- 합 & 일방 공격
 
 ---
 
@@ -574,17 +686,34 @@ Project : Remnant는 게임 'Limbus Company'에서 모티브를 얻어 제작한
 
 ### **A. 구현 정리**
 
-#### ▣
-- 
+#### ▣ 세이브 & 로드 시스템
+- 자동 세이브 & 로드 시스템
+- 데이터 파손 시 복구 기능
 
 ---
 
 ### **B. 사례**
 
-#### **▣ B-1.**
+#### **▣ B-1.자동 세이브**
 
 - **문제점**<br />
+  자동 세이브 구현 및 시점 결정<br />
 
 - **고민**<br />
-
+  이번 프로젝트는 수집, 가챠 요소가 있는 프로젝트를 모티브로 삼은 만큼,<br />
+  스테이지 클리어나 인격 구매, 결제 등 중요한 지점에서 자동 저장이 되어야 했습니다.<br />
+  어떤 상황에서 세이브를 진행할지, 세이브 파일을 단일 혹은 다수의 Json으로 구성할지 선택해야 했습니다.<br />
+  
 - **해결책**<br />
+
+---
+
+#### **▣ B-2.데이터 로드 실패 관리**
+
+- **문제점**<br />
+  데이터 로드 실패 시 프로젝트 동작이 정지되는 문제 발생<br />
+  
+- **고민**<br />
+  
+- **해결책**<br />
+
